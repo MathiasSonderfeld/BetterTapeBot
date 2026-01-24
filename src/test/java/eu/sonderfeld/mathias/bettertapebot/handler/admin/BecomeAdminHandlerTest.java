@@ -1,7 +1,7 @@
-package eu.sonderfeld.mathias.bettertapebot.commandhandler.admin;
+package eu.sonderfeld.mathias.bettertapebot.handler.admin;
 
 import eu.sonderfeld.mathias.bettertapebot.bot.ResponseService;
-import eu.sonderfeld.mathias.bettertapebot.commandhandler.Command;
+import eu.sonderfeld.mathias.bettertapebot.handler.Command;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserEntity;
@@ -45,7 +45,7 @@ class BecomeAdminHandlerTest {
     @Test
     public void unknownSessionGetsDenied(){
         Long chatId = 1234L;
-        becomeAdminHandler.handleMessage(chatId, "testmessage");
+        becomeAdminHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
 
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
@@ -73,7 +73,7 @@ class BecomeAdminHandlerTest {
             .user(user)
             .build());
 
-        becomeAdminHandler.handleMessage(chatId, "testmessage");
+        becomeAdminHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
 
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
@@ -102,7 +102,7 @@ class BecomeAdminHandlerTest {
             .user(user)
             .build());
 
-        becomeAdminHandler.handleMessage(chatId, "testmessage");
+        becomeAdminHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
 
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
@@ -131,7 +131,7 @@ class BecomeAdminHandlerTest {
             .user(user)
             .build());
 
-        becomeAdminHandler.handleMessage(chatId, "testmessage");
+        becomeAdminHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
 
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);

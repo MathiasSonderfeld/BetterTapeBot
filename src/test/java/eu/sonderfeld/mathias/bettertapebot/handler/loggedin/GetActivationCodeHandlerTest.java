@@ -1,10 +1,8 @@
-package eu.sonderfeld.mathias.bettertapebot.commandhandler.loggedin;
+package eu.sonderfeld.mathias.bettertapebot.handler.loggedin;
 
 import eu.sonderfeld.mathias.bettertapebot.bot.ResponseService;
-import eu.sonderfeld.mathias.bettertapebot.commandhandler.Command;
-import eu.sonderfeld.mathias.bettertapebot.repository.UserRepository;
+import eu.sonderfeld.mathias.bettertapebot.handler.Command;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
-import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserEntity;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
 import eu.sonderfeld.mathias.bettertapebot.util.TestcontainersConfiguration;
@@ -22,30 +20,27 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({TestcontainersConfiguration.class, GetAllUsersHandler.class})
-class GetAllUsersHandlerTest {
+@Import({TestcontainersConfiguration.class, GetActivationCodeHandler.class})
+class GetActivationCodeHandlerTest {
     
     @Autowired
-    GetAllUsersHandler getAllUsersHandler;
+    GetActivationCodeHandler getActivationCodeHandler;
     
     @MockitoSpyBean
     UserStateRepository userStateRepository;
-    
-    @MockitoSpyBean
-    UserRepository userRepository;
     
     @MockitoBean
     ResponseService responseService;
     
     @Test
     public void registersForCorrectCommand(){
-        assertThat(getAllUsersHandler.forCommand()).isEqualTo(Command.USERS);
+        assertThat(getActivationCodeHandler.forCommand()).isEqualTo(Command.CODE);
     }
     
     @Test
-    public void unknownUserGetsDenied(){
+    public void notLoggedInUserGetsDenied(){
         Long chatId = 1234L;
-        getAllUsersHandler.handleMessage(chatId, "testmessage");
+        getActivationCodeHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
@@ -55,35 +50,19 @@ class GetAllUsersHandlerTest {
             .hasSize(1)
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
-            .contains("Nur eingeloggte User können andere User sehen");
+            .contains("Nur eingeloggte User können Codes erzeugen");
     }
     
     @Test
-    public void loggedInUserGetsAllUsers(){
+    public void loggedInUserGetsCode(){
         Long chatId = 2345L;
-        var user1 = userRepository.save(UserEntity.builder()
-            .username("user1")
-            .pin("1234")
-            .build());
-        
-        var user2 = userRepository.save(UserEntity.builder()
-            .username("user2")
-            .pin("1234")
-            .build());
-        
-        var user3 = userRepository.save(UserEntity.builder()
-            .username("user3")
-            .pin("1234")
-            .build());
         
         userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
             .userState(UserState.LOGGED_IN)
-            .user(user1)
             .build());
         
-        getAllUsersHandler.handleMessage(chatId, "testmessage");
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        getActivationCodeHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
@@ -93,7 +72,6 @@ class GetAllUsersHandlerTest {
             .hasSize(1)
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
-            .contains("Folgende User sind registriert:")
-            .contains(user1.getUsername(), user2.getUsername(), user3.getUsername());
+            .contains("Der aktuelle Freischaltcode lautet");
     }
 }

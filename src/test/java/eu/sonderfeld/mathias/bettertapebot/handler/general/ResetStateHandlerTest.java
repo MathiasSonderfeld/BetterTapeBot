@@ -1,7 +1,7 @@
-package eu.sonderfeld.mathias.bettertapebot.commandhandler.loggedin;
+package eu.sonderfeld.mathias.bettertapebot.handler.general;
 
 import eu.sonderfeld.mathias.bettertapebot.bot.ResponseService;
-import eu.sonderfeld.mathias.bettertapebot.commandhandler.Command;
+import eu.sonderfeld.mathias.bettertapebot.handler.Command;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
@@ -20,11 +20,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({TestcontainersConfiguration.class, GetActivationCodeHandler.class})
-class GetActivationCodeHandlerTest {
+@Import({TestcontainersConfiguration.class, ResetStateHandler.class})
+class ResetStateHandlerTest {
     
     @Autowired
-    GetActivationCodeHandler getActivationCodeHandler;
+    ResetStateHandler resetStateHandler;
     
     @MockitoSpyBean
     UserStateRepository userStateRepository;
@@ -34,13 +34,13 @@ class GetActivationCodeHandlerTest {
     
     @Test
     public void registersForCorrectCommand(){
-        assertThat(getActivationCodeHandler.forCommand()).isEqualTo(Command.CODE);
+        assertThat(resetStateHandler.forCommand()).isEqualTo(Command.RESET);
     }
     
     @Test
-    public void notLoggedInUserGetsDenied(){
+    public void unknownChatGetsSkipped(){
         Long chatId = 1234L;
-        getActivationCodeHandler.handleMessage(chatId, "testmessage");
+        resetStateHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
@@ -50,11 +50,11 @@ class GetActivationCodeHandlerTest {
             .hasSize(1)
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
-            .contains("Nur eingeloggte User können Codes erzeugen");
+            .contains("chat unbekannt, kein reset nötig");
     }
     
     @Test
-    public void loggedInUserGetsCode(){
+    public void chatGetsReset(){
         Long chatId = 2345L;
         
         userStateRepository.save(UserStateEntity.builder()
@@ -62,7 +62,7 @@ class GetActivationCodeHandlerTest {
             .userState(UserState.LOGGED_IN)
             .build());
         
-        getActivationCodeHandler.handleMessage(chatId, "testmessage");
+        resetStateHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
@@ -72,6 +72,9 @@ class GetActivationCodeHandlerTest {
             .hasSize(1)
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
-            .contains("Der aktuelle Freischaltcode lautet");
+            .contains("Chat wurde zurückgesetzt");
+        
+        var expected = userStateRepository.findById(chatId);
+        assertThat(expected).isNotNull().isEmpty();
     }
 }

@@ -9,7 +9,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum UserState {
-    FIRST_TIME_ON_SERVER(StateLevel.NONE),
     LOGGED_OUT(StateLevel.NONE),
 
     // Registered user branch
@@ -32,18 +31,9 @@ public enum UserState {
     // Admin
     ADMIN(StateLevel.ADMIN),
     GET_INPUT(StateLevel.ADMIN),
-    CONFIRM_INPUT(StateLevel.ADMIN),
-
-    // Other
-    ERROR_RETRIEVING_STATE(StateLevel.NONE);
+    CONFIRM_INPUT(StateLevel.ADMIN);
 
     StateLevel stateLevel;
-
-
-
-    public enum StateLevel {
-        NONE, LOGGEDIN, ADMIN
-    }
 
     public boolean isLoggedIn(){
         return isAdmin() || this.stateLevel == StateLevel.LOGGEDIN;
@@ -51,5 +41,9 @@ public enum UserState {
 
     public boolean isAdmin() {
         return this.stateLevel == StateLevel.ADMIN;
+    }
+    
+    public enum StateLevel {
+        NONE, LOGGEDIN, ADMIN
     }
 }

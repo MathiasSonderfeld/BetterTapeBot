@@ -1,13 +1,14 @@
-package eu.sonderfeld.mathias.bettertapebot.commandhandler.general;
+package eu.sonderfeld.mathias.bettertapebot.handler.general;
 
 import eu.sonderfeld.mathias.bettertapebot.bot.ResponseService;
-import eu.sonderfeld.mathias.bettertapebot.commandhandler.Command;
-import eu.sonderfeld.mathias.bettertapebot.commandhandler.CommandHandler;
+import eu.sonderfeld.mathias.bettertapebot.handler.Command;
+import eu.sonderfeld.mathias.bettertapebot.handler.CommandHandler;
 import eu.sonderfeld.mathias.bettertapebot.properties.BotProperties;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -24,12 +25,12 @@ public class GetDsgvoHandler implements CommandHandler {
     BotProperties botProperties;
 
     @Override
-    public Command forCommand() {
+    public @NonNull Command forCommand() {
         return Command.DSGVO;
     }
 
     @Override
-    public void handleMessage(long chatId, String message) {
+    public void handleCommand(long chatId, String message) {
         try {
             var dsgoFile = Thread.currentThread().getContextClassLoader()
                 .getResource(botProperties.getDsgvoResourceName());

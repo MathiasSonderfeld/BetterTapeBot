@@ -1,8 +1,10 @@
-package eu.sonderfeld.mathias.bettertapebot.commandhandler.general;
+package eu.sonderfeld.mathias.bettertapebot.handler.loggedin;
 
 import eu.sonderfeld.mathias.bettertapebot.bot.ResponseService;
-import eu.sonderfeld.mathias.bettertapebot.commandhandler.Command;
+import eu.sonderfeld.mathias.bettertapebot.handler.Command;
+import eu.sonderfeld.mathias.bettertapebot.repository.UserRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
+import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserEntity;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
 import eu.sonderfeld.mathias.bettertapebot.util.TestcontainersConfiguration;
@@ -20,27 +22,30 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({TestcontainersConfiguration.class, ResetStateHandler.class})
-class ResetStateHandlerTest {
+@Import({TestcontainersConfiguration.class, GetAllUsersHandler.class})
+class GetAllUsersHandlerTest {
     
     @Autowired
-    ResetStateHandler resetStateHandler;
+    GetAllUsersHandler getAllUsersHandler;
     
     @MockitoSpyBean
     UserStateRepository userStateRepository;
+    
+    @MockitoSpyBean
+    UserRepository userRepository;
     
     @MockitoBean
     ResponseService responseService;
     
     @Test
     public void registersForCorrectCommand(){
-        assertThat(resetStateHandler.forCommand()).isEqualTo(Command.RESET);
+        assertThat(getAllUsersHandler.forCommand()).isEqualTo(Command.USERS);
     }
     
     @Test
-    public void unknownChatGetsSkipped(){
+    public void unknownUserGetsDenied(){
         Long chatId = 1234L;
-        resetStateHandler.handleMessage(chatId, "testmessage");
+        getAllUsersHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
@@ -50,19 +55,35 @@ class ResetStateHandlerTest {
             .hasSize(1)
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
-            .contains("chat unbekannt, kein reset nötig");
+            .contains("Nur eingeloggte User können andere User sehen");
     }
     
     @Test
-    public void chatGetsReset(){
+    public void loggedInUserGetsAllUsers(){
         Long chatId = 2345L;
+        var user1 = userRepository.save(UserEntity.builder()
+            .username("user1")
+            .pin("1234")
+            .build());
+        
+        var user2 = userRepository.save(UserEntity.builder()
+            .username("user2")
+            .pin("1234")
+            .build());
+        
+        var user3 = userRepository.save(UserEntity.builder()
+            .username("user3")
+            .pin("1234")
+            .build());
         
         userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
             .userState(UserState.LOGGED_IN)
+            .user(user1)
             .build());
         
-        resetStateHandler.handleMessage(chatId, "testmessage");
+        getAllUsersHandler.handleCommand(chatId, "testmessage");
+        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
@@ -72,9 +93,7 @@ class ResetStateHandlerTest {
             .hasSize(1)
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
-            .contains("Chat wurde zurückgesetzt");
-        
-        var expected = userStateRepository.findById(chatId);
-        assertThat(expected).isNotNull().isEmpty();
+            .contains("Folgende User sind registriert:")
+            .contains(user1.getUsername(), user2.getUsername(), user3.getUsername());
     }
 }

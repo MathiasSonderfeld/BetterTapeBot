@@ -9,7 +9,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
@@ -21,7 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringJUnitConfig
-class ResponseServiceTest {
+class ResponseServiceTest { //TODO adopt test to changed keyboad behaviour
 
     BotProperties botProperties;
     TelegramClient telegramClient;
@@ -108,7 +108,7 @@ class ResponseServiceTest {
     @SneakyThrows
     void testKeyboardGetsOnlyAddedToFirstMessage() {
         botProperties.getTelegram().setMessageLengthLimit(11);
-        responseService.send(1, "testmessageverylong", new ReplyKeyboardRemove(true));
+        responseService.send(1, new ReplyKeyboardMarkup(List.of()), "testmessageverylong");
         Awaitility.await().atMost(Duration.ofSeconds(3)).untilAsserted(() -> {
             ArgumentCaptor<SendMessage> captor = ArgumentCaptor.forClass(SendMessage.class);
             Mockito.verify(telegramClient, Mockito.times(2)).execute(captor.capture());

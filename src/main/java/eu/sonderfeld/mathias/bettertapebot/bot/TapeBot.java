@@ -1,8 +1,13 @@
 package eu.sonderfeld.mathias.bettertapebot.bot;
 
-import eu.sonderfeld.mathias.bettertapebot.commandhandler.Command;
-import eu.sonderfeld.mathias.bettertapebot.commandhandler.CommandHandler;
+import eu.sonderfeld.mathias.bettertapebot.handler.Command;
+import eu.sonderfeld.mathias.bettertapebot.handler.CommandHandler;
+import eu.sonderfeld.mathias.bettertapebot.handler.StateHandler;
 import eu.sonderfeld.mathias.bettertapebot.properties.BotProperties;
+import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
+import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
+import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
+import eu.sonderfeld.mathias.bettertapebot.util.MessageCleaner;
 import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.CustomLog;
@@ -14,12 +19,15 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
 import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
+import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.util.Collection;
+import java.util.EnumMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Component
 @CustomLog
@@ -29,15 +37,31 @@ import java.util.stream.Collectors;
 public class TapeBot implements SpringLongPollingBot, LongPollingSingleThreadUpdateConsumer {
 
     BotProperties botProperties;
+    ResponseService responseService;
+    UserStateRepository userStateRepository;
+    
     Set<CommandHandler> commandHandlers;
+    Set<StateHandler> stateHandlers;
 
     @NonFinal
     Map<Command, CommandHandler> commandHandlerMap;
-
+    
+    @NonFinal
+    Map<UserState, StateHandler> stateHandlerMap;
+    
     @PostConstruct
-    private void postconstruct(){
-        commandHandlerMap = commandHandlers.stream()
-            .collect(Collectors.toMap(CommandHandler::forCommand, Function.identity()));
+    private void postConstruct(){
+        commandHandlerMap = new EnumMap<>(Command.class);
+        for (CommandHandler commandHandler : commandHandlers) {
+            commandHandlerMap.put(commandHandler.forCommand(), commandHandler);
+        }
+        
+        stateHandlerMap = new EnumMap<>(UserState.class);
+        for (StateHandler stateHandler : stateHandlers) {
+            for (UserState userState : stateHandler.forStates()) {
+                stateHandlerMap.put(userState, stateHandler);
+            }
+        }
     }
 
     @Override
@@ -54,31 +78,51 @@ public class TapeBot implements SpringLongPollingBot, LongPollingSingleThreadUpd
     public void consume(Update update) {
 
         if(!update.hasMessage() || !update.getMessage().hasText()){
-            log.warn("update was ignored {}", update);
+            log.warn("update was ignored as it has no messsage for chatid {} - {}", update.getMessage().getChatId(), update);
             return;
         }
 
         long chatId = update.getMessage().getChatId();
         String receivedText = update.getMessage().getText();
-        String commandText = update.getMessage().getEntities().getFirst().getText();
-
-
-//
-//        // If input is stateless command
-//        Handler commandHandler = CommandHandlerFactory.getCommandHandler(receivedText);
-//        if (commandHandler != null) {
-//            commandHandler.handle(context);
-//            return;
-//        }
-//
-//        // Else input belongs to current state
-//        Handler handler;
-//        try {
-//            handler = StateHandlerFactory.getStateHandler(context);
-//        } catch (ApplicationException e) {
-//            e.handle(context);
-//            return;
-//        }
-//        handler.handle(context);
+        String botCommand = Optional.ofNullable(update.getMessage().getEntities())
+            .stream().flatMap(Collection::stream)
+            .filter(e -> Objects.equals("bot_command", e.getType()))
+            .findFirst()
+            .map(MessageEntity::getText)
+            .orElse(null);
+        Command command = Command.fromCommandString(botCommand);
+        
+        //if command is unknown, reject it
+        if(botCommand != null && command == null){
+            responseService.send(chatId, null, "ungültiger bot-befehl, benutze " + Command.HELP.getCommand() + " für eine Liste der möglichen Befehle");
+            return;
+        }
+        
+        //if command is known, process it
+        if(command != null){
+            receivedText = MessageCleaner.removeCommand(receivedText, command);
+            var handler = commandHandlerMap.get(command);
+            if(handler == null){
+                log.error("missing handler for registered command {}", botCommand);
+            }
+            else {
+                handler.handleCommand(chatId, receivedText);
+            }
+            return;
+        }
+        
+        //no command was given, processing based on state
+        var state = userStateRepository.findById(chatId);
+        if(state.isEmpty()){
+            return;
+        }
+        UserStateEntity userStateEntity = state.get();
+        var handler = stateHandlerMap.get(userStateEntity.getUserState());
+        if(handler == null){
+            log.error("missing handler for state {}, ignoring message", userStateEntity.getUserState());
+        }
+        else {
+            handler.handleMessage(chatId, receivedText);
+        }
     }
 }

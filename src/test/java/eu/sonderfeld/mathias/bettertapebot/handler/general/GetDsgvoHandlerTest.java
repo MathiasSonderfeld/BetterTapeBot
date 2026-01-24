@@ -1,7 +1,7 @@
-package eu.sonderfeld.mathias.bettertapebot.commandhandler.general;
+package eu.sonderfeld.mathias.bettertapebot.handler.general;
 
 import eu.sonderfeld.mathias.bettertapebot.bot.ResponseService;
-import eu.sonderfeld.mathias.bettertapebot.commandhandler.Command;
+import eu.sonderfeld.mathias.bettertapebot.handler.Command;
 import eu.sonderfeld.mathias.bettertapebot.properties.BotProperties;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ class GetDsgvoHandlerTest {
 
     @Test
     void respondsWithDsgvo() {
-        getDsgvoHandler.handleMessage(1L, "");
+        getDsgvoHandler.handleCommand(1L, "");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(1L), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -49,7 +49,7 @@ class GetDsgvoHandlerTest {
     void brokenConfigMeansNoResponse() {
         var before = botProperties.getDsgvoResourceName();
         botProperties.setDsgvoResourceName("invalidFile");
-        getDsgvoHandler.handleMessage(1L, "");
+        getDsgvoHandler.handleCommand(1L, "");
         Mockito.verifyNoInteractions(responseService);
         botProperties.setDsgvoResourceName(before);
     }

@@ -1,7 +1,7 @@
-package eu.sonderfeld.mathias.bettertapebot.commandhandler.general;
+package eu.sonderfeld.mathias.bettertapebot.handler.general;
 
 import eu.sonderfeld.mathias.bettertapebot.bot.ResponseService;
-import eu.sonderfeld.mathias.bettertapebot.commandhandler.Command;
+import eu.sonderfeld.mathias.bettertapebot.handler.Command;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
@@ -43,7 +43,7 @@ class GetHelpHandlerTest {
     @Test
     public void unknownUsersGetGeneralHelpOnly(){
         Long chatId = 1234L;
-        getHelpHandler.handleMessage(chatId, "testmessage");
+        getHelpHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
 
         var expected = Arrays.stream(Command.values())
@@ -76,7 +76,7 @@ class GetHelpHandlerTest {
             .userState(UserState.LOGGED_IN)
             .build());
         
-        getHelpHandler.handleMessage(chatId, "testmessage");
+        getHelpHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
 
         var expected = Arrays.stream(Command.values())
@@ -109,7 +109,7 @@ class GetHelpHandlerTest {
             .userState(UserState.ADMIN)
             .build());
         
-        getHelpHandler.handleMessage(chatId, "testmessage");
+        getHelpHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
         var expected = Arrays.stream(Command.values())
