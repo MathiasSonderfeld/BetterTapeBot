@@ -1,0 +1,16 @@
+package eu.sonderfeld.mathias.bettertapebot.repository;
+
+import eu.sonderfeld.mathias.bettertapebot.repository.entity.TapeEntity;
+import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.UUID;
+
+@Repository
+public interface TapeRepository extends JpaRepository<TapeEntity, UUID> {
+
+    List<TapeEntity> findAllByAuthor(UserEntity userEntity);
+    List<TapeEntity> findAllByStar(UserEntity userEntity);
+}

@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: BetterTapeBot
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tapebot
+    username: postgres
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: validate
+better-tape-bot:
+  telegram:
+    token: "SECRET"

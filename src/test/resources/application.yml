@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: BetterTapeBot
+better-tape-bot:
+  telegram:
+    token: "TEST_TOKEN"
