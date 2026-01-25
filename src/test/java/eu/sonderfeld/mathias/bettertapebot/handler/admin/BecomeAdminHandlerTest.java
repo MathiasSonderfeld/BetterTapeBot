@@ -70,7 +70,7 @@ class BecomeAdminHandlerTest {
         var state = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
             .userState(UserState.ADMIN)
-            .user(user)
+            .owner(user)
             .build());
 
         becomeAdminHandler.handleCommand(chatId, "testmessage");
@@ -99,7 +99,7 @@ class BecomeAdminHandlerTest {
         var state = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
             .userState(UserState.LOGGED_IN)
-            .user(user)
+            .owner(user)
             .build());
 
         becomeAdminHandler.handleCommand(chatId, "testmessage");
@@ -128,7 +128,7 @@ class BecomeAdminHandlerTest {
         var state = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
             .userState(UserState.LOGGED_IN)
-            .user(user)
+            .owner(user)
             .build());
 
         becomeAdminHandler.handleCommand(chatId, "testmessage");

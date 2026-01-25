@@ -27,7 +27,7 @@ public class UserStateEntity {
     UserState userState;
 
     @ManyToOne
-    @JoinColumn(name = "username", referencedColumnName = "username")
+    @JoinColumn(name = "owner", referencedColumnName = "username")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    UserEntity user;
+    UserEntity owner;
 }

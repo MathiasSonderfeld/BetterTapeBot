@@ -46,7 +46,7 @@ public class BecomeAdminHandler implements CommandHandler {
             responseService.send(chatId, "Du bist bereits im Admin-Modus, /help für Befehle");
             return;
         }
-        var user = userStateEntity.getUser();
+        var user = userStateEntity.getOwner();
         if(!user.getIsAdmin()){
             responseService.send(chatId, "Du bist kein Admin");
             return;

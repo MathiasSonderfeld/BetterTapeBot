@@ -7,6 +7,7 @@ import eu.sonderfeld.mathias.bettertapebot.handler.StateHandler;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
+import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.CustomLog;
@@ -40,7 +41,14 @@ public class BroadcastHandler implements CommandHandler, StateHandler { //TODO i
     @Override
     @Transactional
     public void handleCommand(long chatId, String message) {
-    
+        var state = userStateRepository.findById(chatId);
+        var knownAndAdmin = state.map(UserStateEntity::getUserState)
+            .map(UserState::isAdmin)
+            .orElse(false);
+        if(!knownAndAdmin){
+            responseService.send(chatId, "Nur Admins können broadcasten");
+            return;
+        }
     }
     
     @Override

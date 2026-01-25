@@ -79,7 +79,7 @@ class GetAllUsersHandlerTest {
         userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
             .userState(UserState.LOGGED_IN)
-            .user(user1)
+            .owner(user1)
             .build());
         
         getAllUsersHandler.handleCommand(chatId, "testmessage");

@@ -25,7 +25,7 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class LoginHandler implements CommandHandler, StateHandler { //TODO add support for single message login
+public class LoginHandler implements CommandHandler, StateHandler {
 
     ResponseService responseService;
     UserStateRepository userStateRepository;
@@ -50,7 +50,7 @@ public class LoginHandler implements CommandHandler, StateHandler { //TODO add s
             .map(UserState::isLoggedIn)
             .orElse(false);
         if(alreadyLoggedIn){
-            responseService.send(chatId, "du bist schon eingeloggt als " + state.get().getUser().getUsername());
+            responseService.send(chatId, "du bist schon eingeloggt als " + state.get().getOwner().getUsername());
             return;
         }
         
@@ -88,7 +88,7 @@ public class LoginHandler implements CommandHandler, StateHandler { //TODO add s
         }
         
         var pin = MessageCleaner.getFirstWord(message);
-        var userEntity = userStateEntity.getUser();
+        var userEntity = userStateEntity.getOwner();
         
         if(Objects.equals(pin, userEntity.getPin())){
             userStateEntity.setUserState(UserState.LOGGED_IN);
@@ -101,7 +101,7 @@ public class LoginHandler implements CommandHandler, StateHandler { //TODO add s
     
     private void verifyAndSetUsername(long chatId, String username, UserStateEntity userStateEntity){
         //if user is already correctly assigned, we can move on with PIN validation
-        if(userStateEntity.getUser() != null && Objects.equals(username, userStateEntity.getUser().getUsername())){
+        if(userStateEntity.getOwner() != null && Objects.equals(username, userStateEntity.getOwner().getUsername())){
             requestPin(chatId, userStateEntity);
             return;
         }
@@ -112,7 +112,7 @@ public class LoginHandler implements CommandHandler, StateHandler { //TODO add s
             return;
         }
         var userEntity = userEntityOptional.get();
-        userStateEntity.setUser(userEntity);
+        userStateEntity.setOwner(userEntity);
         requestPin(chatId, userStateEntity);
     }
     

@@ -32,14 +32,11 @@ public class GetMeHandler implements CommandHandler {
         var state = userStateRepository.findById(chatId);
         if(state.isEmpty()){
             responseService.send(chatId, String.format("chatId: %d, keine weiteren daten zu dem chat gefunden", chatId));
-            if(log.isDebugEnabled()){
-                log.debug("could not find userstate for chatId {}", chatId);
-            }
             return;
         }
 
         var userState = state.get();
-        var username = userState.getUser().getUsername();
+        var username = userState.getOwner().getUsername();
         var stateName = userState.getUserState().name();
 
         responseService.send(chatId, String.format("chatId: %d, username: %s, user state: %s", chatId, username, stateName));

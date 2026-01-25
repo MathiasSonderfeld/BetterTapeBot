@@ -1,148 +1,16 @@
 databaseChangeLog:
-  - changeSet:
-      id: 1
-      author: MathiasSonderfeld
-      changes:
-        - createTable:
-            tableName: users
-            columns:
-              - column:
-                  name: username
-                  type: VARCHAR(255)
-                  constraints:
-                    primaryKey: true
-                    primaryKeyName: pk_users_username
-              - column:
-                  name: pin
-                  type: VARCHAR(4)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: is_admin
-                  type: BOOLEAN
-                  defaultValueBoolean: false
-              - column:
-                  name: wants_abonnement
-                  type: BOOLEAN
-                  defaultValueBoolean: true
-  - changeSet:
-      id: 2
-      author: MathiasSonderfeld
-      changes:
-        - createTable:
-            tableName: tapes
-            columns:
-              - column:
-                  name: id
-                  type: UUID
-                  constraints:
-                    primaryKey: true
-                    primaryKeyName: pk_tapes_id
-              - column:
-                  name: title
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: author
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: star
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: date_added
-                  type: TIMESTAMP WITH TIME ZONE
-  - changeSet:
-      id: 3
-      author: MathiasSonderfeld
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: tapes
-            baseColumnNames: author
-            constraintName: fk_tapes_author
-            referencedTableName: users
-            referencedColumnNames: username
-  - changeSet:
-      id: 4
-      author: MathiasSonderfeld
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: tapes
-            baseColumnNames: star
-            constraintName: fk_tapes_star
-            referencedTableName: users
-            referencedColumnNames: username
-  - changeSet:
-      id: 5
-      author: MathiasSonderfeld
-      changes:
-        - createTable:
-            tableName: user_states
-            columns:
-              - column:
-                  name: chat_id
-                  type: BIGINT
-                  constraints:
-                    primaryKey: true
-                    primaryKeyName: pk_user_states_chat_id
-              - column:
-                  name: user_state
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: username
-                  type: VARCHAR(255)
-  - changeSet:
-      id: 6
-      author: MathiasSonderfeld
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: user_states
-            baseColumnNames: username
-            constraintName: fk_user_states_username
-            referencedTableName: users
-            referencedColumnNames: username
-            onDelete: CASCADE
-  - changeSet:
-      id: 7
-      author: MathiasSonderfeld
-      changes:
-        - sql:
-            dbms: mysql
-            sql: |
-              CREATE TRIGGER before_user_delete
-              BEFORE DELETE ON users
-              FOR EACH ROW
-              BEGIN
-                UPDATE tapes
-                SET title = 'deleted', for_username = 'deleted'
-                WHERE for_username = OLD.username;
-
-                UPDATE tapes
-                SET by_username = 'deleted'
-                WHERE by_username = OLD.username;
-              END
-  - changeSet:
-      id: 8
-      author: MathiasSonderfeld
-      changes:
-        - insert:
-            tableName: users
-            columns:
-              - column:
-                  name: username
-                  value: deleted
-              - column:
-                  name: pin
-                  value: xxxx
-              - column:
-                  name: is_admin
-                  valueBoolean: "false"
-              - column:
-                  name: wants_abonnement
-                  valueBoolean: "false"
+  - include:
+      file: db.changelog-create-users-table.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: db.changelog-create-tapes-table.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: db.changelog-create-user-states-table.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: db.changelog-add-deleted-user.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: db.changelog-create-before-user-delete-trigger.yaml
+      relativeToChangelogFile: true

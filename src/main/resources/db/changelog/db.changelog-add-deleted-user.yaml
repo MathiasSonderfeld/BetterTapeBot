@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-user-deleted-to-users-table
+      author: MathiasSonderfeld
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: deleted
+              - column:
+                  name: pin
+                  value: xxxx
+              - column:
+                  name: is_admin
+                  valueBoolean: "false"
+              - column:
+                  name: wants_abonnement
+                  valueBoolean: "false"

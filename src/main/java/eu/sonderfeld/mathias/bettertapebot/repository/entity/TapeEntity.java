@@ -27,8 +27,8 @@ public class TapeEntity {
     String title;
 
     @ManyToOne
-    @JoinColumn(name = "author", referencedColumnName = "username", nullable = false)
-    UserEntity author;
+    @JoinColumn(name = "director", referencedColumnName = "username", nullable = false)
+    UserEntity director;
 
     @ManyToOne
     @JoinColumn(name = "star", referencedColumnName = "username", nullable = false)

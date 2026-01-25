@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-before-user-delete-trigger
+      author: MathiasSonderfeld
+      changes:
+        - sql:
+            dbms: mysql
+            sql: |
+              CREATE TRIGGER before_user_delete
+              BEFORE DELETE ON users
+              FOR EACH ROW
+              BEGIN
+                UPDATE tapes
+                SET title = 'deleted', for_username = 'deleted'
+                WHERE for_username = OLD.username;
+
+                UPDATE tapes
+                SET by_username = 'deleted'
+                WHERE by_username = OLD.username;
+              END

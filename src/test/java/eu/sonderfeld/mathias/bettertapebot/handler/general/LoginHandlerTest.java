@@ -63,7 +63,7 @@ class LoginHandlerTest {
         
         userStateRepository.save(UserStateEntity.builder()
             .userState(state)
-            .user(userEntity)
+            .owner(userEntity)
             .chatId(chatId)
             .build());
         
@@ -94,7 +94,7 @@ class LoginHandlerTest {
         
         userStateRepository.save(UserStateEntity.builder()
             .userState(userState)
-            .user(userEntity)
+            .owner(userEntity)
             .chatId(chatId)
             .build());
         
@@ -116,7 +116,7 @@ class LoginHandlerTest {
             .isEqualTo(UserState.LOGIN_VALIDATE_PIN);
         
         assertThat(updatedState).isNotEmpty().get()
-            .extracting(UserStateEntity::getUser).isNotNull()
+            .extracting(UserStateEntity::getOwner).isNotNull()
             .extracting(UserEntity::getUsername)
             .isEqualTo(username);
     }
@@ -139,7 +139,7 @@ class LoginHandlerTest {
         
         userStateRepository.save(UserStateEntity.builder()
             .userState(userState)
-            .user(oldEntity)
+            .owner(oldEntity)
             .chatId(chatId)
             .build());
         
@@ -161,7 +161,7 @@ class LoginHandlerTest {
             .isEqualTo(UserState.LOGIN_VALIDATE_PIN);
         
         assertThat(updatedState).isNotEmpty().get()
-            .extracting(UserStateEntity::getUser).isNotNull()
+            .extracting(UserStateEntity::getOwner).isNotNull()
             .extracting(UserEntity::getUsername)
             .isEqualTo(username);
     }
@@ -179,7 +179,7 @@ class LoginHandlerTest {
         
         userStateRepository.save(UserStateEntity.builder()
             .userState(userState)
-            .user(userEntity)
+            .owner(userEntity)
             .chatId(chatId)
             .build());
         
@@ -201,7 +201,7 @@ class LoginHandlerTest {
             .isEqualTo(UserState.LOGIN_VALIDATE_USERNAME);
         
         assertThat(updatedState).isNotEmpty().get()
-            .extracting(UserStateEntity::getUser).isNotNull()
+            .extracting(UserStateEntity::getOwner).isNotNull()
             .extracting(UserEntity::getUsername)
             .isEqualTo(username);
     }
@@ -219,7 +219,7 @@ class LoginHandlerTest {
         
         userStateRepository.save(UserStateEntity.builder()
             .userState(userState)
-            .user(userEntity)
+            .owner(userEntity)
             .chatId(chatId)
             .build());
         
@@ -241,7 +241,7 @@ class LoginHandlerTest {
             .isEqualTo(UserState.LOGIN_VALIDATE_PIN);
         
         assertThat(updatedState).isNotEmpty().get()
-            .extracting(UserStateEntity::getUser).isNotNull()
+            .extracting(UserStateEntity::getOwner).isNotNull()
             .extracting(UserEntity::getUsername)
             .isEqualTo(username);
     }
@@ -264,7 +264,7 @@ class LoginHandlerTest {
         
         userStateRepository.save(UserStateEntity.builder()
             .userState(userState)
-            .user(oldEntity)
+            .owner(oldEntity)
             .chatId(chatId)
             .build());
         
@@ -286,7 +286,7 @@ class LoginHandlerTest {
             .isEqualTo(UserState.LOGIN_VALIDATE_PIN);
         
         assertThat(updatedState).isNotEmpty().get()
-            .extracting(UserStateEntity::getUser).isNotNull()
+            .extracting(UserStateEntity::getOwner).isNotNull()
             .extracting(UserEntity::getUsername)
             .isEqualTo(username);
     }
@@ -305,7 +305,7 @@ class LoginHandlerTest {
         
         userStateRepository.save(UserStateEntity.builder()
             .userState(userState)
-            .user(userEntity)
+            .owner(userEntity)
             .chatId(chatId)
             .build());
         
@@ -341,7 +341,7 @@ class LoginHandlerTest {
         
         userStateRepository.save(UserStateEntity.builder()
             .userState(userState)
-            .user(userEntity)
+            .owner(userEntity)
             .chatId(chatId)
             .build());
         
