@@ -33,11 +33,10 @@ public class BecomeAdminHandler implements CommandHandler {
     public void handleCommand(long chatId, String message) {
         var state = userStateRepository.findById(chatId);
         
-        //if empty, chat is unknown so we default to true
-        var unknownOrNotLoggedIn = state.map(UserStateEntity::getUserState)
-            .map(UserState::isLoggedIn) //TODO fix already admin gets missing login error
-            .orElse(true);
-        if(unknownOrNotLoggedIn){
+        var knownAndLoggedIn = state.map(UserStateEntity::getUserState)
+            .map(UserState::isLoggedIn)
+            .orElse(false);
+        if(!knownAndLoggedIn){
             responseService.send(chatId, "Nur eingeloggte User können in den Admin-Modus wechseln");
             return;
         }

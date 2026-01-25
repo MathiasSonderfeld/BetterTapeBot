@@ -21,6 +21,7 @@ import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 
 import java.util.Collection;
 import java.util.EnumMap;
@@ -81,10 +82,11 @@ public class TapeBot implements SpringLongPollingBot, LongPollingSingleThreadUpd
             log.warn("update was ignored as it has no messsage for chatid {} - {}", update.getMessage().getChatId(), update);
             return;
         }
-
-        long chatId = update.getMessage().getChatId();
-        String receivedText = update.getMessage().getText();
-        String botCommand = Optional.ofNullable(update.getMessage().getEntities())
+        
+        Message message = update.getMessage();
+        long chatId = message.getChatId();
+        String receivedText = message.getText();
+        String botCommand = Optional.ofNullable(message.getEntities())
             .stream().flatMap(Collection::stream)
             .filter(e -> Objects.equals("bot_command", e.getType()))
             .findFirst()

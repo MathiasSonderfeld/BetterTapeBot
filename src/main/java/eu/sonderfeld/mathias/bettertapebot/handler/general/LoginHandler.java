@@ -25,7 +25,7 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class LoginHandler implements CommandHandler, StateHandler {
+public class LoginHandler implements CommandHandler, StateHandler { //TODO add support for single message login
 
     ResponseService responseService;
     UserStateRepository userStateRepository;
@@ -38,10 +38,7 @@ public class LoginHandler implements CommandHandler, StateHandler {
     
     @Override
     public @NonNull Set<UserState> forStates() {
-        return Set.of(
-            UserState.VALIDATE_USERNAME,
-            UserState.VALIDATE_PIN
-        );
+        return Set.of(UserState.LOGIN_VALIDATE_USERNAME, UserState.LOGIN_VALIDATE_PIN);
     }
 
     @Override
@@ -70,7 +67,7 @@ public class LoginHandler implements CommandHandler, StateHandler {
             return;
         }
         
-        userStateEntity.setUserState(UserState.VALIDATE_USERNAME);
+        userStateEntity.setUserState(UserState.LOGIN_VALIDATE_USERNAME);
         responseService.send(chatId, "Wie lautet dein Benutzername?");
     }
     
@@ -78,13 +75,13 @@ public class LoginHandler implements CommandHandler, StateHandler {
     @Transactional
     public void handleMessage(long chatId, String message) {
         var userStateEntity = userStateRepository.findById(chatId).orElseThrow();
-        if(userStateEntity.getUserState() == UserState.VALIDATE_USERNAME){
+        if(userStateEntity.getUserState() == UserState.LOGIN_VALIDATE_USERNAME){
             var cleanedName = MessageCleaner.getFirstWord(message);
             verifyAndSetUsername(chatId, cleanedName, userStateEntity);
             return;
         }
         
-        if(userStateEntity.getUserState() != UserState.VALIDATE_PIN) {
+        if(userStateEntity.getUserState() != UserState.LOGIN_VALIDATE_PIN) {
             log.error("state not implemented in this handler, this should never happen");
             responseService.send(chatId, "da ist etwas bei mir schiefgegangen. Bitte informiere einen Admin und benutze /reset, falls das Problem persistiert");
             return;
@@ -120,7 +117,7 @@ public class LoginHandler implements CommandHandler, StateHandler {
     }
     
     private void requestPin(long chatId, UserStateEntity userStateEntity){
-        userStateEntity.setUserState(UserState.VALIDATE_PIN);
+        userStateEntity.setUserState(UserState.LOGIN_VALIDATE_PIN);
         responseService.send(chatId, "Wie lautet deine PIN?");
     }
 }

@@ -1,58 +1,52 @@
 package eu.sonderfeld.mathias.bettertapebot.handler;
 
-import eu.sonderfeld.mathias.bettertapebot.bot.ResponseService;
-import eu.sonderfeld.mathias.bettertapebot.handler.general.LoginHandler;
-import eu.sonderfeld.mathias.bettertapebot.properties.BotProperties;
-import eu.sonderfeld.mathias.bettertapebot.repository.UserRepository;
-import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
+import eu.sonderfeld.mathias.bettertapebot.testutil.TestcontainersConfiguration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.telegram.telegrambots.longpolling.starter.TelegramBotInitializer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@ContextConfiguration(classes = {
-    LoginHandler.class
-})
+@Import(TestcontainersConfiguration.class)
 class StateHandlerTest {
+    
+    @MockitoBean
+    TelegramBotInitializer telegramBotInitializer; //disable the telegram api
     
     @Autowired
     List<StateHandler> stateHandlers;
     
-    @MockitoBean
-    BotProperties botProperties;
-    
-    @MockitoBean
-    UserStateRepository userStateRepository;
-    
-    @MockitoBean
-    UserRepository userRepository;
-    
-    @MockitoBean
-    ResponseService responseService;
-    
     @Test
-    @DisplayName("verify that there are no two handlers for the same command")
-    void testUniqueCommand(){
-        var stateHandlerMap = stateHandlers.stream()
-            .flatMap(h -> h.forStates().stream().map(s -> Map.entry(s, h)))
-            .collect(Collectors.groupingBy(Map.Entry::getKey,
-                Collectors.mapping(Map.Entry::getValue,
-                    Collectors.toCollection(ArrayList::new))));
-            
+    @DisplayName("verify that every state, that needs a handler, has exactly one handler")
+    void testExactlyOneHandlerPerRelevantState(){
+        Map<UserState, List<StateHandler>> stateHandlerMap = new HashMap<>();
+        for (StateHandler stateHandler : stateHandlers) {
+            for (UserState forState : stateHandler.forStates()) {
+                stateHandlerMap.computeIfAbsent(forState, _ -> new ArrayList<>())
+                    .add(stateHandler);
+            }
+        }
+        
+        HashSet<UserState> relevantKeys = new HashSet<>(Arrays.asList(UserState.values()));
+        relevantKeys.remove(UserState.LOGGED_OUT);
+        relevantKeys.remove(UserState.LOGGED_IN);
+        relevantKeys.remove(UserState.ADMIN);
         
         assertThat(stateHandlerMap).isNotNull()
-            .hasSize(UserState.values().length) //check that every command has a registered handler
+            .containsOnlyKeys(relevantKeys)
             .allSatisfy((_, handlers) ->
                 assertThat(handlers).isNotNull()
                     .hasSize(1));

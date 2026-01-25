@@ -43,7 +43,7 @@ public class GetDsgvoHandler implements CommandHandler {
             String dsgvo = Files.readString(Path.of(dsgoFile.getPath()));
             responseService.send(chatId, dsgvo);
         } catch (IOException e) {
-         log.error("cant load dsgvo resouce, error during file access", e);
+         log.error("cant load dsgvo resource, error during file access", e);
         }
     }
 }

@@ -1,4 +1,4 @@
-package eu.sonderfeld.mathias.bettertapebot.util;
+package eu.sonderfeld.mathias.bettertapebot.testutil;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;

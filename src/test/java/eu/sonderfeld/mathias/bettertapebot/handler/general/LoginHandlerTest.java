@@ -7,7 +7,7 @@ import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserEntity;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
-import eu.sonderfeld.mathias.bettertapebot.util.TestcontainersConfiguration;
+import eu.sonderfeld.mathias.bettertapebot.testutil.TestcontainersConfiguration;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -45,8 +45,8 @@ class LoginHandlerTest {
     @Test
     public void registersForCorrectStates(){
         assertThat(loginHandler.forStates()).containsExactlyInAnyOrder(
-            UserState.VALIDATE_USERNAME,
-            UserState.VALIDATE_PIN
+            UserState.LOGIN_VALIDATE_USERNAME,
+            UserState.LOGIN_VALIDATE_PIN
         );
     }
     
@@ -113,7 +113,7 @@ class LoginHandlerTest {
         var updatedState = userStateRepository.findById(chatId);
         assertThat(updatedState).isNotEmpty().get()
             .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.VALIDATE_PIN);
+            .isEqualTo(UserState.LOGIN_VALIDATE_PIN);
         
         assertThat(updatedState).isNotEmpty().get()
             .extracting(UserStateEntity::getUser).isNotNull()
@@ -158,7 +158,7 @@ class LoginHandlerTest {
         var updatedState = userStateRepository.findById(chatId);
         assertThat(updatedState).isNotEmpty().get()
             .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.VALIDATE_PIN);
+            .isEqualTo(UserState.LOGIN_VALIDATE_PIN);
         
         assertThat(updatedState).isNotEmpty().get()
             .extracting(UserStateEntity::getUser).isNotNull()
@@ -198,7 +198,7 @@ class LoginHandlerTest {
         var updatedState = userStateRepository.findById(chatId);
         assertThat(updatedState).isNotEmpty().get()
             .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.VALIDATE_USERNAME);
+            .isEqualTo(UserState.LOGIN_VALIDATE_USERNAME);
         
         assertThat(updatedState).isNotEmpty().get()
             .extracting(UserStateEntity::getUser).isNotNull()
@@ -210,7 +210,7 @@ class LoginHandlerTest {
     public void sendingUsernameOnRequestGetsAskedForPIN(){
         Long chatId = 5678L;
         String username = "username";
-        UserState userState = UserState.VALIDATE_USERNAME;
+        UserState userState = UserState.LOGIN_VALIDATE_USERNAME;
         
         UserEntity userEntity = userRepository.save(UserEntity.builder()
             .username(username)
@@ -238,7 +238,7 @@ class LoginHandlerTest {
         var updatedState = userStateRepository.findById(chatId);
         assertThat(updatedState).isNotEmpty().get()
             .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.VALIDATE_PIN);
+            .isEqualTo(UserState.LOGIN_VALIDATE_PIN);
         
         assertThat(updatedState).isNotEmpty().get()
             .extracting(UserStateEntity::getUser).isNotNull()
@@ -250,7 +250,7 @@ class LoginHandlerTest {
     public void sendingNewUsernameOnRequestGetsAskedForPIN(){
         Long chatId = 5678L;
         String username = "username";
-        UserState userState = UserState.VALIDATE_USERNAME;
+        UserState userState = UserState.LOGIN_VALIDATE_USERNAME;
         
         UserEntity oldEntity = userRepository.save(UserEntity.builder()
             .username("old name")
@@ -283,7 +283,7 @@ class LoginHandlerTest {
         var updatedState = userStateRepository.findById(chatId);
         assertThat(updatedState).isNotEmpty().get()
             .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.VALIDATE_PIN);
+            .isEqualTo(UserState.LOGIN_VALIDATE_PIN);
         
         assertThat(updatedState).isNotEmpty().get()
             .extracting(UserStateEntity::getUser).isNotNull()
@@ -296,7 +296,7 @@ class LoginHandlerTest {
         Long chatId = 6789L;
         String username = "username";
         String pin = "1234";
-        UserState userState = UserState.VALIDATE_PIN;
+        UserState userState = UserState.LOGIN_VALIDATE_PIN;
         
         UserEntity userEntity = userRepository.save(UserEntity.builder()
             .username(username)
@@ -324,7 +324,7 @@ class LoginHandlerTest {
         var updatedState = userStateRepository.findById(chatId);
         assertThat(updatedState).isNotEmpty().get()
             .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.VALIDATE_PIN);
+            .isEqualTo(UserState.LOGIN_VALIDATE_PIN);
     }
     
     @Test
@@ -332,7 +332,7 @@ class LoginHandlerTest {
         Long chatId = 6789L;
         String username = "username";
         String pin = "1234";
-        UserState userState = UserState.VALIDATE_PIN;
+        UserState userState = UserState.LOGIN_VALIDATE_PIN;
         
         UserEntity userEntity = userRepository.save(UserEntity.builder()
             .username(username)

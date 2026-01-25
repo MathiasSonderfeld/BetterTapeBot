@@ -29,11 +29,11 @@ public enum Command {
     LOGOUT(CommandLevel.LOGGEDIN, "/logout", "loggt den aktuellen nutzer aus"),
     
     ADMIN(CommandLevel.ADMIN, "/admin", "in den Admin-Modus wechseln"),
-    DELETEUSER(CommandLevel.ADMIN, "/deleteuser", "ausgewählten User löschen"),
-    DELETETAPE(CommandLevel.ADMIN, "/deletetape", "ausgewähltes Tape löschen"),
-    RESETUSER(CommandLevel.ADMIN, "/resetuser", "Status eines ausgewählten Users zurücksetzen"),
-    NEWADMIN(CommandLevel.ADMIN, "/newadmin", "neuen Admin hinzufügen"),
-    REMOVEADMIN(CommandLevel.ADMIN, "/removeadmin", "Admin entfernen"),
+    DELETE_USER(CommandLevel.ADMIN, "/deleteuser", "ausgewählten User löschen"),
+    DELETE_TAPE(CommandLevel.ADMIN, "/deletetape", "ausgewähltes Tape löschen"),
+    RESET_USER(CommandLevel.ADMIN, "/resetuser", "alle Status-Einträge eines ausgewählten Users zurücksetzen"),
+    NEW_ADMIN(CommandLevel.ADMIN, "/newadmin", "neuen Admin hinzufügen"),
+    REMOVE_ADMIN(CommandLevel.ADMIN, "/removeadmin", "Admin entfernen"),
     BROADCAST(CommandLevel.ADMIN, "/broadcast", "erstellt einen Broadcast zu allen eingeloggten Usern"),
     EXIT(CommandLevel.ADMIN, "/exit", "adminmodus verlassen");
 

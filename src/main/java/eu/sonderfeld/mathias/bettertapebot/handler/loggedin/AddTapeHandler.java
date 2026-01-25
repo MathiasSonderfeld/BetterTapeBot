@@ -1,4 +1,4 @@
-package eu.sonderfeld.mathias.bettertapebot.handler.general;
+package eu.sonderfeld.mathias.bettertapebot.handler.loggedin;
 
 import eu.sonderfeld.mathias.bettertapebot.bot.ResponseService;
 import eu.sonderfeld.mathias.bettertapebot.handler.Command;
@@ -21,7 +21,7 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class RegisterHandler implements CommandHandler, StateHandler { //TODO implement
+public class AddTapeHandler implements CommandHandler, StateHandler { //TODO implement
 
     ResponseService responseService;
     UserStateRepository userStateRepository;
@@ -29,17 +29,12 @@ public class RegisterHandler implements CommandHandler, StateHandler { //TODO im
 
     @Override
     public @NonNull Command forCommand() {
-        return Command.REGISTER;
+        return Command.ADD;
     }
     
     @Override
     public @NonNull Set<UserState> forStates() {
-        return Set.of(
-            UserState.REGISTER_AWAITING_DSGVO,
-            UserState.REGISTER_AWAITING_ACTIVATION_CODE,
-            UserState.REGISTER_AWAITING_USERNAME,
-            UserState.REGISTER_AWAITING_PIN
-        );
+        return Set.of(UserState.ADD_TAPE_GET_TITLE, UserState.ADD_TAPE_GET_STAR);
     }
 
     @Override
