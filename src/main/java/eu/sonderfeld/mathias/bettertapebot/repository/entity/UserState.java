@@ -31,7 +31,7 @@ public enum UserState {
     
     // Admin
     DELETE_USER_GET_USERNAME(StateLevel.ADMIN),
-    DELETE_TAPE_GET_TAPE_TITLE(StateLevel.ADMIN),
+    DELETE_TAPE_GET_TAPE_ID(StateLevel.ADMIN),
     RESET_USER_GET_USERNAME(StateLevel.ADMIN),
     NEW_ADMIN_USER_GET_USERNAME(StateLevel.ADMIN),
     REMOVE_ADMIN_USER_GET_USERNAME(StateLevel.ADMIN),

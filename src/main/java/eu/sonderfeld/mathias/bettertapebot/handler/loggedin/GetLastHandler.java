@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class GetLastHandler implements CommandHandler { //TODO implement
+public class GetLastHandler implements CommandHandler { //TODO implement, gib also Id if isAdmin
 
     ResponseService responseService;
     UserStateRepository userStateRepository;

@@ -10,6 +10,7 @@ import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
 import eu.sonderfeld.mathias.bettertapebot.testutil.TestcontainersConfiguration;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -31,19 +32,27 @@ class BecomeAdminHandlerTest {
 
     @MockitoSpyBean
     UserStateRepository userStateRepository;
+    
+    @MockitoSpyBean
+    UserRepository userRepository;
 
     @MockitoBean
     ResponseService responseService;
     
-    @Autowired
-    private UserRepository userRepository;
+    @BeforeEach
+    void reset(){
+        Mockito.reset(
+            userRepository,
+            userStateRepository,
+            responseService
+        );
+    }
     
     @AfterEach
     void cleanUp(){
         userStateRepository.deleteAll();
         userRepository.deleteAll();
     }
-
 
     @Test
     public void registersForCorrectCommand(){

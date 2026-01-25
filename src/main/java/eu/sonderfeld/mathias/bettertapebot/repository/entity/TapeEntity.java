@@ -25,12 +25,20 @@ public class TapeEntity {
 
     @Column(nullable = false)
     String title;
-
-    @ManyToOne
+    
+    /*
+      we only need the username, as that's the foreign key, it can be accessed without cost
+      So no need to load the rest eagerly if at all
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "director", referencedColumnName = "username", nullable = false)
     UserEntity director;
-
-    @ManyToOne
+    
+    /*
+      we only need the username, as that's the foreign key, it can be accessed without cost
+      So no need to load the rest eagerly if at all
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "star", referencedColumnName = "username", nullable = false)
     UserEntity star;
 

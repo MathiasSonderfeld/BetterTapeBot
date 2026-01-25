@@ -8,6 +8,7 @@ import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
 import eu.sonderfeld.mathias.bettertapebot.testutil.TestcontainersConfiguration;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -25,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @Import({TestcontainersConfiguration.class, BroadcastHandler.class})
 class BroadcastHandlerTest {
+    
     @Autowired
     BroadcastHandler broadcastHandler;
     
@@ -33,6 +35,14 @@ class BroadcastHandlerTest {
     
     @MockitoBean
     ResponseService responseService;
+    
+    @BeforeEach
+    void reset(){
+        Mockito.reset(
+            userStateRepository,
+            responseService
+        );
+    }
     
     @AfterEach
     void cleanUp(){
@@ -71,7 +81,7 @@ class BroadcastHandlerTest {
         Long loggedInChatId = 1234L;
         Long loggedOutChatId = 9876L;
         String message = "testmessage";
-        userStateRepository.save(UserStateEntity.builder()
+        var state = userStateRepository.save(UserStateEntity.builder()
             .userState(UserState.ADMIN)
             .owner(null)
             .chatId(chatId)
@@ -110,6 +120,10 @@ class BroadcastHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains(message);
+        
+        assertThat(state)
+            .extracting(UserStateEntity::getUserState)
+            .isEqualTo(UserState.ADMIN);
     }
     
     @Test
@@ -146,7 +160,7 @@ class BroadcastHandlerTest {
         Long loggedInChatId = 1234L;
         Long loggedOutChatId = 9876L;
         String message = "testmessage";
-        userStateRepository.save(UserStateEntity.builder()
+        var state = userStateRepository.save(UserStateEntity.builder()
             .userState(UserState.BROADCAST_AWAIT_MESSAGE)
             .owner(null)
             .chatId(chatId)
@@ -183,5 +197,9 @@ class BroadcastHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains(message);
+        
+        assertThat(state)
+            .extracting(UserStateEntity::getUserState)
+            .isEqualTo(UserState.ADMIN);
     }
 }

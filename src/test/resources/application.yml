@@ -1,3 +1,7 @@
+logging:
+  level:
+    root: INFO
+    eu.sonderfeld.mathias: DEBUG
 spring:
   application:
     name: BetterTapeBot

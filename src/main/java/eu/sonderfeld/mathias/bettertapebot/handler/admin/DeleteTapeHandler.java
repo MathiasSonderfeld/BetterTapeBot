@@ -2,31 +2,34 @@ package eu.sonderfeld.mathias.bettertapebot.handler.admin;
 
 import eu.sonderfeld.mathias.bettertapebot.bot.ResponseService;
 import eu.sonderfeld.mathias.bettertapebot.handler.Command;
-import eu.sonderfeld.mathias.bettertapebot.handler.CommandHandler;
 import eu.sonderfeld.mathias.bettertapebot.handler.StateHandler;
-import eu.sonderfeld.mathias.bettertapebot.repository.UserRepository;
+import eu.sonderfeld.mathias.bettertapebot.repository.TapeRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
+import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
+import eu.sonderfeld.mathias.bettertapebot.util.MessageCleaner;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.CustomLog;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
+import java.util.UUID;
 
 @CustomLog
 @Component
-@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class DeleteTapeHandler implements CommandHandler, StateHandler { //TODO implement
+public class DeleteTapeHandler extends AbstractAdminHandler implements StateHandler {
 
-    ResponseService responseService;
-    UserStateRepository userStateRepository;
-    UserRepository userRepository;
-
+    TapeRepository tapeRepository;
+    
+    public DeleteTapeHandler(UserStateRepository userStateRepository, ResponseService responseService, TapeRepository tapeRepository) {
+        super(userStateRepository, responseService);
+        this.tapeRepository = tapeRepository;
+    }
+    
     @Override
     public @NonNull Command forCommand() {
         return Command.DELETE_TAPE;
@@ -34,18 +37,42 @@ public class DeleteTapeHandler implements CommandHandler, StateHandler { //TODO 
     
     @Override
     public @NonNull Set<UserState> forStates() {
-        return Set.of(UserState.DELETE_TAPE_GET_TAPE_TITLE);
+        return Set.of(UserState.DELETE_TAPE_GET_TAPE_ID);
     }
-
-    @Override
-    @Transactional
-    public void handleCommand(long chatId, String message) {
     
+    @Override
+    protected @NonNull String getErrorMessage(){
+        return "Nur Admins können Tapes löschen";
     }
     
     @Override
     @Transactional
     public void handleMessage(long chatId, String message) {
+        var userState = userStateRepository.findById(chatId).orElseThrow();
+        handleCommandWithMessage(userState, message);
+    }
     
+    @Override
+    protected void handleCommandWithoutMessage(@NonNull UserStateEntity userStateEntity) {
+        userStateEntity.setUserState(UserState.DELETE_TAPE_GET_TAPE_ID);
+        responseService.send(userStateEntity.getChatId(), "Wie lautet die Tape-ID?");
+    }
+    
+    @Override
+    protected void handleCommandWithMessage(@NonNull UserStateEntity userStateEntity, @NonNull String message) {
+        var uuidString = MessageCleaner.getFirstWord(message);
+        UUID id;
+        try{
+            id = UUID.fromString(uuidString);
+        }
+        catch (IllegalArgumentException e){
+            log.warn("failed to parse UUID from string {}, cut out from user input {}", uuidString, message, e);
+            userStateEntity.setUserState(UserState.DELETE_TAPE_GET_TAPE_ID);
+            responseService.send(userStateEntity.getChatId(), "Die ID konnte ich nicht parsen, probiers nochmal");
+            return;
+        }
+        log.info("deleting tape with id {} on request in chat {}", id, userStateEntity.getOwner().getUsername());
+        tapeRepository.deleteById(id);
+        userStateEntity.setUserState(UserState.ADMIN);
     }
 }
