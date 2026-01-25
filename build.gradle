@@ -5,7 +5,7 @@ plugins {
     id("io.freefair.lombok") version "$lombokVersion"
 }
 
-group = 'com.mygroup'
+group = 'bettertapebot'
 description = 'BetterTapeBot'
 
 java {
