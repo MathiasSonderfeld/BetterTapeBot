@@ -1,19 +1,15 @@
-<p>
-  <img src="https://img.shields.io/badge/📼-BetterTapeBot-blueviolet?style=for-the-badge" alt="BetterTapeBot"/>
-</p>
-
 <h1>BetterTapeBot</h1>
 
 <p>
-  <strong>A Telegram bot for collaborative movie tape collection management</strong>
+  <strong>A Telegram Bot to track possible movie names based on funny quotes</strong>
 </p>
 
 <p>
   <a href="https://github.com/MathiasSonderfeld/BetterTapeBot/actions/workflows/build.yaml">
     <img src="https://github.com/MathiasSonderfeld/BetterTapeBot/actions/workflows/build.yaml/badge.svg" alt="CI Status"/>
   </a>
-  <img src="https://img.shields.io/badge/Spring%20Boot-4.0.2-6DB33F?logo=springboot&logoColor=white" alt="Spring Boot 4.0.2"/>
-  <img src="https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white" alt="Java 25"/>
+  <img src="https://img.shields.io/badge/Java-25-e76f00?logo=openjdk&logoColor=e76f00" alt="Java 25"/>
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.0.2-6cb52d?logo=spring" alt="Spring Boot 4.0.2"/>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-AGPL%20v3-blue.svg" alt="License: AGPL v3"/>
   </a>
@@ -174,7 +170,9 @@ ghcr.io/<username>/bettertapebot:<version>
 ## 🧪 Testing
 
 ```bash
-# Run all tests (uses Testcontainers for PostgreSQL)
+# Run all tests
+# uses Testcontainers for PostgreSQL
+# requires Docker Runtime Environment
 ./gradlew test
 ```
 
