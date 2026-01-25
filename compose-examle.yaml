@@ -1,0 +1,85 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: BetterTapeBotDb
+    environment:
+      # any change in values also need to applied to the BetterTapeBot container
+      POSTGRES_DB: bettertapebot
+      POSTGRES_USER: changeme_root
+      POSTGRES_PASSWORD: changeme_root_password
+      # credentials for migration user, can alter table
+      MIGRATION_USER: changeme_migration_user
+      MIGRATION_PASSWORD: changeme_migration_password
+      # credentials for application user, can only access table data
+      APP_USER: changeme_app_user
+      APP_PASSWORD: changeme_app_password
+    # ports:
+    #   - "5432:5432"  # just for debugging
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - betterTapeBotIntranet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    # Init-Script
+    command: >
+      bash -c "
+      cat > /docker-entrypoint-initdb.d/init.sql <<EOF
+      -- create migration user
+      CREATE USER ${MIGRATION_USER} WITH PASSWORD '${MIGRATION_PASSWORD}';
+      GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO ${MIGRATION_USER};
+      GRANT CREATE, USAGE ON SCHEMA public TO ${MIGRATION_USER};
+      GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${MIGRATION_USER};
+      GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${MIGRATION_USER};
+      ALTER changeme PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO ${MIGRATION_USER};
+      ALTER changeme PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO ${MIGRATION_USER};
+
+      -- create application user
+      CREATE USER ${APP_USER} WITH PASSWORD '${APP_PASSWORD}';
+      GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO ${APP_USER};
+      GRANT USAGE ON SCHEMA public TO ${APP_USER};
+      GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO ${APP_USER};
+      GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${APP_USER};
+      ALTER changeme PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO ${APP_USER};
+      ALTER changeme PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO ${APP_USER};
+      EOF
+      && docker-entrypoint.sh postgres
+      "
+
+  app:
+    build: .
+    container_name: BetterTapeBot
+    image: ghcr.io/mathiassonderfeld/bettertapebot:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: BetterTapeBot
+      SPRING_JPA_HIBERNATE_DDL-AUTO: validate
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bettertapebot
+      SPRING_DATASOURCE_USERNAME: changeme_app_user
+      SPRING_DATASOURCE_PASSWORD: changeme_app_password
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/bettertapebot
+      SPRING_LIQUIBASE_USER: changeme_migration_user
+      SPRING_LIQUIBASE_PASSWORD: changeme_migration_password
+      BETTER-TAPE-BOT_TELEGRAM_TOKEN: changeme_token
+    networks:
+      - betterTapeBotIntranet
+      - internet
+
+networks:
+  betterTapeBotIntranet:
+    driver: bridge
+    internal: true
+
+  internet:
+    driver: bridge
+
+volumes:
+  postgres_data:
