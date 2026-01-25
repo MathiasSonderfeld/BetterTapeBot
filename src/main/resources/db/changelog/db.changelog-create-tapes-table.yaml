@@ -50,3 +50,13 @@ databaseChangeLog:
             constraintName: fk_tapes_star
             referencedTableName: users
             referencedColumnNames: username
+  - changeSet:
+      id: add-index-tapes-date-added
+      author: MathiasSonderfeld
+      changes:
+        - createIndex:
+            indexName: idx_tapes_date_added
+            tableName: tapes
+            columns:
+              - column:
+                  name: date_added

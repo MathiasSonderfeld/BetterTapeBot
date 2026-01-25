@@ -94,6 +94,7 @@ public class ResponseService {
                 .builder()
                 .chatId(chatId)
                 .text(chunk)
+                .parseMode("HTML")
                 .build();
             
             if(markup != null){

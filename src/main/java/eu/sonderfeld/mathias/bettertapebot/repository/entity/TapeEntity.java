@@ -3,6 +3,7 @@ package eu.sonderfeld.mathias.bettertapebot.repository.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @Table(name = TapeEntity.TABLE_NAME)
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldNameConstants
 @Builder(toBuilder = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TapeEntity {

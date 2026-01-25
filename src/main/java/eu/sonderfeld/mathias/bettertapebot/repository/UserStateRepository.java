@@ -1,5 +1,6 @@
 package eu.sonderfeld.mathias.bettertapebot.repository;
 
+import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserEntity;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,4 +13,6 @@ import java.util.List;
 public interface UserStateRepository extends JpaRepository<UserStateEntity, Long> {
     
     List<UserStateEntity> findUserStateEntitiesByUserStateIn(Collection<UserState> userStates);
+    
+    long deleteUserStateEntitiesByOwner(UserEntity owner);
 }

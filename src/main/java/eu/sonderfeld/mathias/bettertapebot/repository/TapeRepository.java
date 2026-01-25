@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Repository
 public interface TapeRepository extends JpaRepository<TapeEntity, UUID> {
-
+    
     List<TapeEntity> findAllByDirector(UserEntity userEntity);
     List<TapeEntity> findAllByStar(UserEntity userEntity);
     
