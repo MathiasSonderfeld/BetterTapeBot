@@ -29,8 +29,8 @@ public class ResetStateHandler implements CommandHandler {
     @Override
     @Transactional
     public void handleCommand(long chatId, String message) {
-        var state = userStateRepository.findById(chatId);
-        if(state.isEmpty()){
+        var stateOptional = userStateRepository.findById(chatId);
+        if(stateOptional.isEmpty()){
             responseService.send(chatId, "chat unbekannt, kein reset nötig");
             return;
         }

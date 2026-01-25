@@ -9,6 +9,7 @@ import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
 import eu.sonderfeld.mathias.bettertapebot.testutil.TestcontainersConfiguration;
 import org.assertj.core.api.InstanceOfAssertFactories;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -33,8 +34,15 @@ class BecomeAdminHandlerTest {
 
     @MockitoBean
     ResponseService responseService;
+    
     @Autowired
     private UserRepository userRepository;
+    
+    @AfterEach
+    void cleanUp(){
+        userStateRepository.deleteAll();
+        userRepository.deleteAll();
+    }
 
 
     @Test
@@ -64,6 +72,7 @@ class BecomeAdminHandlerTest {
 
         var user = userRepository.save(UserEntity.builder()
             .username("admin")
+            .pin("1234")
             .isAdmin(true)
             .build());
 
@@ -93,6 +102,7 @@ class BecomeAdminHandlerTest {
 
         var user = userRepository.save(UserEntity.builder()
             .username("user")
+            .pin("1234")
             .isAdmin(false)
             .build());
 
@@ -122,6 +132,7 @@ class BecomeAdminHandlerTest {
 
         var user = userRepository.save(UserEntity.builder()
             .username("admin")
+            .pin("1234")
             .isAdmin(true)
             .build());
 

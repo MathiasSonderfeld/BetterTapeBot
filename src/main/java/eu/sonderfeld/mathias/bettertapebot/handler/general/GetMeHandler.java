@@ -29,13 +29,13 @@ public class GetMeHandler implements CommandHandler {
     @Override
     @Transactional
     public void handleCommand(long chatId, String message) {
-        var state = userStateRepository.findById(chatId);
-        if(state.isEmpty()){
+        var stateOptional = userStateRepository.findById(chatId);
+        if(stateOptional.isEmpty()){
             responseService.send(chatId, String.format("chatId: %d, keine weiteren daten zu dem chat gefunden", chatId));
             return;
         }
 
-        var userState = state.get();
+        var userState = stateOptional.get();
         var username = userState.getOwner().getUsername();
         var stateName = userState.getUserState().name();
 

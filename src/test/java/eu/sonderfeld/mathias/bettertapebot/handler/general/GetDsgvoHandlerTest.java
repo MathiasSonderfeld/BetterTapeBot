@@ -24,6 +24,7 @@ class GetDsgvoHandlerTest {
 
     @MockitoBean
     ResponseService responseService;
+    
     @Autowired
     private BotProperties botProperties;
 

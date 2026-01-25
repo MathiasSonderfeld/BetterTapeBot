@@ -31,9 +31,8 @@ public class BecomeAdminHandler implements CommandHandler {
     @Override
     @Transactional
     public void handleCommand(long chatId, String message) {
-        var state = userStateRepository.findById(chatId);
-        
-        var knownAndLoggedIn = state.map(UserStateEntity::getUserState)
+        var stateOptional = userStateRepository.findById(chatId);
+        var knownAndLoggedIn = stateOptional.map(UserStateEntity::getUserState)
             .map(UserState::isLoggedIn)
             .orElse(false);
         if(!knownAndLoggedIn){
@@ -41,7 +40,7 @@ public class BecomeAdminHandler implements CommandHandler {
             return;
         }
         
-        var userStateEntity = state.get();
+        var userStateEntity = stateOptional.get();
         if(userStateEntity.getUserState().isAdmin()){
             responseService.send(chatId, "Du bist bereits im Admin-Modus, /help für Befehle");
             return;

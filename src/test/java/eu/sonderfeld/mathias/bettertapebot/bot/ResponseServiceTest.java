@@ -16,7 +16,9 @@ import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,6 +38,7 @@ class ResponseServiceTest {
         botProperties.getTelegram().setDelayBetweenMessagesMs(100);
         telegramClient = Mockito.mock(TelegramClient.class);
         responseService = new ResponseService(telegramClient, botProperties);
+        responseService.postConstruct();
     }
 
     @Test
@@ -181,5 +184,52 @@ class ResponseServiceTest {
             Duration gap = Duration.between(callTimes.get(i-1), callTimes.get(i));
             assertThat(gap.toMillis()).isGreaterThanOrEqualTo(100L);
         }
+    }
+    
+    @Test
+    @SneakyThrows
+    void testBroadcastsGetSentWithDelayOnlyPerChat() {
+        String input = "x".repeat(20);
+        botProperties.getTelegram().setMessageLengthLimit(5);
+        
+        ConcurrentHashMap<String, CopyOnWriteArrayList<Instant>> map = new ConcurrentHashMap<>();
+        Mockito.when(telegramClient.execute(ArgumentMatchers.any(SendMessage.class)))
+            .thenAnswer(invocation -> {
+                var chatId = invocation.getArgument(0, SendMessage.class).getChatId();
+                map.computeIfAbsent(chatId, _ -> new CopyOnWriteArrayList<>())
+                    .add(Instant.now());
+                return null;
+            });
+        
+        responseService.broadcast(List.of(1L,2L,3L), input);
+        Awaitility.await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
+            ArgumentCaptor<SendMessage> captor = ArgumentCaptor.forClass(SendMessage.class);
+            Mockito.verify(telegramClient, Mockito.times(12)).execute(captor.capture());
+        });
+        
+        for (var entry : map.entrySet()) {
+            var list = entry.getValue();
+            for (int i = 1; i < list.size(); i++) {
+                Duration gap = Duration.between(list.get(i-1), list.get(i));
+                assertThat(gap.toMillis()).isGreaterThanOrEqualTo(100L);
+            }
+        }
+        
+        // irgendeine Liste nehmen, um die Länge zu bestimmen
+        int size = map.values().iterator().next().size();
+        
+        for (int i = 0; i < size; i++) {
+            ArrayList<Instant> timestamps = new ArrayList<>();
+            
+            for (CopyOnWriteArrayList<Instant> list : map.values()) {
+                timestamps.add(list.get(i));
+            }
+            
+            for (int j = 1; j < timestamps.size(); j++) {
+                Duration gap = Duration.between(timestamps.get(j-1), timestamps.get(j));
+                assertThat(gap.toMillis()).isLessThanOrEqualTo(20L);
+            }
+        }
+        
     }
 }

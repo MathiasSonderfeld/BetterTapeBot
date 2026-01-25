@@ -35,7 +35,7 @@ public enum UserState {
     RESET_USER_GET_USERNAME(StateLevel.ADMIN),
     NEW_ADMIN_USER_GET_USERNAME(StateLevel.ADMIN),
     REMOVE_ADMIN_USER_GET_USERNAME(StateLevel.ADMIN),
-    BROADCAST_CONFIRM(StateLevel.ADMIN);
+    BROADCAST_AWAIT_MESSAGE(StateLevel.ADMIN);
 
     StateLevel stateLevel;
 

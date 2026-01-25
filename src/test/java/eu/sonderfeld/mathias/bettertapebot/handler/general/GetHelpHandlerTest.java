@@ -7,6 +7,7 @@ import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
 import eu.sonderfeld.mathias.bettertapebot.testutil.TestcontainersConfiguration;
 import org.assertj.core.api.InstanceOfAssertFactories;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -34,6 +35,11 @@ class GetHelpHandlerTest {
 
     @MockitoBean
     ResponseService responseService;
+    
+    @AfterEach
+    void cleanUp(){
+        userStateRepository.deleteAll();
+    }
 
     @Test
     public void registersForCorrectCommand(){

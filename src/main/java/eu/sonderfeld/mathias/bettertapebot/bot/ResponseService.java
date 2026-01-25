@@ -2,10 +2,12 @@ package eu.sonderfeld.mathias.bettertapebot.bot;
 
 import eu.sonderfeld.mathias.bettertapebot.properties.BotProperties;
 import eu.sonderfeld.mathias.bettertapebot.util.TextSplitter;
+import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -27,6 +29,14 @@ public class ResponseService {
 
     TelegramClient telegramClient;
     BotProperties botProperties;
+    
+    @NonFinal
+    Duration throttleDuration;
+    
+    @PostConstruct
+    void postConstruct(){
+        throttleDuration = Duration.ofMillis(botProperties.getTelegram().getDelayBetweenMessagesMs());
+    }
     
     /**
      * sends a chat to the telegram api asynchronously.
@@ -51,42 +61,56 @@ public class ResponseService {
      */
     public void send(long chatId, ReplyKeyboard replyKeyboard, String text) {
         List<String> chunks = TextSplitter.splitTextSmart(text, botProperties.getTelegram().getMessageLengthLimit());
-        var throttleDuration = Duration.ofMillis(botProperties.getTelegram().getDelayBetweenMessagesMs());
-        
         //send messages async
-        Flux.fromIterable(chunks)
+        sendChunks(chatId, chunks, replyKeyboard).subscribe();
+    }
+    
+    public void broadcast(List<Long> chatIds, String text) {
+        List<String> chunks = TextSplitter.splitTextSmart(text, botProperties.getTelegram().getMessageLengthLimit());
+        
+        //broadcast async
+        Flux.fromIterable(chatIds)
+            //flatMap does not keep order but there is no order to preserve in the chatIds
+            .flatMap(chatId -> sendChunks(chatId, chunks, null))
+            .subscribe();
+    }
+    
+    private Flux<Long> sendChunks(long chatId, List<String> chunks, ReplyKeyboard markup){
+        return Flux.fromIterable(chunks)
             .index()
             //concatMap ensures sequential processing of chunks
             .concatMap(tuple -> {
                 long index = tuple.getT1();
                 String chunk = tuple.getT2();
-
-                return Mono.fromRunnable(() -> sendChunk(chatId, chunk, index == 0 ? replyKeyboard : null))
-                    .subscribeOn(Schedulers.boundedElastic())
+                
+                return sendChunk(chatId, chunk, index == 0 ? markup : null)
                     .then(index < chunks.size() - 1 ? Mono.delay(throttleDuration) : Mono.empty());  // Kein delay nach letztem Chunk
-            })
-            .subscribe();
+            });
     }
 
-    private void sendChunk(long chatId, String chunk, ReplyKeyboard markup) {
-        SendMessage message = SendMessage
-            .builder()
-            .chatId(chatId)
-            .text(chunk)
-            .build();
-
-        if(markup != null){
-            message.setReplyMarkup(markup);
-        }
-
-        try {
-            telegramClient.execute(message);
-            if(log.isDebugEnabled()){
-                log.debug("Message sent to ChatId '{}': {}", chatId, chunk);
+    private Mono<Void> sendChunk(long chatId, String chunk, ReplyKeyboard markup) {
+        return Mono.fromRunnable(() -> {
+            SendMessage message = SendMessage
+                .builder()
+                .chatId(chatId)
+                .text(chunk)
+                .build();
+            
+            if(markup != null){
+                message.setReplyMarkup(markup);
             }
-        } catch (TelegramApiException e) {
-            log.error("Error sending message chunk to chatId '{}': {}", chatId, chunk, e);
-        }
+            
+            try {
+                telegramClient.execute(message);
+                if(log.isDebugEnabled()){
+                    log.debug("Message sent to ChatId '{}': {}", chatId, chunk);
+                }
+            } catch (TelegramApiException e) {
+                log.error("Error sending message chunk to chatId '{}': {}", chatId, chunk, e);
+            }
+        })
+        .subscribeOn(Schedulers.boundedElastic())
+        .then();
     }
 
 

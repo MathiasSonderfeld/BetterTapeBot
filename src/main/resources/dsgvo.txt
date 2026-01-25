@@ -45,4 +45,4 @@ Datenschutzerklärung für den Chatbot zur Erfassung von Filmtiteln (Sextapes)
     Da der Chatbot über die Plattform Telegram betrieben wird, gelten zusätzlich die Datenschutzbestimmungen von Telegram. Weitere Informationen hierzu finden Sie in den Datenschutzrichtlinien von Telegram.
 
 15.	Änderungen der Datenschutzerklärung
-Diese Datenschutzerklärung kann bei Bedarf aktualisiert werden. Änderungen werden den Benutzern rechtzeitig mitgeteilt.
+    Diese Datenschutzerklärung kann bei Bedarf aktualisiert werden. Änderungen werden den Benutzern rechtzeitig mitgeteilt.

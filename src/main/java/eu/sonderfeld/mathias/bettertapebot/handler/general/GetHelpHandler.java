@@ -32,11 +32,11 @@ public class GetHelpHandler implements CommandHandler {
     @Override
     @Transactional
     public void handleCommand(long chatId, String message) {
-        var state = userStateRepository.findById(chatId);
-
+        var stateOptional = userStateRepository.findById(chatId);
+        
         var commandsMap = Arrays.stream(Command.values())
             .collect(Collectors.groupingBy(Command::getCommandLevel));
-
+        
         StringBuilder sb = new StringBuilder()
             .append("Grundfunktionen:")
             .append("\n");
@@ -44,11 +44,11 @@ public class GetHelpHandler implements CommandHandler {
             .map(Command::getFormattedHelpText)
             .forEach(c -> sb.append(c).append("\n"));
 
-        if(state.isEmpty()){
+        if(stateOptional.isEmpty()){
             responseService.send(chatId, sb.toString());
             return;
         }
-        var userState = state.get().getUserState();
+        var userState = stateOptional.get().getUserState();
 
         //user commands
         if(userState.isLoggedIn()){

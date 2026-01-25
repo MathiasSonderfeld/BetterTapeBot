@@ -44,17 +44,17 @@ public class LoginHandler implements CommandHandler, StateHandler {
     @Override
     @Transactional
     public void handleCommand(long chatId, String message) {
-        var state = userStateRepository.findById(chatId);
+        var stateOptional = userStateRepository.findById(chatId);
         
-        var alreadyLoggedIn = state.map(UserStateEntity::getUserState)
+        var alreadyLoggedIn = stateOptional.map(UserStateEntity::getUserState)
             .map(UserState::isLoggedIn)
             .orElse(false);
         if(alreadyLoggedIn){
-            responseService.send(chatId, "du bist schon eingeloggt als " + state.get().getOwner().getUsername());
+            responseService.send(chatId, "du bist schon eingeloggt als " + stateOptional.get().getOwner().getUsername());
             return;
         }
         
-        UserStateEntity userStateEntity = state
+        UserStateEntity userStateEntity = stateOptional
             .orElseGet(() -> userStateRepository.save(
                 UserStateEntity.builder()
                     .chatId(chatId)

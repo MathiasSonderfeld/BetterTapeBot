@@ -34,8 +34,8 @@ public class GetAllUsersHandler implements CommandHandler {
     @Override
     @Transactional
     public void handleCommand(long chatId, String message) {
-        var state = userStateRepository.findById(chatId);
-        if(state.isEmpty() || !state.get().getUserState().isLoggedIn()){
+        var stateOptional = userStateRepository.findById(chatId);
+        if(stateOptional.isEmpty() || !stateOptional.get().getUserState().isLoggedIn()){
             responseService.send(chatId, "Nur eingeloggte User können andere User sehen");
             return;
         }
