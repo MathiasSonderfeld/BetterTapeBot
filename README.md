@@ -9,8 +9,8 @@
 </p>
 
 <p>
-  <a href="https://github.com/MathiasSonderworthy/BetterTapeBot/actions/workflows/build.yaml">
-    <img src="https://github.com/MathiasSonderworthy/BetterTapeBot/actions/workflows/build.yaml/badge.svg" alt="CI Status"/>
+  <a href="https://github.com/MathiasSonderfeld/BetterTapeBot/actions/workflows/build.yaml">
+    <img src="https://github.com/MathiasSonderfeld/BetterTapeBot/actions/workflows/build.yaml/badge.svg" alt="CI Status"/>
   </a>
   <img src="https://img.shields.io/badge/Spring%20Boot-4.0.2-6DB33F?logo=springboot&logoColor=white" alt="Spring Boot 4.0.2"/>
   <img src="https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white" alt="Java 25"/>
