@@ -145,5 +145,5 @@ ghcr.io/<username>/bettertapebot:<version>
 ```
 
 ## Lizenz
+Dieses Projekt steht unter der [AGPL v3](LICENSE).
 
-Privates Projekt.
