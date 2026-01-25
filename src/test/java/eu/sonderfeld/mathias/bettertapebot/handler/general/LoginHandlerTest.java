@@ -295,7 +295,7 @@ class LoginHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Wie lautet deine PIN?");
-        Mockito.verify(userRepository, Mockito.times(1)).findById(ArgumentMatchers.eq(username));
+        Mockito.verify(userRepository, Mockito.times(1)).findById(username);
         Mockito.verifyNoInteractions(userStateRepository);
         
         var updatedState = userStateRepository.findById(chatId);

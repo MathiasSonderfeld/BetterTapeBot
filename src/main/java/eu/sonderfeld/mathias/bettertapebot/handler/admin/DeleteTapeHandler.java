@@ -68,8 +68,14 @@ public class DeleteTapeHandler extends AbstractAdminHandler implements StateHand
             responseService.send(userStateEntity.getChatId(), "Die ID konnte ich nicht parsen, probiers nochmal");
             return;
         }
-        log.info("deleting tape with id {} on request of {}", id, userStateEntity.getOwner().getUsername());
-        tapeRepository.deleteById(id);
-        userStateEntity.setUserState(UserState.ADMIN);
+        var deleteOptional = tapeRepository.deleteTapeEntityById(id);
+        if(deleteOptional.isPresent()){
+            log.info("deleting tape with id {} on request of {}", id, userStateEntity.getOwner().getUsername());
+            userStateEntity.setUserState(UserState.ADMIN);
+        }
+        else {
+            userStateEntity.setUserState(UserState.DELETE_TAPE_GET_TAPE_ID);
+            responseService.send(userStateEntity.getChatId(), "Zu der ID konnte ich keinen Eintrag finden, probiers nochmal");
+        }
     }
 }

@@ -24,6 +24,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -114,7 +115,7 @@ class DeleteTapeHandlerTest {
         
         deleteTapeHandler.handleCommand(chatId, tape.getId().toString());
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-        Mockito.verify(tapeRepository, Mockito.times(1)).deleteById(tape.getId());
+        Mockito.verify(tapeRepository, Mockito.times(1)).deleteTapeEntityById(tape.getId());
         
         var tapeOptional = tapeRepository.findById(tape.getId());
         assertThat(tapeOptional).isNotNull().isEmpty();
@@ -122,6 +123,44 @@ class DeleteTapeHandlerTest {
         assertThat(state)
             .extracting(UserStateEntity::getUserState)
             .isEqualTo(UserState.ADMIN);
+    }
+    
+    @Test
+    public void deleteTapeCommandWithValidButUnknownUUIDGetsAskedAgain(){
+        Long chatId = 2345L;
+        
+        var user = userRepository.save(UserEntity.builder()
+            .username("username")
+            .pin("1234")
+            .isAdmin(true)
+            .build());
+        
+        var state = userStateRepository.save(UserStateEntity.builder()
+            .userState(UserState.ADMIN)
+            .owner(user)
+            .chatId(chatId)
+            .build());
+        
+        UUID randomId = UUID.randomUUID();
+        
+        Mockito.reset(userStateRepository, userRepository, tapeRepository);
+        deleteTapeHandler.handleCommand(chatId, randomId.toString());
+        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        Mockito.verify(tapeRepository, Mockito.times(1)).deleteTapeEntityById(randomId);
+        
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
+        var texts = textCaptor.getAllValues();
+        assertThat(texts).isNotNull()
+            .hasSize(1)
+            .element(0)
+            .asInstanceOf(InstanceOfAssertFactories.STRING)
+            .contains("Zu der ID konnte ich keinen Eintrag finden, probiers nochmal");
+        Mockito.verifyNoInteractions(userRepository);
+        
+        assertThat(state)
+            .extracting(UserStateEntity::getUserState)
+            .isEqualTo(UserState.DELETE_TAPE_GET_TAPE_ID);
     }
     
     @Test
@@ -193,6 +232,43 @@ class DeleteTapeHandlerTest {
     }
     
     @Test
+    public void deleteTapeMessageWithValidButUnknownUUIDGetsAskedAgain(){
+        long chatId = 2345L;
+        
+        var user = userRepository.save(UserEntity.builder()
+            .username("username")
+            .pin("1234")
+            .isAdmin(true)
+            .build());
+        
+        var state = userStateRepository.save(UserStateEntity.builder()
+            .userState(UserState.DELETE_TAPE_GET_TAPE_ID)
+            .owner(user)
+            .chatId(chatId)
+            .build());
+        
+        UUID randomId = UUID.randomUUID();
+        
+        Mockito.reset(userStateRepository, userRepository, tapeRepository);
+        deleteTapeHandler.handleMessage(state, chatId, randomId.toString());
+        Mockito.verify(tapeRepository, Mockito.times(1)).deleteTapeEntityById(randomId);
+        
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
+        var texts = textCaptor.getAllValues();
+        assertThat(texts).isNotNull()
+            .hasSize(1)
+            .element(0)
+            .asInstanceOf(InstanceOfAssertFactories.STRING)
+            .contains("Zu der ID konnte ich keinen Eintrag finden, probiers nochmal");
+        Mockito.verifyNoInteractions(userStateRepository, userRepository);
+        
+        assertThat(state)
+            .extracting(UserStateEntity::getUserState)
+            .isEqualTo(UserState.DELETE_TAPE_GET_TAPE_ID);
+    }
+    
+    @Test
     public void deleteTapeMessageWithValidUUIDGetsDeleted(){
         long chatId = 2345L;
         
@@ -217,7 +293,7 @@ class DeleteTapeHandlerTest {
         
         Mockito.reset(userStateRepository, userRepository, tapeRepository);
         deleteTapeHandler.handleMessage(state, chatId, tape.getId().toString());
-        Mockito.verify(tapeRepository, Mockito.times(1)).deleteById(tape.getId());
+        Mockito.verify(tapeRepository, Mockito.times(1)).deleteTapeEntityById(tape.getId());
         
         var tapeOptional = tapeRepository.findById(tape.getId());
         assertThat(tapeOptional).isNotNull().isEmpty();

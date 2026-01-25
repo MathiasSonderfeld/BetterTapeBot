@@ -19,7 +19,7 @@ import java.util.Set;
 @CustomLog
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class DeleteUserHandler  extends AbstractAdminHandler implements StateHandler { //TODO implement
+public class DeleteUserHandler  extends AbstractAdminHandler implements StateHandler {
 
     UserRepository userRepository;
     
@@ -40,7 +40,7 @@ public class DeleteUserHandler  extends AbstractAdminHandler implements StateHan
     
     @Override
     protected @NonNull String getErrorMessage() {
-        return "Nur Admins können User löschen";
+        return "Nur Admins können Benutzer löschen";
     }
     
     @Override

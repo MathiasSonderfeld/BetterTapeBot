@@ -124,8 +124,7 @@ class TapeBotTest {
         
         Assertions.assertDoesNotThrow(() -> tapeBot.consume(update));
         Mockito.verifyNoInteractions(responseService, userStateRepository, stateHandler);
-        Mockito.verify(commandHandler, Mockito.times(1))
-            .handleCommand(ArgumentMatchers.eq(chatId), ArgumentMatchers.eq(text));
+        Mockito.verify(commandHandler, Mockito.times(1)).handleCommand(chatId, text);
     }
     
     @Test
@@ -136,7 +135,7 @@ class TapeBotTest {
         
         Assertions.assertDoesNotThrow(() -> tapeBot.consume(update));
         Mockito.verifyNoInteractions(commandHandler, stateHandler);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(ArgumentMatchers.eq(chatId));
+        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1))
@@ -165,7 +164,7 @@ class TapeBotTest {
         
         Assertions.assertDoesNotThrow(() -> tapeBot.consume(update));
         Mockito.verifyNoInteractions(responseService, commandHandler, stateHandler);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(ArgumentMatchers.eq(chatId));
+        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
     }
     
     @Test
@@ -181,7 +180,7 @@ class TapeBotTest {
         
         Assertions.assertDoesNotThrow(() -> tapeBot.consume(update));
         Mockito.verifyNoInteractions(responseService, commandHandler);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(ArgumentMatchers.eq(chatId));
+        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         Mockito.verify(stateHandler, Mockito.times(1))
             .handleMessage(ArgumentMatchers.any(), ArgumentMatchers.eq(chatId), ArgumentMatchers.eq(text));
     }
