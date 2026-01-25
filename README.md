@@ -1,74 +1,108 @@
-# BetterTapeBot
+<p>
+  <img src="https://img.shields.io/badge/📼-BetterTapeBot-blueviolet?style=for-the-badge" alt="BetterTapeBot"/>
+</p>
 
-Ein Telegram Bot zur gemeinschaftlichen Verwaltung und Erfassung von Filmtiteln. Benutzer können sich registrieren, einloggen und Tapes mit Titel, Autor und Star erfassen.
+<h1>BetterTapeBot</h1>
 
-## Features
+<p>
+  <strong>A Telegram bot for collaborative movie tape collection management</strong>
+</p>
 
-- **Benutzerregistrierung** mit Username und PIN
-- **Login-System** mit Freischaltcode für neue Benutzer
-- **Tape-Verwaltung**: Hinzufügen, Auflisten und Suchen
-- **Filteroptionen**: Suche nach Star (`/starring`) oder Autor (`/directing`)
-- **Benachrichtigungen**: Optionale Subscription für neue Tapes
-- **Admin-Funktionen**: Benutzerverwaltung, Broadcast-Nachrichten
-- **DSGVO-konform**: Integrierte Datenschutzerklärung
+<p>
+  <a href="https://github.com/MathiasSonderworthy/BetterTapeBot/actions/workflows/build.yaml">
+    <img src="https://github.com/MathiasSonderworthy/BetterTapeBot/actions/workflows/build.yaml/badge.svg" alt="CI Status"/>
+  </a>
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.0.2-6DB33F?logo=springboot&logoColor=white" alt="Spring Boot 4.0.2"/>
+  <img src="https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white" alt="Java 25"/>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-AGPL%20v3-blue.svg" alt="License: AGPL v3"/>
+  </a>
+</p>
 
-## Technologie-Stack
+---
 
-- **Java 25** mit Spring Boot 4.0
-- **PostgreSQL** als Datenbank
-- **Liquibase** für Datenbank-Migrationen
-- **Telegram Bot API** (Long Polling)
-- **Lombok** für Boilerplate-Reduktion
-- **Testcontainers** für Integrationstests
+## ✨ Features
 
-## Bot-Befehle
+- **User Registration** — Sign up with username and PIN
+- **Login System** — Activation codes for new user verification
+- **Tape Management** — Add, list, and search movie tapes
+- **Filter Options** — Search by star (`/starring`) or director (`/directing`)
+- **Notifications** — Optional subscription for new tape alerts
+- **Admin Tools** — User management, broadcast messages
+- **GDPR Compliant** — Built-in privacy policy
 
-### Allgemein
-| Befehl | Beschreibung |
-|--------|-------------|
-| `/register` | Neuen Benutzer registrieren |
-| `/login` | Einloggen |
-| `/dsgvo` | Datenschutzbestimmungen anzeigen |
-| `/me` | Eigene Benutzerinfo anzeigen |
-| `/help` | Hilfe anzeigen |
-| `/reset` | Chat-Status zurücksetzen |
+## 🛠️ Tech Stack
 
-### Nach Login
-| Befehl | Beschreibung |
-|--------|-------------|
-| `/code` | Aktuellen Freischaltcode anzeigen |
-| `/users` | Alle registrierten Benutzer anzeigen |
-| `/add` | Neues Tape hinzufügen |
-| `/last` | Letztes Tape anzeigen |
-| `/all` | Alle Tapes auflisten |
-| `/starring` | Tapes eines Stars filtern |
-| `/directing` | Tapes eines Autors filtern |
-| `/subscription` | Benachrichtigungen ein-/ausschalten |
-| `/logout` | Ausloggen |
+| Technology | Purpose |
+|------------|---------|
+| **Java 25** | Runtime |
+| **Spring Boot 4.0** | Application Framework |
+| **PostgreSQL** | Database |
+| **Liquibase** | Database Migrations |
+| **Telegram Bot API** | Long Polling Integration |
+| **Lombok** | Boilerplate Reduction |
+| **Testcontainers** | Integration Testing |
 
-### Admin
-| Befehl | Beschreibung |
-|--------|-------------|
-| `/admin` | Admin-Modus aktivieren |
-| `/deleteuser` | Benutzer löschen |
-| `/deletetape` | Tape löschen |
-| `/resetuser` | Benutzer-Status zurücksetzen |
-| `/newadmin` | Neuen Admin hinzufügen |
-| `/removeadmin` | Admin-Rechte entziehen |
-| `/broadcast` | Nachricht an alle senden |
-| `/exit` | Admin-Modus verlassen |
+## 📖 Bot Commands
 
-## Setup
+<details>
+<summary><b>General Commands</b></summary>
 
-### Voraussetzungen
+| Command | Description |
+|---------|-------------|
+| `/register` | Register a new account |
+| `/login` | Log into your account |
+| `/dsgvo` | View privacy policy |
+| `/me` | Show your user info |
+| `/help` | Display help |
+| `/reset` | Reset chat state |
+
+</details>
+
+<details>
+<summary><b>Logged-in Commands</b></summary>
+
+| Command | Description |
+|---------|-------------|
+| `/code` | Show current activation code |
+| `/users` | List all registered users |
+| `/add` | Add a new tape |
+| `/last` | Show the last added tape |
+| `/all` | List all tapes |
+| `/starring` | Filter tapes by star |
+| `/directing` | Filter tapes by director |
+| `/subscription` | Toggle notifications |
+| `/logout` | Log out |
+
+</details>
+
+<details>
+<summary><b>Admin Commands</b></summary>
+
+| Command | Description |
+|---------|-------------|
+| `/admin` | Enter admin mode |
+| `/deleteuser` | Delete a user |
+| `/deletetape` | Delete a tape |
+| `/resetuser` | Reset user state |
+| `/newadmin` | Promote user to admin |
+| `/removeadmin` | Revoke admin privileges |
+| `/broadcast` | Send message to all users |
+| `/exit` | Exit admin mode |
+
+</details>
+
+## 🚀 Getting Started
+
+### Prerequisites
 
 - Java 25+
-- PostgreSQL Datenbank
+- PostgreSQL database
 - Telegram Bot Token (via [@BotFather](https://t.me/BotFather))
 
-### Konfiguration
+### Configuration
 
-Konfiguriere die Anwendung über Umgebungsvariablen oder `application.yml`:
+Configure the application via environment variables or `application.yml`:
 
 ```yaml
 spring:
@@ -79,71 +113,73 @@ spring:
 
 better-tape-bot:
   telegram:
-    token: "DEIN_BOT_TOKEN"
+    token: "YOUR_BOT_TOKEN"
 ```
 
-### Lokale Entwicklung
+### Local Development
 
 ```bash
-# Projekt bauen
+# Build the project
 ./gradlew build
 
-# Anwendung starten
+# Run the application
 ./gradlew bootRun
 ```
 
-### Docker
+### 🐳 Docker
 
 ```bash
-# JAR bauen
+# Build JAR
 ./gradlew build
 
-# Docker Image bauen
+# Build Docker image
 docker build -t bettertapebot .
 
-# Container starten
+# Run container
 docker run -d \
   -e SPRING_DATASOURCE_URL=jdbc:postgresql://host:5432/tapebot \
   -e SPRING_DATASOURCE_USERNAME=postgres \
   -e SPRING_DATASOURCE_PASSWORD=password \
-  -e BETTER_TAPE_BOT_TELEGRAM_TOKEN=DEIN_BOT_TOKEN \
+  -e BETTER_TAPE_BOT_TELEGRAM_TOKEN=YOUR_BOT_TOKEN \
   bettertapebot
 ```
 
-## CI/CD
+## 🔄 CI/CD
 
-Das Projekt nutzt GitHub Actions für automatisierte Builds. Bei jedem Push auf `main` wird:
+The project uses GitHub Actions for automated builds. On every push to `main`:
 
-1. Das Projekt mit Gradle gebaut
-2. Ein Docker Image erstellt
-3. Das Image in die GitHub Container Registry gepusht
+1. ✅ Build project with Gradle
+2. 🐳 Create Docker image
+3. 📦 Push to GitHub Container Registry
 
 ```
 ghcr.io/<username>/bettertapebot:latest
 ghcr.io/<username>/bettertapebot:<version>
 ```
 
-## Datenmodell
+## 📊 Data Model
 
 ```
 ┌─────────────┐       ┌─────────────┐       ┌─────────────┐
-│   users     │       │    tapes    │       │ user_states │
+│    tapes    │       │    users    │       │ user_states │
 ├─────────────┤       ├─────────────┤       ├─────────────┤
-│ username PK │◄──────┤ author FK   │       │ chat_id PK  │
-│ pin         │◄──────┤ star FK     │       │ user_state  │
-│ is_admin    │       │ id          │       │ username FK │
-│ wants_abon. │       │ title       │       └─────────────┘
-└─────────────┘       │ date_added  │
-                      └─────────────┘
+│ id          │       │ username PK │       │ chat_id PK  │
+│ title       │       │ pin         │       │ user_state  │
+│ author FK   ├──────►│ is_admin    │◄──────┤ username FK │
+│ star FK     ├──────►│ wants_abon. │       └─────────────┘
+│ date_added  │       └─────────────┘
+└─────────────┘
 ```
 
-## Tests
+## 🧪 Testing
 
 ```bash
-# Alle Tests ausführen (nutzt Testcontainers für PostgreSQL)
+# Run all tests (uses Testcontainers for PostgreSQL)
 ./gradlew test
 ```
 
-## Lizenz
-Dieses Projekt steht unter der [AGPL v3](LICENSE).
+## 📄 License
 
+This project is licensed under the [AGPL v3](LICENSE).
+
+---
