@@ -22,7 +22,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
@@ -142,7 +141,7 @@ class GetAllHandlerTest {
         Mockito.reset(userStateRepository, userRepository, tapeRepository);
         getAllHandler.handleCommand(chatId, null);
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-        Mockito.verify(tapeRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Sort.class));
+        Mockito.verify(tapeRepository, Mockito.times(1)).findAllByOrderByDateAddedDesc();
         Mockito.verifyNoInteractions(userRepository);
         
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);

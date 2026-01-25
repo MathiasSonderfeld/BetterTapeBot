@@ -12,6 +12,9 @@ import java.util.UUID;
 @Repository
 public interface TapeRepository extends JpaRepository<TapeEntity, UUID> {
     
+    Optional<TapeEntity> findTopByOrderByDateAddedDesc();
+    List<TapeEntity> findAllByOrderByDateAddedDesc();
+    
     List<TapeEntity> findAllByDirector(UserEntity userEntity);
     List<TapeEntity> findAllByStar(UserEntity userEntity);
     Optional<TapeEntity> deleteTapeEntityById(UUID id);

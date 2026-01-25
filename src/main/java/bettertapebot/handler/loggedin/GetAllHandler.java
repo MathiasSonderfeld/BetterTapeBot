@@ -14,7 +14,6 @@ import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jspecify.annotations.NonNull;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class GetAllHandler implements CommandHandler { //TODO implement, gib also Id if isAdmin
+public class GetAllHandler implements CommandHandler {
 
     ResponseService responseService;
     UserStateRepository userStateRepository;
@@ -46,8 +45,7 @@ public class GetAllHandler implements CommandHandler { //TODO implement, gib als
             return;
         }
         boolean isAdmin = stateOptional.get().getUserState().isAdmin();
-        var sort = Sort.by(Sort.Direction.DESC, TapeEntity.Fields.dateAdded);
-        List<TapeEntity> tapes = tapeRepository.findAll(sort);
+        List<TapeEntity> tapes = tapeRepository.findAllByOrderByDateAddedDesc();
         
         StringBuilder stringBuilder = new StringBuilder();
         for (TapeEntity tape : tapes) {
