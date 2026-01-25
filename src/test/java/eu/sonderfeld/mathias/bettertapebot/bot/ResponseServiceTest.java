@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
@@ -21,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringJUnitConfig
-class ResponseServiceTest { //TODO adopt test to changed keyboad behaviour
+class ResponseServiceTest {
 
     BotProperties botProperties;
     TelegramClient telegramClient;
@@ -53,6 +54,8 @@ class ResponseServiceTest { //TODO adopt test to changed keyboad behaviour
                     assertThat(sendMessage).isNotNull();
                     assertThat(sendMessage.getChatId()).isEqualTo("1");
                     assertThat(sendMessage.getText()).isEqualTo("testmessage");
+                    assertThat(sendMessage.getReplyMarkup()).isNotNull()
+                        .isEqualTo(new ReplyKeyboardRemove(true));
                 });
         });
     }
@@ -74,11 +77,14 @@ class ResponseServiceTest { //TODO adopt test to changed keyboad behaviour
             assertThat(firstMessage).isNotNull();
             assertThat(firstMessage.getChatId()).isEqualTo("1");
             assertThat(firstMessage.getText()).isEqualTo("testmessage");
+            assertThat(firstMessage.getReplyMarkup()).isNotNull()
+                .isEqualTo(new ReplyKeyboardRemove(true));
 
             var secondMessage = allMessages.get(1);
             assertThat(secondMessage).isNotNull();
             assertThat(secondMessage.getChatId()).isEqualTo("1");
             assertThat(secondMessage.getText()).isEqualTo("verylong");
+            assertThat(secondMessage.getReplyMarkup()).isNull();
         });
     }
 
@@ -106,7 +112,7 @@ class ResponseServiceTest { //TODO adopt test to changed keyboad behaviour
 
     @Test
     @SneakyThrows
-    void testKeyboardGetsOnlyAddedToFirstMessage() {
+    void testExplicitKeyboardGetsOnlyAddedToFirstMessage() {
         botProperties.getTelegram().setMessageLengthLimit(11);
         responseService.send(1, new ReplyKeyboardMarkup(List.of()), "testmessageverylong");
         Awaitility.await().atMost(Duration.ofSeconds(3)).untilAsserted(() -> {
@@ -128,6 +134,27 @@ class ResponseServiceTest { //TODO adopt test to changed keyboad behaviour
             assertThat(secondMessage.getChatId()).isEqualTo("1");
             assertThat(secondMessage.getText()).isEqualTo("verylong");
             assertThat(secondMessage.getReplyMarkup()).isNull();
+        });
+    }
+    @Test
+    @SneakyThrows
+    void testCanHandleNullKeyboards() {
+        botProperties.getTelegram().setMessageLengthLimit(11);
+        responseService.send(1, null, "testmessage");
+        Awaitility.await().atMost(Duration.ofSeconds(3)).untilAsserted(() -> {
+            ArgumentCaptor<SendMessage> captor = ArgumentCaptor.forClass(SendMessage.class);
+            Mockito.verify(telegramClient, Mockito.times(1)).execute(captor.capture());
+            
+            var allMessages = captor.getAllValues();
+            assertThat(allMessages).isNotNull()
+                .hasSize(1)
+                .element(0)
+                .satisfies(sendMessage -> {
+                    assertThat(sendMessage).isNotNull();
+                    assertThat(sendMessage.getChatId()).isEqualTo("1");
+                    assertThat(sendMessage.getText()).isEqualTo("testmessage");
+                    assertThat(sendMessage.getReplyMarkup()).isNull();
+                });
         });
     }
 
