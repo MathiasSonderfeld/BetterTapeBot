@@ -7,7 +7,7 @@ import eu.sonderfeld.mathias.bettertapebot.handler.StateHandler;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
-import jakarta.transaction.Transactional;
+import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
@@ -38,14 +38,12 @@ public class StarringHandler implements CommandHandler, StateHandler { //TODO im
     }
 
     @Override
-    @Transactional
     public void handleCommand(long chatId, String message) {
     
     }
     
     @Override
-    @Transactional
-    public void handleMessage(long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
     
     }
 }

@@ -158,4 +158,106 @@ class DeleteTapeHandlerTest {
             .isEqualTo(UserState.DELETE_TAPE_GET_TAPE_ID);
     }
     
+    @Test
+    public void deleteTapeCommandWithoutIdGetsAskedForId(){
+        Long chatId = 3456L;
+        
+        var user = userRepository.save(UserEntity.builder()
+            .username("username")
+            .pin("1234")
+            .isAdmin(true)
+            .build());
+        
+        var state = userStateRepository.save(UserStateEntity.builder()
+            .userState(UserState.ADMIN)
+            .owner(user)
+            .chatId(chatId)
+            .build());
+        
+        deleteTapeHandler.handleCommand(chatId, null);
+        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        Mockito.verifyNoInteractions(tapeRepository);
+        
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
+        var texts = textCaptor.getAllValues();
+        assertThat(texts).isNotNull()
+            .hasSize(1)
+            .element(0)
+            .asInstanceOf(InstanceOfAssertFactories.STRING)
+            .contains("Wie lautet die Tape-ID?");
+        
+        assertThat(state)
+            .extracting(UserStateEntity::getUserState)
+            .isEqualTo(UserState.DELETE_TAPE_GET_TAPE_ID);
+    }
+    
+    @Test
+    public void deleteTapeMessageWithValidUUIDGetsDeleted(){
+        long chatId = 2345L;
+        
+        var user = userRepository.save(UserEntity.builder()
+            .username("username")
+            .pin("1234")
+            .isAdmin(true)
+            .build());
+        
+        var state = userStateRepository.save(UserStateEntity.builder()
+            .userState(UserState.DELETE_TAPE_GET_TAPE_ID)
+            .owner(user)
+            .chatId(chatId)
+            .build());
+        
+        var tape = tapeRepository.save(TapeEntity.builder()
+            .title("test tape 1")
+            .star(user)
+            .director(user)
+            .dateAdded(Instant.now())
+            .build());
+        
+        Mockito.reset(userStateRepository, userRepository, tapeRepository);
+        deleteTapeHandler.handleMessage(state, chatId, tape.getId().toString());
+        Mockito.verify(tapeRepository, Mockito.times(1)).deleteById(tape.getId());
+        
+        var tapeOptional = tapeRepository.findById(tape.getId());
+        assertThat(tapeOptional).isNotNull().isEmpty();
+        
+        assertThat(state)
+            .extracting(UserStateEntity::getUserState)
+            .isEqualTo(UserState.ADMIN);
+        Mockito.verifyNoInteractions(userRepository, userStateRepository, responseService);
+    }
+    
+    @Test
+    public void deleteTapeMessageWithInvalidUUIDGetsError(){
+        Long chatId = 3456L;
+        
+        var user = userRepository.save(UserEntity.builder()
+            .username("username")
+            .pin("1234")
+            .isAdmin(true)
+            .build());
+        
+        var state = userStateRepository.save(UserStateEntity.builder()
+            .userState(UserState.DELETE_TAPE_GET_TAPE_ID)
+            .owner(user)
+            .chatId(chatId)
+            .build());
+        Mockito.reset(userStateRepository, userRepository);
+        deleteTapeHandler.handleMessage(state, chatId, "invalid");
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
+        var texts = textCaptor.getAllValues();
+        assertThat(texts).isNotNull()
+            .hasSize(1)
+            .element(0)
+            .asInstanceOf(InstanceOfAssertFactories.STRING)
+            .contains("Die ID konnte ich nicht parsen, probiers nochmal");
+        
+        assertThat(state)
+            .extracting(UserStateEntity::getUserState)
+            .isEqualTo(UserState.DELETE_TAPE_GET_TAPE_ID);
+        Mockito.verifyNoInteractions(userRepository, userStateRepository, tapeRepository);
+    }
+    
 }

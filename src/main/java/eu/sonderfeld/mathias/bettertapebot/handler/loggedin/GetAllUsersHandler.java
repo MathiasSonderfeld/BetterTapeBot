@@ -6,7 +6,6 @@ import eu.sonderfeld.mathias.bettertapebot.handler.CommandHandler;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserEntity;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,6 @@ public class GetAllUsersHandler implements CommandHandler {
     }
 
     @Override
-    @Transactional
     public void handleCommand(long chatId, String message) {
         var stateOptional = userStateRepository.findById(chatId);
         if(stateOptional.isEmpty() || !stateOptional.get().getUserState().isLoggedIn()){

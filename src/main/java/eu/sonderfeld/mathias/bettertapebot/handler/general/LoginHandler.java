@@ -9,7 +9,6 @@ import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
 import eu.sonderfeld.mathias.bettertapebot.util.MessageCleaner;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +41,6 @@ public class LoginHandler implements CommandHandler, StateHandler {
     }
 
     @Override
-    @Transactional
     public void handleCommand(long chatId, String message) {
         var stateOptional = userStateRepository.findById(chatId);
         
@@ -72,9 +70,7 @@ public class LoginHandler implements CommandHandler, StateHandler {
     }
     
     @Override
-    @Transactional
-    public void handleMessage(long chatId, String message) {
-        var userStateEntity = userStateRepository.findById(chatId).orElseThrow();
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
         if(userStateEntity.getUserState() == UserState.LOGIN_VALIDATE_USERNAME){
             var cleanedName = MessageCleaner.getFirstWord(message);
             verifyAndSetUsername(chatId, cleanedName, userStateEntity);

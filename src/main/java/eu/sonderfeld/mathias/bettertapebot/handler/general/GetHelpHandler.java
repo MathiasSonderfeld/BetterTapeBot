@@ -4,7 +4,6 @@ import eu.sonderfeld.mathias.bettertapebot.bot.ResponseService;
 import eu.sonderfeld.mathias.bettertapebot.handler.Command;
 import eu.sonderfeld.mathias.bettertapebot.handler.CommandHandler;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,6 @@ public class GetHelpHandler implements CommandHandler {
     }
 
     @Override
-    @Transactional
     public void handleCommand(long chatId, String message) {
         var stateOptional = userStateRepository.findById(chatId);
         

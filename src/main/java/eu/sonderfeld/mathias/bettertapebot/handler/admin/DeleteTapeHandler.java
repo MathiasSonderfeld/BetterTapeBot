@@ -8,7 +8,6 @@ import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
 import eu.sonderfeld.mathias.bettertapebot.util.MessageCleaner;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.experimental.FieldDefaults;
@@ -46,10 +45,8 @@ public class DeleteTapeHandler extends AbstractAdminHandler implements StateHand
     }
     
     @Override
-    @Transactional
-    public void handleMessage(long chatId, String message) {
-        var userState = userStateRepository.findById(chatId).orElseThrow();
-        handleCommandWithMessage(userState, message);
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+        handleCommandWithMessage(userStateEntity, message);
     }
     
     @Override
@@ -71,7 +68,7 @@ public class DeleteTapeHandler extends AbstractAdminHandler implements StateHand
             responseService.send(userStateEntity.getChatId(), "Die ID konnte ich nicht parsen, probiers nochmal");
             return;
         }
-        log.info("deleting tape with id {} on request in chat {}", id, userStateEntity.getOwner().getUsername());
+        log.info("deleting tape with id {} on request of {}", id, userStateEntity.getOwner().getUsername());
         tapeRepository.deleteById(id);
         userStateEntity.setUserState(UserState.ADMIN);
     }

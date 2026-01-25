@@ -5,7 +5,6 @@ import eu.sonderfeld.mathias.bettertapebot.handler.CommandHandler;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,7 +19,6 @@ public abstract class AbstractAdminHandler implements CommandHandler {
     ResponseService responseService;
     
     @Override
-    @Transactional
     public void handleCommand(long chatId, String message) {
         var stateOptional = userStateRepository.findById(chatId);
         var knownAndAdmin = stateOptional.map(UserStateEntity::getUserState)

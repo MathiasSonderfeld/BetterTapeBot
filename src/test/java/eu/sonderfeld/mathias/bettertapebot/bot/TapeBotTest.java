@@ -173,16 +173,16 @@ class TapeBotTest {
         long chatId = 678L;
         var text = "data";
         Update update = createUpdate(chatId, text);
-        UserStateEntity entity = UserStateEntity.builder()
+        var state = UserStateEntity.builder()
             .chatId(chatId)
             .userState(HANDLED_STATE)
             .build();
-        Mockito.when(userStateRepository.findById(chatId)).thenReturn(Optional.of(entity));
+        Mockito.when(userStateRepository.findById(chatId)).thenReturn(Optional.of(state));
         
         Assertions.assertDoesNotThrow(() -> tapeBot.consume(update));
         Mockito.verifyNoInteractions(responseService, commandHandler);
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(ArgumentMatchers.eq(chatId));
         Mockito.verify(stateHandler, Mockito.times(1))
-            .handleMessage(ArgumentMatchers.eq(chatId), ArgumentMatchers.eq(text));
+            .handleMessage(ArgumentMatchers.any(), ArgumentMatchers.eq(chatId), ArgumentMatchers.eq(text));
     }
 }

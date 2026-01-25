@@ -16,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
 import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
@@ -76,8 +77,8 @@ public class TapeBot implements SpringLongPollingBot, LongPollingSingleThreadUpd
     }
 
     @Override
+    @Transactional
     public void consume(Update update) {
-
         if(!update.hasMessage() || !update.getMessage().hasText()){
             log.warn("update was ignored as it has no messsage for chatid {} - {}", update.getMessage().getChatId(), update);
             return;
@@ -122,7 +123,7 @@ public class TapeBot implements SpringLongPollingBot, LongPollingSingleThreadUpd
         UserStateEntity userStateEntity = stateOptional.get();
         var handler = stateHandlerMap.get(userStateEntity.getUserState());
         if(handler != null){
-            handler.handleMessage(chatId, receivedText);
+            handler.handleMessage(userStateEntity, chatId, receivedText);
         }
     }
 }

@@ -5,7 +5,6 @@ import eu.sonderfeld.mathias.bettertapebot.handler.Command;
 import eu.sonderfeld.mathias.bettertapebot.handler.CommandHandler;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,6 @@ public class GetAllHandler implements CommandHandler { //TODO implement, gib als
     }
 
     @Override
-    @Transactional
     public void handleCommand(long chatId, String message) {
     
     }

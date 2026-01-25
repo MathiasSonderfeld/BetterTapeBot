@@ -234,15 +234,14 @@ class LoginHandlerTest {
             .pin("1234")
             .build());
         
-        userStateRepository.save(UserStateEntity.builder()
+        var state = userStateRepository.save(UserStateEntity.builder()
             .userState(userState)
             .owner(userEntity)
             .chatId(chatId)
             .build());
         
-        loginHandler.handleMessage(chatId, username);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-        
+        Mockito.reset(userRepository, userStateRepository);
+        loginHandler.handleMessage(state, chatId, username);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -251,6 +250,7 @@ class LoginHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Wie lautet deine PIN?");
+        Mockito.verifyNoInteractions(userRepository, userStateRepository);
         
         var updatedState = userStateRepository.findById(chatId);
         assertThat(updatedState).isNotEmpty().get()
@@ -279,15 +279,14 @@ class LoginHandlerTest {
             .pin("1234")
             .build());
         
-        userStateRepository.save(UserStateEntity.builder()
+        var state = userStateRepository.save(UserStateEntity.builder()
             .userState(userState)
             .owner(oldEntity)
             .chatId(chatId)
             .build());
         
-        loginHandler.handleMessage(chatId, username);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-        
+        Mockito.reset(userRepository, userStateRepository);
+        loginHandler.handleMessage(state, chatId, username);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -296,6 +295,8 @@ class LoginHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Wie lautet deine PIN?");
+        Mockito.verify(userRepository, Mockito.times(1)).findById(ArgumentMatchers.eq(username));
+        Mockito.verifyNoInteractions(userStateRepository);
         
         var updatedState = userStateRepository.findById(chatId);
         assertThat(updatedState).isNotEmpty().get()
@@ -320,15 +321,14 @@ class LoginHandlerTest {
             .pin(pin)
             .build());
         
-        userStateRepository.save(UserStateEntity.builder()
+        var state = userStateRepository.save(UserStateEntity.builder()
             .userState(userState)
             .owner(userEntity)
             .chatId(chatId)
             .build());
         
-        loginHandler.handleMessage(chatId, "wrong pin");
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-        
+        Mockito.reset(userRepository, userStateRepository);
+        loginHandler.handleMessage(state, chatId, "wrong pin");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -337,6 +337,7 @@ class LoginHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("PIN inkorrekt, versuchs nochmal");
+        Mockito.verifyNoInteractions(userRepository, userStateRepository);
         
         var updatedState = userStateRepository.findById(chatId);
         assertThat(updatedState).isNotEmpty().get()
@@ -356,15 +357,14 @@ class LoginHandlerTest {
             .pin(pin)
             .build());
         
-        userStateRepository.save(UserStateEntity.builder()
+        var state = userStateRepository.save(UserStateEntity.builder()
             .userState(userState)
             .owner(userEntity)
             .chatId(chatId)
             .build());
         
-        loginHandler.handleMessage(chatId, pin);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-        
+        Mockito.reset(userRepository, userStateRepository);
+        loginHandler.handleMessage(state, chatId, pin);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -373,6 +373,7 @@ class LoginHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("du wurdest erfolgreich eingeloggt");
+        Mockito.verifyNoInteractions(userRepository, userStateRepository);
         
         var updatedState = userStateRepository.findById(chatId);
         assertThat(updatedState).isNotEmpty().get()

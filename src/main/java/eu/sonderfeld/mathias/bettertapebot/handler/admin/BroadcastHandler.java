@@ -6,7 +6,6 @@ import eu.sonderfeld.mathias.bettertapebot.handler.StateHandler;
 import eu.sonderfeld.mathias.bettertapebot.repository.UserStateRepository;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserState;
 import eu.sonderfeld.mathias.bettertapebot.repository.entity.UserStateEntity;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.experimental.FieldDefaults;
@@ -41,9 +40,7 @@ public class BroadcastHandler extends AbstractAdminHandler implements StateHandl
     }
     
     @Override
-    @Transactional
-    public void handleMessage(long chatId, String message) {
-        var userStateEntity = userStateRepository.findById(chatId).orElseThrow();
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
         handleCommandWithMessage(userStateEntity, message);
     }
     

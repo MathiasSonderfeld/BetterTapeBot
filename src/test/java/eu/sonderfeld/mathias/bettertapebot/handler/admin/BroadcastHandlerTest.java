@@ -176,7 +176,7 @@ class BroadcastHandlerTest {
             .chatId(loggedOutChatId)
             .build());
         
-        broadcastHandler.handleMessage(chatId, message);
+        broadcastHandler.handleMessage(state, chatId, message);
         //noinspection unchecked
         ArgumentCaptor<List<Long>> listCaptor = ArgumentCaptor.forClass(List.class);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
