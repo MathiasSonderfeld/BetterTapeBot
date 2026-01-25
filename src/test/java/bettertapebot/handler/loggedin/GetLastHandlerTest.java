@@ -73,7 +73,7 @@ class GetLastHandlerTest {
     
     @Test
     public void notLoggedInUserGetsDenied(){
-        Long chatId = 1234L;
+        long chatId = 1234L;
         getLastHandler.handleCommand(chatId, null);
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
@@ -90,7 +90,7 @@ class GetLastHandlerTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     public void testGetsListOfTapes(boolean isAdmin){
-        Long chatId = 2345L;
+        long chatId = 2345L;
         ZonedDateTime time1 = ZonedDateTime.of(2025, 9, 1,12,0,0,0, ZoneId.systemDefault());
         ZonedDateTime time2 = ZonedDateTime.of(2024, 9, 1,12,0,0,0, ZoneId.systemDefault());
         ZonedDateTime time3 = ZonedDateTime.of(2023, 9, 1,12,0,0,0, ZoneId.systemDefault());

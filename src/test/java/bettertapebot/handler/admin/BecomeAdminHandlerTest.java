@@ -61,7 +61,7 @@ class BecomeAdminHandlerTest {
 
     @Test
     public void unknownSessionGetsDenied(){
-        Long chatId = 1234L;
+        long chatId = 1234L;
         becomeAdminHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
 
@@ -77,7 +77,7 @@ class BecomeAdminHandlerTest {
 
     @Test
     public void alreadyAdminGetsInformed(){
-        Long chatId = 2345L;
+        long chatId = 2345L;
 
         var user = userRepository.save(UserEntity.builder()
             .username("admin")
@@ -107,7 +107,7 @@ class BecomeAdminHandlerTest {
 
     @Test
     public void normalUserGetsDenied(){
-        Long chatId = 3456L;
+        long chatId = 3456L;
 
         var user = userRepository.save(UserEntity.builder()
             .username("user")
@@ -137,7 +137,7 @@ class BecomeAdminHandlerTest {
 
     @Test
     public void adminCanUpgrade(){
-        Long chatId = 4567L;
+        long chatId = 4567L;
 
         var user = userRepository.save(UserEntity.builder()
             .username("admin")

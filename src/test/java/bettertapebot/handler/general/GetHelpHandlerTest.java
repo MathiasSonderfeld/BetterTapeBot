@@ -57,7 +57,7 @@ class GetHelpHandlerTest {
 
     @Test
     public void unknownUsersGetGeneralHelpOnly(){
-        Long chatId = 1234L;
+        long chatId = 1234L;
         getHelpHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
 
@@ -84,7 +84,7 @@ class GetHelpHandlerTest {
 
     @Test
     public void loggedInUsersGetGeneralAndUserHelp(){
-        Long chatId = 2345L;
+        long chatId = 2345L;
 
         userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
@@ -117,7 +117,7 @@ class GetHelpHandlerTest {
     
     @Test
     public void adminGetGeneralAll(){
-        Long chatId = 3456L;
+        long chatId = 3456L;
         
         userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)

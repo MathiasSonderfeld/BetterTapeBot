@@ -57,7 +57,7 @@ class GetMeHandlerTest {
     
     @Test
     public void unknownChatGetsChatIdOnly(){
-        Long chatId = 1234L;
+        long chatId = 1234L;
         getMeHandler.handleCommand(chatId, null);
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
@@ -74,7 +74,7 @@ class GetMeHandlerTest {
     
     @Test
     public void knownChatGetsDebugData(){
-        Long chatId = 2345L;
+        long chatId = 2345L;
         String username = "user";
         UserState state = UserState.DELETE_USER_GET_USERNAME;
         

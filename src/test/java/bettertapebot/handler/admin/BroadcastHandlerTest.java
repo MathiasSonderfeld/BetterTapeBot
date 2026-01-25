@@ -61,7 +61,7 @@ class BroadcastHandlerTest {
     
     @Test
     public void notAdminChatGetsDenied(){
-        Long chatId = 1234L;
+        long chatId = 1234L;
         broadcastHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
@@ -77,7 +77,7 @@ class BroadcastHandlerTest {
     
     @Test
     public void broadcastCommandWithMessageGetsSent(){
-        Long chatId = 2345L;
+        long chatId = 2345L;
         Long loggedInChatId = 1234L;
         Long loggedOutChatId = 9876L;
         String message = "testmessage";
@@ -128,7 +128,7 @@ class BroadcastHandlerTest {
     
     @Test
     public void broadcastCommandWithoutMessageGetsAskedForMessage(){
-        Long chatId = 3456L;
+        long chatId = 3456L;
         userStateRepository.save(UserStateEntity.builder()
             .userState(UserState.ADMIN)
             .owner(null)
@@ -156,7 +156,7 @@ class BroadcastHandlerTest {
     
     @Test
     public void BroadcastMessageGetsSent(){
-        Long chatId = 4567L;
+        long chatId = 4567L;
         Long loggedInChatId = 1234L;
         Long loggedOutChatId = 9876L;
         String message = "testmessage";

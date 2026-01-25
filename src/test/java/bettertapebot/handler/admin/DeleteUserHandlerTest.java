@@ -65,7 +65,7 @@ class DeleteUserHandlerTest {
     
     @Test
     public void notAdminChatGetsDenied(){
-        Long chatId = 1234L;
+        long chatId = 1234L;
         deleteUserHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
@@ -81,7 +81,7 @@ class DeleteUserHandlerTest {
     
     @Test
     public void deleteUserCommandWithUnknownUserGetsAskedAgain(){
-        Long chatId = 3456L;
+        long chatId = 3456L;
         String usernameToDelete = "redundantuser";
         var admin = userRepository.save(UserEntity.builder()
             .username("username")
@@ -116,7 +116,7 @@ class DeleteUserHandlerTest {
     
     @Test
     public void deleteUserCommandWithoutUserGetsAskedForUsername(){
-        Long chatId = 3456L;
+        long chatId = 3456L;
         var admin = userRepository.save(UserEntity.builder()
             .username("username")
             .pin("1234")
@@ -149,7 +149,7 @@ class DeleteUserHandlerTest {
     
     @Test
     public void deleteUserCommandWithKnownUserGetsDeleted(){
-        Long chatId = 3456L;
+        long chatId = 3456L;
         String usernameToDelete = "redundantuser";
         var admin = userRepository.save(UserEntity.builder()
             .username("username")
@@ -220,7 +220,7 @@ class DeleteUserHandlerTest {
     
     @Test
     public void messageWithUnknownUserGetsAskedAgain(){
-        Long chatId = 3456L;
+        long chatId = 3456L;
         String usernameToDelete = "redundantuser";
         var admin = userRepository.save(UserEntity.builder()
             .username("username")

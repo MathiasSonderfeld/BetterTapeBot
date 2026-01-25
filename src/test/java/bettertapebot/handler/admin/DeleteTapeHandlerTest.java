@@ -76,7 +76,7 @@ class DeleteTapeHandlerTest {
     
     @Test
     public void notAdminChatGetsDenied(){
-        Long chatId = 1234L;
+        long chatId = 1234L;
         deleteTapeHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
@@ -92,7 +92,7 @@ class DeleteTapeHandlerTest {
     
     @Test
     public void deleteTapeCommandWithValidUUIDGetsDeleted(){
-        Long chatId = 2345L;
+        long chatId = 2345L;
         
         var user = userRepository.save(UserEntity.builder()
             .username("username")
@@ -127,7 +127,7 @@ class DeleteTapeHandlerTest {
     
     @Test
     public void deleteTapeCommandWithValidButUnknownUUIDGetsAskedAgain(){
-        Long chatId = 2345L;
+        long chatId = 2345L;
         
         var user = userRepository.save(UserEntity.builder()
             .username("username")
@@ -165,7 +165,7 @@ class DeleteTapeHandlerTest {
     
     @Test
     public void deleteTapeCommandWithInvalidUUIDGetsError(){
-        Long chatId = 3456L;
+        long chatId = 3456L;
         
         var user = userRepository.save(UserEntity.builder()
             .username("username")
@@ -199,7 +199,7 @@ class DeleteTapeHandlerTest {
     
     @Test
     public void deleteTapeCommandWithoutIdGetsAskedForId(){
-        Long chatId = 3456L;
+        long chatId = 3456L;
         
         var user = userRepository.save(UserEntity.builder()
             .username("username")
@@ -306,7 +306,7 @@ class DeleteTapeHandlerTest {
     
     @Test
     public void deleteTapeMessageWithInvalidUUIDGetsError(){
-        Long chatId = 3456L;
+        long chatId = 3456L;
         
         var user = userRepository.save(UserEntity.builder()
             .username("username")

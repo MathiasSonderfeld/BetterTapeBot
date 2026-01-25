@@ -54,7 +54,7 @@ class ResetStateHandlerTest {
     
     @Test
     public void unknownChatGetsSkipped(){
-        Long chatId = 1234L;
+        long chatId = 1234L;
         resetStateHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
@@ -70,7 +70,7 @@ class ResetStateHandlerTest {
     
     @Test
     public void chatGetsReset(){
-        Long chatId = 2345L;
+        long chatId = 2345L;
         
         userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)

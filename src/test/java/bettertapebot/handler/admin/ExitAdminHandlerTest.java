@@ -57,7 +57,7 @@ class ExitAdminHandlerTest {
     
     @Test
     public void unknownSessionGetsDenied(){
-        Long chatId = 1234L;
+        long chatId = 1234L;
         exitAdminHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
@@ -75,7 +75,7 @@ class ExitAdminHandlerTest {
     @ValueSource(strings = "value")
     @ParameterizedTest
     public void alreadyAdminGetsInformed(String message){
-        Long chatId = 2345L;
+        long chatId = 2345L;
         
         var state = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)

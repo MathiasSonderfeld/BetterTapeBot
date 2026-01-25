@@ -69,7 +69,7 @@ class LoginHandlerTest {
     
     @Test
     public void alreadyLoggedInUserGetsInfo(){
-        Long chatId = 1234L;
+        long chatId = 1234L;
         String username = "username";
         UserState state = UserState.LOGGED_IN;
         
@@ -100,7 +100,7 @@ class LoginHandlerTest {
     
     @Test
     public void loggedOutUserWithGivenUsernameGetsAskedForPIN(){
-        Long chatId = 2345L;
+        long chatId = 2345L;
         String username = "username";
         UserState userState = UserState.LOGGED_OUT;
         
@@ -140,7 +140,7 @@ class LoginHandlerTest {
     
     @Test
     public void newUserWithGivenUsernameGetsAskedForPIN(){
-        Long chatId = 3456L;
+        long chatId = 3456L;
         String username = "username";
         UserState userState = UserState.LOGGED_OUT;
         
@@ -185,7 +185,7 @@ class LoginHandlerTest {
     
     @Test
     public void loggedOutUserGetsAskedForUsername(){
-        Long chatId = 4567L;
+        long chatId = 4567L;
         String username = "username";
         UserState userState = UserState.LOGGED_OUT;
         
@@ -225,7 +225,7 @@ class LoginHandlerTest {
     
     @Test
     public void sendingUsernameOnRequestGetsAskedForPIN(){
-        Long chatId = 5678L;
+        long chatId = 5678L;
         String username = "username";
         UserState userState = UserState.LOGIN_VALIDATE_USERNAME;
         
@@ -265,7 +265,7 @@ class LoginHandlerTest {
     
     @Test
     public void sendingNewUsernameOnRequestGetsAskedForPIN(){
-        Long chatId = 5678L;
+        long chatId = 5678L;
         String username = "username";
         UserState userState = UserState.LOGIN_VALIDATE_USERNAME;
         
@@ -311,7 +311,7 @@ class LoginHandlerTest {
     
     @Test
     public void sendingWrongPINOnRequestGetsAskedToRepeat(){
-        Long chatId = 6789L;
+        long chatId = 6789L;
         String username = "username";
         String pin = "1234";
         UserState userState = UserState.LOGIN_VALIDATE_PIN;
@@ -347,7 +347,7 @@ class LoginHandlerTest {
     
     @Test
     public void sendingCorrectPINOnRequestGetsLoggedIn(){
-        Long chatId = 6789L;
+        long chatId = 6789L;
         String username = "username";
         String pin = "1234";
         UserState userState = UserState.LOGIN_VALIDATE_PIN;

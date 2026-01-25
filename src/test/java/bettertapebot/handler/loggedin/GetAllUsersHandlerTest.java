@@ -61,7 +61,7 @@ class GetAllUsersHandlerTest {
     
     @Test
     public void unknownUserGetsDenied(){
-        Long chatId = 1234L;
+        long chatId = 1234L;
         getAllUsersHandler.handleCommand(chatId, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
@@ -77,7 +77,7 @@ class GetAllUsersHandlerTest {
     
     @Test
     public void loggedInUserGetsAllUsers(){
-        Long chatId = 2345L;
+        long chatId = 2345L;
         var user1 = userRepository.save(UserEntity.builder()
             .username("user1")
             .pin("1234")

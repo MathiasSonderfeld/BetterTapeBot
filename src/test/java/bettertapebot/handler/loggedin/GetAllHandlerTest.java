@@ -73,7 +73,7 @@ class GetAllHandlerTest {
     
     @Test
     public void notLoggedInUserGetsDenied(){
-        Long chatId = 1234L;
+        long chatId = 1234L;
         getAllHandler.handleCommand(chatId, null);
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
@@ -90,7 +90,7 @@ class GetAllHandlerTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     public void testGetsListOfTapes(boolean isAdmin){
-        Long chatId = 2345L;
+        long chatId = 2345L;
         ZonedDateTime time = ZonedDateTime.of(2025, 9, 1,12,0,0,0, ZoneId.systemDefault());
         String expectedTime = "01.09.25 12:00";
         var requestor = userRepository.save(UserEntity.builder()
