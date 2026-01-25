@@ -51,7 +51,7 @@ public class TapeBot implements SpringLongPollingBot, LongPollingSingleThreadUpd
     Map<UserState, StateHandler> stateHandlerMap;
     
     @PostConstruct
-    private void postConstruct(){
+    void postConstruct(){
         commandHandlerMap = new EnumMap<>(Command.class);
         for (CommandHandler commandHandler : commandHandlers) {
             commandHandlerMap.put(commandHandler.forCommand(), commandHandler);
@@ -116,14 +116,12 @@ public class TapeBot implements SpringLongPollingBot, LongPollingSingleThreadUpd
         //no command was given, processing based on state
         var state = userStateRepository.findById(chatId);
         if(state.isEmpty()){
+            responseService.send(chatId, null, "Hi, gib /login zum einloggen oder /register zum registrieren ein.");
             return;
         }
         UserStateEntity userStateEntity = state.get();
         var handler = stateHandlerMap.get(userStateEntity.getUserState());
-        if(handler == null){
-            log.error("missing handler for state {}, ignoring message", userStateEntity.getUserState());
-        }
-        else {
+        if(handler != null){
             handler.handleMessage(chatId, receivedText);
         }
     }

@@ -14,7 +14,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class BotProperties {
 
     @NotNull
-    TelegramProperties telegram;
+    TelegramProperties telegram = new TelegramProperties();
 
     @NotBlank
     String dsgvoResourceName = "dsgvo.txt";

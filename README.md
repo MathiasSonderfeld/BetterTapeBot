@@ -32,7 +32,7 @@
 | Technology | Purpose |
 |------------|---------|
 | **Java 25** | Runtime |
-| **Spring Boot 4.0** | Application Framework |
+| **Spring Boot** | Application Framework |
 | **PostgreSQL** | Database |
 | **Liquibase** | Database Migrations |
 | **Telegram Bot API** | Long Polling Integration |
