@@ -103,6 +103,7 @@ public class MessageDelegator {
         var handler = stateHandlerMap.get(userStateEntity.getUserState());
         if(handler != null){
             handler.handleMessage(userStateEntity, chatId, receivedText);
+            return;
         }
         
         responseService.send(chatId, null, String.format("Hi, gib %s zum einloggen oder %s zum registrieren ein.", Command.LOGIN.getCommand(), Command.REGISTER.getCommand()));

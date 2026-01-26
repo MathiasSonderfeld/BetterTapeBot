@@ -136,7 +136,7 @@ public class RegisterHandler implements CommandHandler, StateHandler {
         }
         else {
             userStateEntity.setUserState(UserState.REGISTER_AWAITING_DSGVO);
-            responseService.send(userStateEntity.getChatId(), "Nice! 😎");
+            responseService.send(userStateEntity.getChatId(), "Nice! 😎"); //TODO send is async, merge dis
             responseService.send(userStateEntity.getChatId(),"Leider sind wir in Deutschland und Datenschutz ist wichtig... 😒");
             responseService.send(userStateEntity.getChatId(), dsgvoMarkup,String.format("Bitte bestätige, dass ich Deine Daten für diesen Dienst speichern und verarbeiten darf. Gib %s ein, um genaueres zu erfahren.", Command.DSGVO.getCommand()));
         }
