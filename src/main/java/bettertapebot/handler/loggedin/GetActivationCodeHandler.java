@@ -3,8 +3,10 @@ package bettertapebot.handler.loggedin;
 import bettertapebot.bot.ResponseService;
 import bettertapebot.handler.Command;
 import bettertapebot.handler.CommandHandler;
+import bettertapebot.properties.BotProperties;
 import bettertapebot.repository.entity.UserStateEntity;
 import bettertapebot.config.PasscodeGenerator;
+import bettertapebot.util.DurationFormatter;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class GetActivationCodeHandler implements CommandHandler {
 
     ResponseService responseService;
     PasscodeGenerator passcodeGenerator;
+    BotProperties botProperties;
 
     @Override
     public @NonNull Command forCommand() {
@@ -34,6 +37,9 @@ public class GetActivationCodeHandler implements CommandHandler {
             responseService.send(chatId, "Nur eingeloggte User können Codes erzeugen");
             return;
         }
-        responseService.send(chatId, "Der aktuelle Freischaltcode lautet: " + passcodeGenerator.generatePasscode());
+        
+        var ttlFormatted = DurationFormatter.format(botProperties.getActivationCodeTTL(), botProperties.getActivationCodeFormatLocale());
+        var response = String.format("Der aktuelle Freischaltcode lautet: %04d, er ist %s gültig", passcodeGenerator.generatePasscode(), ttlFormatted);
+        responseService.send(chatId, response);
     }
 }

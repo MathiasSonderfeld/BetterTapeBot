@@ -49,7 +49,7 @@ public class GetHelpHandler implements CommandHandler {
                 .append("Befehle für eingeloggte User:")
                 .append("\n");
 
-            commandsMap.get(Command.CommandLevel.LOGGEDIN).stream()
+            commandsMap.get(Command.CommandLevel.LOGGED_IN).stream()
                 .map(Command::getFormattedHelpText)
                 .forEach(c -> sb.append(c).append("\n"));
         }

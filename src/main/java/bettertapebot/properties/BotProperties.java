@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Locale;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -19,10 +20,17 @@ public class BotProperties {
 
     @NotNull
     Duration activationCodeTTL = Duration.ofHours(24);
+    @NotNull
+    Locale activationCodeFormatLocale = Locale.GERMANY;
     
     @NotBlank
-    String dsgvoResourceName = "dsgvo.txt";
+    String gdprResourceName = "dsgvo.txt";
     
+    @NotBlank
+    String acceptGdprText = "Akzeptieren";
+    
+    @NotBlank
+    String denyGdprText = "Ablehnen";
     
     @NotNull
     SubscriptionProperties subscription = new SubscriptionProperties();
