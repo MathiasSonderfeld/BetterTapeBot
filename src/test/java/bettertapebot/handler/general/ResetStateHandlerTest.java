@@ -69,7 +69,8 @@ class ResetStateHandlerTest {
         long chatId = 2345L;
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .build());
         
         resetStateHandler.handleMessage(userStateEntity, chatId, "testmessage");

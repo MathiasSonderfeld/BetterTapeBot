@@ -97,7 +97,8 @@ class GetAllHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         
@@ -139,7 +140,8 @@ class GetAllHandlerTest {
         var requestorStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
             .owner(requestor)
-            .userState(isAdmin ? UserState.ADMIN : UserState.LOGGED_IN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(isAdmin)
             .build());
         
         var tape1 = tapeRepository.save(TapeEntity.builder()

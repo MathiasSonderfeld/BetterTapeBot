@@ -60,7 +60,8 @@ class LoginHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         

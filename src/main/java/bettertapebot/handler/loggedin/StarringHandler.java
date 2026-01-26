@@ -65,7 +65,7 @@ public class StarringHandler implements CommandHandler, StateHandler {
         
         var star = starOptional.get();
         var tapes = tapeRepository.findAllByStar(star);
-        boolean isAdmin = userStateEntity.getUserState().isAdmin();
+        boolean isAdmin = userStateEntity.isAdminModeActive();
         var response = TapeFormatter.formatTapes(tapes, isAdmin);
         responseService.send(chatId, response);
         userStateEntity.setUserState(UserState.LOGGED_IN); //TODO figure out how to solve unwanted admin mode exit

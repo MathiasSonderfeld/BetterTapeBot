@@ -95,7 +95,8 @@ class DeleteTapeHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         
@@ -126,7 +127,8 @@ class DeleteTapeHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         
@@ -157,7 +159,8 @@ class DeleteTapeHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         
@@ -189,7 +192,7 @@ class DeleteTapeHandlerTest {
         
         assertThat(userStateEntity)
             .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.ADMIN);
+            .isEqualTo(UserState.LOGGED_IN);
     }
     
     @Test
@@ -202,7 +205,8 @@ class DeleteTapeHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         

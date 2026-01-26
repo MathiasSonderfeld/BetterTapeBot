@@ -41,7 +41,7 @@ public class RemoveAdminHandler implements CommandHandler, StateHandler {
     @Override
     @Transactional
     public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
-        if (!userStateEntity.getUserState().isAdmin()) {
+        if (!userStateEntity.isAdminModeActive()) {
             responseService.send(chatId, "Nur Admins dürfen andere Admins entfernen");
             return;
         }
@@ -62,13 +62,13 @@ public class RemoveAdminHandler implements CommandHandler, StateHandler {
         
         var userEntity = user.get();
         if(!userEntity.getIsAdmin()){
-            userStateEntity.setUserState(UserState.ADMIN);
+            userStateEntity.setUserState(UserState.LOGGED_IN);
             responseService.send(userStateEntity.getChatId(), userEntity.getUsername() + " ist nicht Admin");
             return;
         }
         
         userEntity.setIsAdmin(false);
-        userStateEntity.setUserState(UserState.ADMIN);
+        userStateEntity.setUserState(UserState.LOGGED_IN);
         responseService.send(userStateEntity.getChatId(),  userEntity.getUsername() + " ist nicht mehr Admin");
     }
 }

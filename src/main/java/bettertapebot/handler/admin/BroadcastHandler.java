@@ -39,7 +39,7 @@ public class BroadcastHandler implements CommandHandler, StateHandler {
     
     @Override
     public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
-        if (!userStateEntity.getUserState().isAdmin()) {
+        if (!userStateEntity.isAdminModeActive()) {
             responseService.send(chatId, "Nur Admins dürfen Broadcasts senden");
             return;
         }
@@ -57,7 +57,7 @@ public class BroadcastHandler implements CommandHandler, StateHandler {
         var chats = userStateRepository.findUserStateEntitiesByUserStateIn(loggedInStates)
             .stream().map(UserStateEntity::getChatId).toList();
         
-        userStateEntity.setUserState(UserState.ADMIN);
+        userStateEntity.setUserState(UserState.LOGGED_IN);
         responseService.broadcast(chats, message);
     }
 }

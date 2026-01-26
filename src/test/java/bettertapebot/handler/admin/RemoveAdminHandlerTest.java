@@ -87,7 +87,8 @@ class RemoveAdminHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         
@@ -118,7 +119,8 @@ class RemoveAdminHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         String unknownUsername = "unknown";
@@ -150,7 +152,8 @@ class RemoveAdminHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         var otherAdmin = userRepository.save(UserEntity.builder()
@@ -174,7 +177,7 @@ class RemoveAdminHandlerTest {
         
         assertThat(userStateEntity)
             .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.ADMIN);
+            .isEqualTo(UserState.LOGGED_IN);
     }
     
     @Test
@@ -187,7 +190,8 @@ class RemoveAdminHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         var otherUser = userRepository.save(UserEntity.builder()
@@ -213,6 +217,6 @@ class RemoveAdminHandlerTest {
         
         assertThat(userStateEntity)
             .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.ADMIN);
+            .isEqualTo(UserState.LOGGED_IN);
     }
 }

@@ -96,7 +96,8 @@ class StarringHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         
@@ -127,7 +128,8 @@ class StarringHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         String unknownUsername = "unknown";

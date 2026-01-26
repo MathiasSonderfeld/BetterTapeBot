@@ -42,7 +42,7 @@ public class NewAdminHandler implements CommandHandler, StateHandler {
     @Override
     @Transactional
     public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
-        if (!userStateEntity.getUserState().isAdmin()) {
+        if (!userStateEntity.isAdminModeActive()) {
             responseService.send(chatId, "Nur Admins dürfen neue Admins festlegen");
             return;
         }
@@ -55,27 +55,27 @@ public class NewAdminHandler implements CommandHandler, StateHandler {
         
         var givenUsername = MessageCleaner.getFirstWord(message);
         if(Objects.equals(givenUsername, userStateEntity.getOwner().getUsername())){
-            userStateEntity.setUserState(UserState.ADMIN);
+            userStateEntity.setUserState(UserState.LOGGED_IN);
             responseService.send(userStateEntity.getChatId(), "Du bist schon Admin");
             return;
         }
         
-        var user = userRepository.findById(givenUsername);
-        if(user.isEmpty()){
+        var newAdminOptional = userRepository.findById(givenUsername);
+        if(newAdminOptional.isEmpty()){
             userStateEntity.setUserState(UserState.NEW_ADMIN_USER_GET_USERNAME);
             responseService.send(userStateEntity.getChatId(), "Den Benutzer gibt es nicht. Probiers nochmal");
             return;
         }
         
-        var userEntity = user.get();
-        if(userEntity.getIsAdmin()){
-            userStateEntity.setUserState(UserState.ADMIN);
-            responseService.send(userStateEntity.getChatId(), userEntity.getUsername() + " ist schon Admin");
+        var newAdmin = newAdminOptional.get();
+        if(newAdmin.getIsAdmin()){
+            userStateEntity.setUserState(UserState.LOGGED_IN);
+            responseService.send(userStateEntity.getChatId(), newAdmin.getUsername() + " ist schon Admin");
             return;
         }
         
-        userEntity.setIsAdmin(true);
-        userStateEntity.setUserState(UserState.ADMIN);
-        responseService.send(userStateEntity.getChatId(),  userEntity.getUsername() + " ist nun Admin");
+        newAdmin.setIsAdmin(true);
+        userStateEntity.setUserState(UserState.LOGGED_IN);
+        responseService.send(userStateEntity.getChatId(),  newAdmin.getUsername() + " ist nun Admin");
     }
 }

@@ -89,7 +89,8 @@ class ResetUserHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         
@@ -120,7 +121,8 @@ class ResetUserHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         String unknownUsername = "unknown";
@@ -152,7 +154,8 @@ class ResetUserHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         var otherUser = userRepository.save(UserEntity.builder()
@@ -162,7 +165,8 @@ class ResetUserHandlerTest {
             .build());
         userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(otherUser)
             .build());
         
@@ -184,6 +188,6 @@ class ResetUserHandlerTest {
         
         assertThat(userStateEntity)
             .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.ADMIN);
+            .isEqualTo(UserState.LOGGED_IN);
     }
 }

@@ -20,6 +20,10 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: admin_mode
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
                   name: owner
                   type: VARCHAR(255)
   - changeSet:

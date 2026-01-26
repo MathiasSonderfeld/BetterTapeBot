@@ -87,7 +87,8 @@ class DeleteUserHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         
@@ -118,7 +119,8 @@ class DeleteUserHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         String usernameToDelete = "unknown";
@@ -150,7 +152,8 @@ class DeleteUserHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         
@@ -170,6 +173,6 @@ class DeleteUserHandlerTest {
         
         assertThat(userStateEntity)
             .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.ADMIN);
+            .isEqualTo(UserState.LOGGED_IN);
     }
 }

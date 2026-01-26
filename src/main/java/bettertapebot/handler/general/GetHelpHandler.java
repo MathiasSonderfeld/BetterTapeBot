@@ -54,7 +54,7 @@ public class GetHelpHandler implements CommandHandler {
                 .forEach(c -> sb.append(c).append("\n"));
         }
         
-        if(userState.isAdmin()){
+        if(userStateEntity.isAdminModeActive()){
             sb.append("\n")
                 .append("Befehle für Admins:")
                 .append("\n");

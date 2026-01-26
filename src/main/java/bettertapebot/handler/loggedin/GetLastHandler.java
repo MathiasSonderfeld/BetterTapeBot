@@ -41,7 +41,7 @@ public class GetLastHandler implements CommandHandler {
             responseService.send(chatId, "Es gibt noch keine Einträge");
             return;
         }
-        boolean isAdmin = userStateEntity.getUserState().isAdmin();
+        boolean isAdmin = userStateEntity.isAdminModeActive();
         responseService.send(chatId, TapeFormatter.formatTape(tape.get(), isAdmin));
     }
 }

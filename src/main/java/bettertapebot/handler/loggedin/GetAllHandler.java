@@ -45,7 +45,7 @@ public class GetAllHandler implements CommandHandler {
             return;
         }
         
-        boolean isAdmin = userStateEntity.getUserState().isAdmin();
+        boolean isAdmin = userStateEntity.isAdminModeActive();
         var response = TapeFormatter.formatTapes(tapes, isAdmin);
         responseService.send(chatId, response);
     }

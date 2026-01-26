@@ -41,7 +41,7 @@ public class DeleteUserHandler implements CommandHandler, StateHandler {
     @Override
     @Transactional
     public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
-        if (!userStateEntity.getUserState().isAdmin()) {
+        if (!userStateEntity.isAdminModeActive()) {
             responseService.send(chatId, "Nur Admins können Benutzer löschen");
             return;
         }
@@ -56,7 +56,7 @@ public class DeleteUserHandler implements CommandHandler, StateHandler {
         var deletedEntity = userRepository.deleteByUsername(usernameToRemove);
         if(deletedEntity.isPresent()){
             log.info("deleting user with username {} on request of {}", usernameToRemove, userStateEntity.getOwner().getUsername());
-            userStateEntity.setUserState(UserState.ADMIN);
+            userStateEntity.setUserState(UserState.LOGGED_IN);
         }
         else {
             userStateEntity.setUserState(UserState.DELETE_USER_GET_USERNAME);

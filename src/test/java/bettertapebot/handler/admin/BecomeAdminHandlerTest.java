@@ -78,7 +78,8 @@ class BecomeAdminHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         
@@ -92,7 +93,7 @@ class BecomeAdminHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Du bist bereits im Admin-Modus");
-        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.ADMIN);
+        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.LOGGED_IN);
     }
 
     @Test
@@ -146,7 +147,8 @@ class BecomeAdminHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Du bist in den Admin-Bereich gewechselt");
-        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.ADMIN);
+        assertThat(userStateEntity.getAdminMode()).isTrue();
+        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.LOGGED_IN);
     }
 
 }

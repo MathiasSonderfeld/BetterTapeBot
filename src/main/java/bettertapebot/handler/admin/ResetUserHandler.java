@@ -43,7 +43,7 @@ public class ResetUserHandler implements CommandHandler, StateHandler {
     @Override
     @Transactional
     public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
-        if (!userStateEntity.getUserState().isAdmin()) {
+        if (!userStateEntity.isAdminModeActive()) {
             responseService.send(chatId, "Nur Admins dürfen Benutzer zurücksetzen");
             return;
         }
@@ -65,7 +65,7 @@ public class ResetUserHandler implements CommandHandler, StateHandler {
         var userEntity = user.get();
         long count = userStateRepository.deleteUserStateEntitiesByOwner(userEntity);
         var response = String.format("%s in %d chats zurückgesetzt", givenUsername, count);
-        userStateEntity.setUserState(UserState.ADMIN);
+        userStateEntity.setUserState(UserState.LOGGED_IN);
         responseService.send(userStateEntity.getChatId(), response);
     }
 }

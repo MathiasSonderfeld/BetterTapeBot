@@ -42,7 +42,7 @@ public class DeleteTapeHandler implements CommandHandler, StateHandler {
     @Override
     @Transactional
     public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
-        if (!userStateEntity.getUserState().isAdmin()) {
+        if (!userStateEntity.isAdminModeActive()) {
             responseService.send(chatId, "Nur Admins können Tapes löschen");
             return;
         }
@@ -63,7 +63,7 @@ public class DeleteTapeHandler implements CommandHandler, StateHandler {
         var deleteOptional = tapeRepository.deleteTapeEntityById(id);
         if(deleteOptional.isPresent()){
             log.info("deleting tape with id {} on request of {}", id, userStateEntity.getOwner().getUsername());
-            userStateEntity.setUserState(UserState.ADMIN);
+            userStateEntity.setUserState(UserState.LOGGED_IN);
         }
         else {
             userStateEntity.setUserState(UserState.DELETE_TAPE_GET_TAPE_ID);

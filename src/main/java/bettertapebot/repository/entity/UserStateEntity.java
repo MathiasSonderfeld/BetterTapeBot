@@ -25,6 +25,9 @@ public class UserStateEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "user_state", nullable = false)
     UserState userState;
+    
+    @Column(name = "admin_mode")
+    Boolean adminMode;
 
     /*
       most times we only need the username, as that's the foreign key, it can be accessed without cost
@@ -34,4 +37,8 @@ public class UserStateEntity {
     @JoinColumn(name = "owner", referencedColumnName = "username")
     @OnDelete(action = OnDeleteAction.CASCADE)
     UserEntity owner;
+    
+    public boolean isAdminModeActive(){
+        return Boolean.TRUE.equals(adminMode);
+    }
 }

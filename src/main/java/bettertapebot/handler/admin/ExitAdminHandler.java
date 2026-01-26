@@ -29,7 +29,7 @@ public class ExitAdminHandler implements CommandHandler {
     @Override
     @Transactional
     public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
-        if (!userStateEntity.getUserState().isAdmin()) {
+        if (!userStateEntity.isAdminModeActive()) {
             responseService.send(chatId, "Du bist gar nicht im Admin-Modus");
             return;
         }

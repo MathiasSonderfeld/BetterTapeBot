@@ -90,7 +90,8 @@ class BroadcastHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         
@@ -124,7 +125,8 @@ class BroadcastHandlerTest {
             .build());
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .owner(userEntity)
             .build());
         
@@ -153,6 +155,6 @@ class BroadcastHandlerTest {
         
         assertThat(userStateEntity)
             .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.ADMIN);
+            .isEqualTo(UserState.LOGGED_IN);
     }
 }

@@ -112,7 +112,8 @@ class GetHelpHandlerTest {
         long chatId = 3456L;
         var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.ADMIN)
+            .userState(UserState.LOGGED_IN)
+            .adminMode(true)
             .build());
         
         Mockito.reset(responseService);

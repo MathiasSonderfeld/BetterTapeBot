@@ -43,7 +43,6 @@ class StateHandlerTest {
         HashSet<UserState> relevantKeys = new HashSet<>(Arrays.asList(UserState.values()));
         relevantKeys.remove(UserState.LOGGED_OUT);
         relevantKeys.remove(UserState.LOGGED_IN);
-        relevantKeys.remove(UserState.ADMIN);
         relevantKeys.remove(UserState.NEW_CHAT);
         
         assertThat(stateHandlerMap).isNotNull()
