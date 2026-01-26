@@ -27,3 +27,42 @@ databaseChangeLog:
                   name: wants_abonnement
                   type: BOOLEAN
                   defaultValueBoolean: true
+  - changeSet:
+      id: add-user-anonymous-to-users-table
+      author: MathiasSonderfeld
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: anonymous
+              - column:
+                  name: pin
+                  value: xxxx
+              - column:
+                  name: is_admin
+                  valueBoolean: "false"
+              - column:
+                  name: wants_abonnement
+                  valueBoolean: "false"
+  - changeSet:
+      id: protect-anonymous-user-in-users-table
+      author: MathiasSonderfeld
+      changes:
+        - sql:
+            sql: |
+              CREATE OR REPLACE FUNCTION prevent_anonymous_user_delete()
+              RETURNS trigger AS $$
+              BEGIN
+                IF OLD.username = 'anonymous' THEN
+                  RAISE EXCEPTION 'anonymous user must not be deleted';
+                END IF;
+                RETURN OLD;
+              END;
+              $$ LANGUAGE plpgsql;
+
+              CREATE TRIGGER trg_prevent_anonymous_user_delete
+              BEFORE DELETE ON users
+              FOR EACH ROW
+              EXECUTE FUNCTION prevent_anonymous_user_delete();

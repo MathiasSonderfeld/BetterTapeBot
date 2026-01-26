@@ -10,9 +10,3 @@ databaseChangeLog:
   - include:
       file: db.changelog-create-user-states-table.yaml
       relativeToChangelogFile: true
-  - include:
-      file: db.changelog-add-deleted-user.yaml
-      relativeToChangelogFile: true
-  - include:
-      file: db.changelog-create-before-user-delete-trigger.yaml
-      relativeToChangelogFile: true

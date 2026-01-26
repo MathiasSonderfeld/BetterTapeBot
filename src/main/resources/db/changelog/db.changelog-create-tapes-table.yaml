@@ -32,6 +32,14 @@ databaseChangeLog:
               - column:
                   name: date_added
                   type: TIMESTAMP WITH TIME ZONE
+        - addDefaultValue:
+            tableName: tapes
+            columnName: director
+            defaultValue: anonymous
+        - addDefaultValue:
+            tableName: tapes
+            columnName: star
+            defaultValue: anonymous
   - changeSet:
       id: add-tapes-director-user-fk
       author: MathiasSonderfeld
@@ -42,6 +50,7 @@ databaseChangeLog:
             constraintName: fk_tapes_director
             referencedTableName: users
             referencedColumnNames: username
+            onDelete: SET DEFAULT
   - changeSet:
       id: add-tapes-star-user-fk
       author: MathiasSonderfeld
@@ -52,6 +61,7 @@ databaseChangeLog:
             constraintName: fk_tapes_star
             referencedTableName: users
             referencedColumnNames: username
+            onDelete: SET DEFAULT
   - changeSet:
       id: add-index-tapes-date-added
       author: MathiasSonderfeld
