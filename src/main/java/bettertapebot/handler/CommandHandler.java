@@ -2,8 +2,7 @@ package bettertapebot.handler;
 
 import org.jspecify.annotations.NonNull;
 
-public interface CommandHandler {
+public interface CommandHandler extends Handler {
 
     @NonNull Command forCommand();
-    void handleCommand(long chatId, String message);
 }

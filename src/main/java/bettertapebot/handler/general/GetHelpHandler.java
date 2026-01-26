@@ -3,13 +3,14 @@ package bettertapebot.handler.general;
 import bettertapebot.bot.ResponseService;
 import bettertapebot.handler.Command;
 import bettertapebot.handler.CommandHandler;
-import bettertapebot.repository.UserStateRepository;
+import bettertapebot.repository.entity.UserStateEntity;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -20,7 +21,6 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GetHelpHandler implements CommandHandler {
 
-    UserStateRepository userStateRepository;
     ResponseService responseService;
 
     @Override
@@ -29,8 +29,9 @@ public class GetHelpHandler implements CommandHandler {
     }
 
     @Override
-    public void handleCommand(long chatId, String message) {
-        var stateOptional = userStateRepository.findById(chatId);
+    @Transactional
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+        var userState = userStateEntity.getUserState();
         
         var commandsMap = Arrays.stream(Command.values())
             .collect(Collectors.groupingBy(Command::getCommandLevel));
@@ -38,16 +39,11 @@ public class GetHelpHandler implements CommandHandler {
         StringBuilder sb = new StringBuilder()
             .append("Grundfunktionen:")
             .append("\n");
+        
         commandsMap.get(Command.CommandLevel.GENERAL).stream()
             .map(Command::getFormattedHelpText)
             .forEach(c -> sb.append(c).append("\n"));
-
-        if(stateOptional.isEmpty()){
-            responseService.send(chatId, sb.toString());
-            return;
-        }
-        var userState = stateOptional.get().getUserState();
-
+        
         //user commands
         if(userState.isLoggedIn()){
             sb.append("\n")
@@ -69,7 +65,6 @@ public class GetHelpHandler implements CommandHandler {
                 .map(Command::getFormattedHelpText)
                 .forEach(c -> sb.append(c).append("\n"));
         }
-
         responseService.send(chatId, sb.toString());
     }
 }

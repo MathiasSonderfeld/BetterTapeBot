@@ -44,6 +44,7 @@ class StateHandlerTest {
         relevantKeys.remove(UserState.LOGGED_OUT);
         relevantKeys.remove(UserState.LOGGED_IN);
         relevantKeys.remove(UserState.ADMIN);
+        relevantKeys.remove(UserState.NEW_CHAT);
         
         assertThat(stateHandlerMap).isNotNull()
             .containsOnlyKeys(relevantKeys)

@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum UserState {
     //unhandled - user needs to send command to trigger event
+    NEW_CHAT(StateLevel.NONE),
     LOGGED_OUT(StateLevel.NONE),
     LOGGED_IN(StateLevel.LOGGEDIN),
     ADMIN(StateLevel.ADMIN),

@@ -3,7 +3,6 @@ package bettertapebot.handler.admin;
 import bettertapebot.bot.ResponseService;
 import bettertapebot.handler.Command;
 import bettertapebot.handler.CommandHandler;
-import bettertapebot.repository.UserStateRepository;
 import bettertapebot.repository.entity.UserState;
 import bettertapebot.repository.entity.UserStateEntity;
 import lombok.AccessLevel;
@@ -12,14 +11,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @CustomLog
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BecomeAdminHandler implements CommandHandler {
-
-    UserStateRepository userStateRepository;
+    
     ResponseService responseService;
 
     @Override
@@ -28,21 +27,18 @@ public class BecomeAdminHandler implements CommandHandler {
     }
 
     @Override
-    public void handleCommand(long chatId, String message) {
-        var stateOptional = userStateRepository.findById(chatId);
-        var knownAndLoggedIn = stateOptional.map(UserStateEntity::getUserState)
-            .map(UserState::isLoggedIn)
-            .orElse(false);
-        if(!knownAndLoggedIn){
+    @Transactional
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+        if(!userStateEntity.getUserState().isLoggedIn()){
             responseService.send(chatId, "Nur eingeloggte User können in den Admin-Modus wechseln");
             return;
         }
         
-        var userStateEntity = stateOptional.get();
         if(userStateEntity.getUserState().isAdmin()){
             responseService.send(chatId, "Du bist bereits im Admin-Modus, /help für Befehle");
             return;
         }
+        
         var user = userStateEntity.getOwner();
         if(!user.getIsAdmin()){
             responseService.send(chatId, "Du bist kein Admin");

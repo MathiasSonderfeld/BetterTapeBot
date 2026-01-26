@@ -10,7 +10,6 @@ import bettertapebot.repository.entity.UserStateEntity;
 import bettertapebot.testutil.TestcontainersConfiguration;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,24 +27,15 @@ class BecomeAdminHandlerTest {
 
     @Autowired
     BecomeAdminHandler becomeAdminHandler;
-
-    @MockitoSpyBean
-    UserStateRepository userStateRepository;
     
-    @MockitoSpyBean
-    UserRepository userRepository;
-
     @MockitoBean
     ResponseService responseService;
     
-    @BeforeEach
-    void reset(){
-        Mockito.reset(
-            userRepository,
-            userStateRepository,
-            responseService
-        );
-    }
+    @Autowired
+    UserStateRepository userStateRepository;
+    
+    @Autowired
+    UserRepository userRepository;
     
     @AfterEach
     void cleanUp(){
@@ -60,11 +49,15 @@ class BecomeAdminHandlerTest {
     }
 
     @Test
-    public void unknownSessionGetsDenied(){
+    public void notLoggedInGetsDenied(){
         long chatId = 1234L;
-        becomeAdminHandler.handleCommand(chatId, "testmessage");
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.NEW_CHAT)
+            .build());
+        
+        Mockito.reset(responseService);
+        becomeAdminHandler.handleMessage(userStateEntity, chatId, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -78,22 +71,19 @@ class BecomeAdminHandlerTest {
     @Test
     public void alreadyAdminGetsInformed(){
         long chatId = 2345L;
-
-        var user = userRepository.save(UserEntity.builder()
+        var userEntity = userRepository.save(UserEntity.builder()
             .username("admin")
             .pin("1234")
             .isAdmin(true)
             .build());
-
-        var state = userStateRepository.save(UserStateEntity.builder()
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
             .userState(UserState.ADMIN)
-            .owner(user)
+            .owner(userEntity)
             .build());
-
-        becomeAdminHandler.handleCommand(chatId, "testmessage");
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-
+        
+        Mockito.reset(responseService);
+        becomeAdminHandler.handleMessage(userStateEntity, chatId, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -102,28 +92,25 @@ class BecomeAdminHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Du bist bereits im Admin-Modus");
-        assertThat(state.getUserState()).isEqualTo(UserState.ADMIN);
+        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.ADMIN);
     }
 
     @Test
     public void normalUserGetsDenied(){
         long chatId = 3456L;
-
-        var user = userRepository.save(UserEntity.builder()
+        var userEntity = userRepository.save(UserEntity.builder()
             .username("user")
             .pin("1234")
             .isAdmin(false)
             .build());
-
-        var state = userStateRepository.save(UserStateEntity.builder()
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
             .userState(UserState.LOGGED_IN)
-            .owner(user)
+            .owner(userEntity)
             .build());
-
-        becomeAdminHandler.handleCommand(chatId, "testmessage");
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-
+        
+        Mockito.reset(responseService);
+        becomeAdminHandler.handleMessage(userStateEntity, chatId, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -132,28 +119,25 @@ class BecomeAdminHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Du bist kein Admin");
-        assertThat(state.getUserState()).isEqualTo(UserState.LOGGED_IN);
+        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.LOGGED_IN);
     }
 
     @Test
     public void adminCanUpgrade(){
         long chatId = 4567L;
-
-        var user = userRepository.save(UserEntity.builder()
+        var userEntity = userRepository.save(UserEntity.builder()
             .username("admin")
             .pin("1234")
             .isAdmin(true)
             .build());
-
-        var state = userStateRepository.save(UserStateEntity.builder()
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
             .userState(UserState.LOGGED_IN)
-            .owner(user)
+            .owner(userEntity)
             .build());
-
-        becomeAdminHandler.handleCommand(chatId, "testmessage");
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-
+        
+        Mockito.reset(responseService);
+        becomeAdminHandler.handleMessage(userStateEntity, chatId, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -162,7 +146,7 @@ class BecomeAdminHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Du bist in den Admin-Bereich gewechselt");
-        assertThat(state.getUserState()).isEqualTo(UserState.ADMIN);
+        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.ADMIN);
     }
 
 }

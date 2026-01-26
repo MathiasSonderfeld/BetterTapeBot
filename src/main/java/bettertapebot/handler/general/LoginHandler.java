@@ -1,3 +1,4 @@
+
 package bettertapebot.handler.general;
 
 import bettertapebot.bot.ResponseService;
@@ -5,7 +6,6 @@ import bettertapebot.handler.Command;
 import bettertapebot.handler.CommandHandler;
 import bettertapebot.handler.StateHandler;
 import bettertapebot.repository.UserRepository;
-import bettertapebot.repository.UserStateRepository;
 import bettertapebot.repository.entity.UserState;
 import bettertapebot.repository.entity.UserStateEntity;
 import bettertapebot.util.MessageCleaner;
@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Objects;
@@ -27,7 +28,6 @@ import java.util.Set;
 public class LoginHandler implements CommandHandler, StateHandler {
 
     ResponseService responseService;
-    UserStateRepository userStateRepository;
     UserRepository userRepository;
 
     @Override
@@ -41,70 +41,48 @@ public class LoginHandler implements CommandHandler, StateHandler {
     }
 
     @Override
-    public void handleCommand(long chatId, String message) {
-        var stateOptional = userStateRepository.findById(chatId);
-        
-        var alreadyLoggedIn = stateOptional.map(UserStateEntity::getUserState)
-            .map(UserState::isLoggedIn)
-            .orElse(false);
-        if(alreadyLoggedIn){
-            responseService.send(chatId, "du bist schon eingeloggt als " + stateOptional.get().getOwner().getUsername());
-            return;
-        }
-        
-        UserStateEntity userStateEntity = stateOptional
-            .orElseGet(() -> userStateRepository.save(
-                UserStateEntity.builder()
-                    .chatId(chatId)
-                    .build()));
-        
-        //user hat username direkt mit angegeben
-        if(StringUtils.hasText(message)){
-            var givenName = MessageCleaner.getFirstWord(message);
-            verifyAndSetUsername(chatId, givenName, userStateEntity);
-            return;
-        }
-        
-        userStateEntity.setUserState(UserState.LOGIN_VALIDATE_USERNAME);
-        responseService.send(chatId, "Wie lautet dein Benutzername?");
-    }
-    
-    @Override
+    @Transactional
     public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
-        if(userStateEntity.getUserState() == UserState.LOGIN_VALIDATE_USERNAME){
-            var cleanedName = MessageCleaner.getFirstWord(message);
-            verifyAndSetUsername(chatId, cleanedName, userStateEntity);
+        if(userStateEntity.getUserState().isLoggedIn()){
+            responseService.send(chatId, "du bist schon eingeloggt als " + userStateEntity.getOwner().getUsername());
             return;
         }
         
-        if(userStateEntity.getUserState() != UserState.LOGIN_VALIDATE_PIN) {
-            log.error("state not implemented in this handler, this should never happen");
-            responseService.send(chatId, "da ist etwas bei mir schiefgegangen. Bitte informiere einen Admin und benutze /reset, falls das Problem persistiert");
+        if(!StringUtils.hasText(message)){
+            userStateEntity.setUserState(UserState.LOGIN_VALIDATE_USERNAME);
+            responseService.send(chatId, "Wie lautet dein Benutzername?");
             return;
         }
         
-        var pin = MessageCleaner.getFirstWord(message);
-        var userEntity = userStateEntity.getOwner();
+        if(userStateEntity.getUserState() == UserState.LOGIN_VALIDATE_PIN){
+            var pin = MessageCleaner.getFirstWord(message);
+            var userEntity = userStateEntity.getOwner();
+            
+            if(Objects.equals(pin, userEntity.getPin())){
+                userStateEntity.setUserState(UserState.LOGGED_IN);
+                responseService.send(chatId, "du wurdest erfolgreich eingeloggt");
+            }
+            else {
+                responseService.send(chatId, "PIN inkorrekt, versuchs nochmal");
+            }
+            return;
+        }
         
-        if(Objects.equals(pin, userEntity.getPin())){
-            userStateEntity.setUserState(UserState.LOGGED_IN);
-            responseService.send(chatId, "du wurdest erfolgreich eingeloggt");
-        }
-        else {
-            responseService.send(chatId, "PIN inkorrekt, versuchs nochmal");
-        }
+        var cleanedName = MessageCleaner.getFirstWord(message);
+        verifyAndSetUsername(chatId, cleanedName, userStateEntity);
     }
     
     private void verifyAndSetUsername(long chatId, String username, UserStateEntity userStateEntity){
-        //if user is already correctly assigned, we can move on with PIN validation
         if(userStateEntity.getOwner() != null && Objects.equals(username, userStateEntity.getOwner().getUsername())){
             requestPin(chatId, userStateEntity);
+            userStateEntity.setUserState(UserState.LOGIN_VALIDATE_PIN);
             return;
         }
         
         var userEntityOptional = userRepository.findById(username);
         if(userEntityOptional.isEmpty()){
-            responseService.send(chatId, "der angegebene benutzername " + username + " ist unbekannt");
+            userStateEntity.setUserState(UserState.LOGIN_VALIDATE_USERNAME);
+            responseService.send(chatId, "der angegebene benutzername " + username + " ist unbekannt. Probiers nochmal");
             return;
         }
         var userEntity = userEntityOptional.get();

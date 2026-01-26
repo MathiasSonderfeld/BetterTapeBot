@@ -1,6 +1,8 @@
 spring:
   application:
     name: BetterTapeBot
+  profiles:
+    active: secret
   datasource:
     url: jdbc:postgresql://localhost:5432/tapebot
     username: postgres

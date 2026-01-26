@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -38,11 +39,7 @@ public class AddTapeHandler implements CommandHandler, StateHandler { //TODO imp
     }
 
     @Override
-    public void handleCommand(long chatId, String message) {
-    
-    }
-    
-    @Override
+    @Transactional
     public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
     
     }

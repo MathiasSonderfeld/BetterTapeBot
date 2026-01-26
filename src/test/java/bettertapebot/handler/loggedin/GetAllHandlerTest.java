@@ -38,25 +38,20 @@ class GetAllHandlerTest {
     GetAllHandler getAllHandler;
     
     @MockitoSpyBean
-    UserStateRepository userStateRepository;
-    
-    @MockitoSpyBean
-    UserRepository userRepository;
-    
-    @MockitoSpyBean
     TapeRepository tapeRepository;
     
     @MockitoBean
     ResponseService responseService;
     
+    @Autowired
+    UserStateRepository userStateRepository;
+    
+    @Autowired
+    UserRepository userRepository;
+    
     @BeforeEach
     void reset(){
-        Mockito.reset(
-            userStateRepository,
-            userRepository,
-            tapeRepository,
-            responseService
-        );
+        Mockito.reset(tapeRepository, responseService);
     }
     
     @AfterEach
@@ -74,9 +69,13 @@ class GetAllHandlerTest {
     @Test
     public void notLoggedInUserGetsDenied(){
         long chatId = 1234L;
-        getAllHandler.handleCommand(chatId, null);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.NEW_CHAT)
+            .build());
         
+        Mockito.reset(tapeRepository, responseService);
+        getAllHandler.handleMessage(userStateEntity, chatId, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -85,12 +84,40 @@ class GetAllHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Nur eingeloggte User können Tapes abfragen");
+        Mockito.verifyNoInteractions(tapeRepository);
+    }
+    
+    @Test
+    public void loggedInUserGetsSorryIfDatabaseIsEmpty(){
+        long chatId = 2345L;
+        var userEntity = userRepository.save(UserEntity.builder()
+            .username("admin")
+            .pin("1234")
+            .isAdmin(true)
+            .build());
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.ADMIN)
+            .owner(userEntity)
+            .build());
+        
+        Mockito.reset(tapeRepository, responseService);
+        getAllHandler.handleMessage(userStateEntity, chatId, null);
+        Mockito.verify(tapeRepository, Mockito.times(1)).findAllByOrderByDateAddedDesc();
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
+        var texts = textCaptor.getAllValues();
+        assertThat(texts).isNotNull()
+            .hasSize(1)
+            .element(0)
+            .asInstanceOf(InstanceOfAssertFactories.STRING)
+            .contains("Es gibt noch keine Einträge");
     }
     
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     public void testGetsListOfTapes(boolean isAdmin){
-        long chatId = 2345L;
+        long chatId = 3456L;
         ZonedDateTime time = ZonedDateTime.of(2025, 9, 1,12,0,0,0, ZoneId.systemDefault());
         String expectedTime = "01.09.25 12:00";
         var requestor = userRepository.save(UserEntity.builder()
@@ -98,20 +125,18 @@ class GetAllHandlerTest {
             .pin("1234")
             .isAdmin(isAdmin)
             .build());
-        
         var star = userRepository.save(UserEntity.builder()
             .username("star")
             .pin("9876")
             .isAdmin(false)
             .build());
-        
         var director = userRepository.save(UserEntity.builder()
             .username("director")
             .pin("8765")
             .isAdmin(false)
             .build());
         
-        userStateRepository.save(UserStateEntity.builder()
+        var requestorStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
             .owner(requestor)
             .userState(isAdmin ? UserState.ADMIN : UserState.LOGGED_IN)
@@ -138,12 +163,9 @@ class GetAllHandlerTest {
             .dateAdded(time.toInstant())
             .build());
         
-        Mockito.reset(userStateRepository, userRepository, tapeRepository);
-        getAllHandler.handleCommand(chatId, null);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        Mockito.reset(tapeRepository, responseService);
+        getAllHandler.handleMessage(requestorStateEntity, chatId, null);
         Mockito.verify(tapeRepository, Mockito.times(1)).findAllByOrderByDateAddedDesc();
-        Mockito.verifyNoInteractions(userRepository);
-        
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();

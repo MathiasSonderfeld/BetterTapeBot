@@ -10,7 +10,6 @@ import bettertapebot.repository.entity.UserStateEntity;
 import bettertapebot.testutil.TestcontainersConfiguration;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -22,6 +21,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 @DataJpaTest
 @Import({TestcontainersConfiguration.class, DeleteUserHandler.class})
 class DeleteUserHandlerTest {
@@ -30,22 +30,13 @@ class DeleteUserHandlerTest {
     DeleteUserHandler deleteUserHandler;
     
     @MockitoSpyBean
-    UserStateRepository userStateRepository;
-    
-    @MockitoSpyBean
     UserRepository userRepository;
     
     @MockitoBean
     ResponseService responseService;
     
-    @BeforeEach
-    void reset(){
-        Mockito.reset(
-            userRepository,
-            userStateRepository,
-            responseService
-        );
-    }
+    @Autowired
+    UserStateRepository userStateRepository;
     
     @AfterEach
     void cleanUp(){
@@ -54,21 +45,27 @@ class DeleteUserHandlerTest {
     }
     
     @Test
-    public void registersForCorrectCommand(){
+    public void registersForCorrectCommandAndStates(){
         assertThat(deleteUserHandler.forCommand()).isEqualTo(Command.DELETE_USER);
-    }
-    
-    @Test
-    public void registersForCorrectStates(){
         assertThat(deleteUserHandler.forStates()).containsExactlyInAnyOrder(UserState.DELETE_USER_GET_USERNAME);
     }
     
     @Test
     public void notAdminChatGetsDenied(){
         long chatId = 1234L;
-        deleteUserHandler.handleCommand(chatId, "testmessage");
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        var userEntity = userRepository.save(UserEntity.builder()
+            .username("user")
+            .pin("1234")
+            .isAdmin(true)
+            .build());
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.LOGGED_IN)
+            .owner(userEntity)
+            .build());
         
+        Mockito.reset(userRepository, responseService);
+        deleteUserHandler.handleMessage(userStateEntity, chatId, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -77,61 +74,25 @@ class DeleteUserHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Nur Admins können Benutzer löschen");
+        Mockito.verifyNoInteractions(userRepository);
     }
     
     @Test
-    public void deleteUserCommandWithUnknownUserGetsAskedAgain(){
-        long chatId = 3456L;
-        String usernameToDelete = "redundantuser";
-        var admin = userRepository.save(UserEntity.builder()
-            .username("username")
+    public void deleteUserWithoutUsernameGetsAskedForUsername(){
+        long chatId = 2345L;
+        var userEntity = userRepository.save(UserEntity.builder()
+            .username("admin")
             .pin("1234")
             .isAdmin(true)
             .build());
-        
-        var state = userStateRepository.save(UserStateEntity.builder()
-            .userState(UserState.ADMIN)
-            .owner(admin)
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .build());
-        
-        Mockito.reset(userRepository, userStateRepository);
-        deleteUserHandler.handleCommand(chatId, usernameToDelete);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-        Mockito.verify(userRepository, Mockito.times(1)).deleteByUsername(usernameToDelete);
-        
-        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
-        var texts = textCaptor.getAllValues();
-        assertThat(texts).isNotNull()
-            .hasSize(1)
-            .element(0)
-            .asInstanceOf(InstanceOfAssertFactories.STRING)
-            .contains("Den Benutzer gibt es nicht. Probiers nochmal");
-        
-        assertThat(state)
-            .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.DELETE_USER_GET_USERNAME);
-    }
-    
-    @Test
-    public void deleteUserCommandWithoutUserGetsAskedForUsername(){
-        long chatId = 3456L;
-        var admin = userRepository.save(UserEntity.builder()
-            .username("username")
-            .pin("1234")
-            .isAdmin(true)
-            .build());
-        
-        var state = userStateRepository.save(UserStateEntity.builder()
             .userState(UserState.ADMIN)
-            .owner(admin)
-            .chatId(chatId)
+            .owner(userEntity)
             .build());
         
-        Mockito.reset(userRepository, userStateRepository);
-        deleteUserHandler.handleCommand(chatId, null);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        Mockito.reset(userRepository, responseService);
+        deleteUserHandler.handleMessage(userStateEntity, chatId, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -142,102 +103,29 @@ class DeleteUserHandlerTest {
             .contains("Wie lautet der Benutzername?");
         Mockito.verifyNoInteractions(userRepository);
         
-        assertThat(state)
+        assertThat(userStateEntity)
             .extracting(UserStateEntity::getUserState)
             .isEqualTo(UserState.DELETE_USER_GET_USERNAME);
     }
     
     @Test
-    public void deleteUserCommandWithKnownUserGetsDeleted(){
+    public void deleteUserWithUnknownUserGetsAskedAgain(){
         long chatId = 3456L;
-        String usernameToDelete = "redundantuser";
-        var admin = userRepository.save(UserEntity.builder()
-            .username("username")
+        var userEntity = userRepository.save(UserEntity.builder()
+            .username("admin")
             .pin("1234")
             .isAdmin(true)
             .build());
-        
-        var state = userStateRepository.save(UserStateEntity.builder()
-            .userState(UserState.ADMIN)
-            .owner(admin)
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .build());
-        
-        userRepository.save(UserEntity.builder()
-            .username(usernameToDelete)
-            .pin("9876")
-            .isAdmin(false)
-            .build());
-        
-        Mockito.reset(userRepository, userStateRepository);
-        deleteUserHandler.handleCommand(chatId, usernameToDelete);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-        Mockito.verify(userRepository, Mockito.times(1)).deleteByUsername(usernameToDelete);
-        Mockito.verifyNoInteractions(responseService);
-        
-        var deleted = userRepository.findById(usernameToDelete);
-        assertThat(deleted).isNotNull().isEmpty();
-        
-        assertThat(state)
-            .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.ADMIN);
-    }
-    
-    @Test
-    public void messageWithKnownUserGetsDeleted(){
-        long chatId = 3456L;
-        String usernameToDelete = "redundantuser";
-        var admin = userRepository.save(UserEntity.builder()
-            .username("username")
-            .pin("1234")
-            .isAdmin(true)
-            .build());
-        
-        var state = userStateRepository.save(UserStateEntity.builder()
             .userState(UserState.ADMIN)
-            .owner(admin)
-            .chatId(chatId)
+            .owner(userEntity)
             .build());
+        String usernameToDelete = "unknown";
         
-        userRepository.save(UserEntity.builder()
-            .username(usernameToDelete)
-            .pin("9876")
-            .isAdmin(false)
-            .build());
-        
-        Mockito.reset(userRepository, userStateRepository);
-        deleteUserHandler.handleMessage(state, chatId, usernameToDelete);
+        Mockito.reset(userRepository, responseService);
+        deleteUserHandler.handleMessage(userStateEntity, chatId, usernameToDelete);
         Mockito.verify(userRepository, Mockito.times(1)).deleteByUsername(usernameToDelete);
-        Mockito.verifyNoInteractions(userStateRepository, responseService);
-        
-        var deleted = userRepository.findById(usernameToDelete);
-        assertThat(deleted).isNotNull().isEmpty();
-        
-        assertThat(state)
-            .extracting(UserStateEntity::getUserState)
-            .isEqualTo(UserState.ADMIN);
-    }
-    
-    @Test
-    public void messageWithUnknownUserGetsAskedAgain(){
-        long chatId = 3456L;
-        String usernameToDelete = "redundantuser";
-        var admin = userRepository.save(UserEntity.builder()
-            .username("username")
-            .pin("1234")
-            .isAdmin(true)
-            .build());
-        
-        var state = userStateRepository.save(UserStateEntity.builder()
-            .userState(UserState.ADMIN)
-            .owner(admin)
-            .chatId(chatId)
-            .build());
-        
-        Mockito.reset(userRepository, userStateRepository);
-        deleteUserHandler.handleMessage(state, chatId, usernameToDelete);
-        Mockito.verify(userRepository, Mockito.times(1)).deleteByUsername(usernameToDelete);
-        
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -246,10 +134,42 @@ class DeleteUserHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Den Benutzer gibt es nicht. Probiers nochmal");
-        Mockito.verifyNoInteractions(userStateRepository);
         
-        assertThat(state)
+        assertThat(userStateEntity)
             .extracting(UserStateEntity::getUserState)
             .isEqualTo(UserState.DELETE_USER_GET_USERNAME);
+    }
+    
+    @Test
+    public void deleteUserCommandWithKnownUserGetsDeleted(){
+        long chatId = 4567L;
+        var userEntity = userRepository.save(UserEntity.builder()
+            .username("admin")
+            .pin("1234")
+            .isAdmin(true)
+            .build());
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.ADMIN)
+            .owner(userEntity)
+            .build());
+        
+        var userToRemove = userRepository.save(UserEntity.builder()
+            .username("user")
+            .pin("1234")
+            .isAdmin(false)
+            .build());
+        
+        Mockito.reset(userRepository, responseService);
+        deleteUserHandler.handleMessage(userStateEntity, chatId, userToRemove.getUsername());
+        Mockito.verify(userRepository, Mockito.times(1)).deleteByUsername(userToRemove.getUsername());
+        Mockito.verifyNoInteractions(responseService);
+        
+        var deleted = userRepository.findById(userToRemove.getUsername());
+        assertThat(deleted).isNotNull().isEmpty();
+        
+        assertThat(userStateEntity)
+            .extracting(UserStateEntity::getUserState)
+            .isEqualTo(UserState.ADMIN);
     }
 }

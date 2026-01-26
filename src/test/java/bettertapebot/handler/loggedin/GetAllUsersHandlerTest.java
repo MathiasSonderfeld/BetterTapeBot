@@ -10,7 +10,6 @@ import bettertapebot.repository.entity.UserStateEntity;
 import bettertapebot.testutil.TestcontainersConfiguration;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -31,22 +30,13 @@ class GetAllUsersHandlerTest {
     GetAllUsersHandler getAllUsersHandler;
     
     @MockitoSpyBean
-    UserStateRepository userStateRepository;
-    
-    @MockitoSpyBean
     UserRepository userRepository;
     
     @MockitoBean
     ResponseService responseService;
     
-    @BeforeEach
-    void reset(){
-        Mockito.reset(
-            userRepository,
-            userStateRepository,
-            responseService
-        );
-    }
+    @Autowired
+    UserStateRepository userStateRepository;
     
     @AfterEach
     void cleanUp(){
@@ -62,9 +52,13 @@ class GetAllUsersHandlerTest {
     @Test
     public void unknownUserGetsDenied(){
         long chatId = 1234L;
-        getAllUsersHandler.handleCommand(chatId, "testmessage");
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.NEW_CHAT)
+            .build());
         
+        Mockito.reset(userRepository, responseService);
+        getAllUsersHandler.handleMessage(userStateEntity, chatId, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -73,36 +67,39 @@ class GetAllUsersHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Nur eingeloggte User können andere User sehen");
+        Mockito.verifyNoInteractions(userRepository);
     }
     
     @Test
     public void loggedInUserGetsAllUsers(){
         long chatId = 2345L;
+        var userEntity = userRepository.save(UserEntity.builder()
+            .username("admin")
+            .pin("1234")
+            .isAdmin(true)
+            .build());
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.ADMIN)
+            .owner(userEntity)
+            .build());
+        
         var user1 = userRepository.save(UserEntity.builder()
             .username("user1")
             .pin("1234")
             .build());
-        
         var user2 = userRepository.save(UserEntity.builder()
             .username("user2")
             .pin("1234")
             .build());
-        
         var user3 = userRepository.save(UserEntity.builder()
             .username("user3")
             .pin("1234")
             .build());
         
-        userStateRepository.save(UserStateEntity.builder()
-            .chatId(chatId)
-            .userState(UserState.LOGGED_IN)
-            .owner(user1)
-            .build());
-        
-        getAllUsersHandler.handleCommand(chatId, "testmessage");
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-        
+        Mockito.reset(userRepository, responseService);
+        getAllUsersHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        Mockito.verify(userRepository, Mockito.times(1)).findAll();
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();

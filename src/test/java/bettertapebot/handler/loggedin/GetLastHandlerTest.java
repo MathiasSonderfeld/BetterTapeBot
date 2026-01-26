@@ -12,7 +12,6 @@ import bettertapebot.repository.entity.UserStateEntity;
 import bettertapebot.testutil.TestcontainersConfiguration;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -38,26 +37,16 @@ class GetLastHandlerTest {
     GetLastHandler getLastHandler;
     
     @MockitoSpyBean
-    UserStateRepository userStateRepository;
-    
-    @MockitoSpyBean
-    UserRepository userRepository;
-    
-    @MockitoSpyBean
     TapeRepository tapeRepository;
     
     @MockitoBean
     ResponseService responseService;
     
-    @BeforeEach
-    void reset(){
-        Mockito.reset(
-            userStateRepository,
-            userRepository,
-            tapeRepository,
-            responseService
-        );
-    }
+    @Autowired
+    UserStateRepository userStateRepository;
+    
+    @Autowired
+    UserRepository userRepository;
     
     @AfterEach
     void cleanUp(){
@@ -74,9 +63,13 @@ class GetLastHandlerTest {
     @Test
     public void notLoggedInUserGetsDenied(){
         long chatId = 1234L;
-        getLastHandler.handleCommand(chatId, null);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.NEW_CHAT)
+            .build());
         
+        Mockito.reset(tapeRepository, responseService);
+        getLastHandler.handleMessage(userStateEntity, chatId, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -85,35 +78,61 @@ class GetLastHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Nur eingeloggte User können Tapes abfragen");
+        Mockito.verifyNoInteractions(tapeRepository);
+    }
+    
+    @Test
+    public void loggedInUserGetsSorryIfDatabaseIsEmpty(){
+        long chatId = 2345L;
+        var userEntity = userRepository.save(UserEntity.builder()
+            .username("admin")
+            .pin("1234")
+            .isAdmin(true)
+            .build());
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.ADMIN)
+            .owner(userEntity)
+            .build());
+        
+        Mockito.reset(tapeRepository, responseService);
+        getLastHandler.handleMessage(userStateEntity, chatId, null);
+        Mockito.verify(tapeRepository, Mockito.times(1)).findTopByOrderByDateAddedDesc();
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
+        var texts = textCaptor.getAllValues();
+        assertThat(texts).isNotNull()
+            .hasSize(1)
+            .element(0)
+            .asInstanceOf(InstanceOfAssertFactories.STRING)
+            .contains("Es gibt noch keine Einträge");
     }
     
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     public void testGetsListOfTapes(boolean isAdmin){
-        long chatId = 2345L;
-        ZonedDateTime time1 = ZonedDateTime.of(2025, 9, 1,12,0,0,0, ZoneId.systemDefault());
+        long chatId = 3456L;
+        ZonedDateTime time1 = ZonedDateTime.of(2023, 9, 1,12,0,0,0, ZoneId.systemDefault());
         ZonedDateTime time2 = ZonedDateTime.of(2024, 9, 1,12,0,0,0, ZoneId.systemDefault());
-        ZonedDateTime time3 = ZonedDateTime.of(2023, 9, 1,12,0,0,0, ZoneId.systemDefault());
+        ZonedDateTime time3 = ZonedDateTime.of(2025, 9, 1,12,0,0,0, ZoneId.systemDefault());
         String expectedTime = "01.09.25 12:00";
         var requestor = userRepository.save(UserEntity.builder()
             .username("requestor")
             .pin("1234")
             .isAdmin(isAdmin)
             .build());
-        
         var star = userRepository.save(UserEntity.builder()
             .username("star")
             .pin("9876")
             .isAdmin(false)
             .build());
-        
         var director = userRepository.save(UserEntity.builder()
             .username("director")
             .pin("8765")
             .isAdmin(false)
             .build());
         
-        userStateRepository.save(UserStateEntity.builder()
+        var requestorStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
             .owner(requestor)
             .userState(isAdmin ? UserState.ADMIN : UserState.LOGGED_IN)
@@ -126,26 +145,23 @@ class GetLastHandlerTest {
             .dateAdded(time1.toInstant())
             .build());
         
-        tapeRepository.save(TapeEntity.builder()
+        var tape2 = tapeRepository.save(TapeEntity.builder()
             .title("tape 2")
             .star(star)
             .director(director)
             .dateAdded(time2.toInstant())
             .build());
         
-        tapeRepository.save(TapeEntity.builder()
+        var tape3 = tapeRepository.save(TapeEntity.builder()
             .title("tape 3")
             .star(star)
             .director(director)
             .dateAdded(time3.toInstant())
             .build());
         
-        Mockito.reset(userStateRepository, userRepository, tapeRepository);
-        getLastHandler.handleCommand(chatId, null);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        Mockito.reset(tapeRepository, responseService);
+        getLastHandler.handleMessage(requestorStateEntity, chatId, null);
         Mockito.verify(tapeRepository, Mockito.times(1)).findTopByOrderByDateAddedDesc();
-        Mockito.verifyNoInteractions(userRepository);
-        
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -155,11 +171,16 @@ class GetLastHandlerTest {
         assertThat(text)
             .contains(star.getUsername())
             .contains(director.getUsername())
-            .contains(tape1.getTitle())
-            .contains(expectedTime);
+            .contains(tape3.getTitle())
+            .contains(expectedTime)
+            .doesNotContain(tape1.getTitle())
+            .doesNotContain(tape2.getTitle());
         
         if(isAdmin){
-            assertThat(text).contains(tape1.getId().toString());
+            assertThat(text)
+                .contains(tape3.getId().toString())
+                .doesNotContain(tape1.getId().toString())
+                .doesNotContain(tape2.getId().toString());
         }
     }
 }

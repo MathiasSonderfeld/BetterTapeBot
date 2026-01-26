@@ -17,18 +17,14 @@ import lombok.experimental.NonFinal;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
-import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
-import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 
-import java.util.Collection;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 @Component
@@ -36,9 +32,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 @EnableConfigurationProperties(BotProperties.class)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class TapeBot implements SpringLongPollingBot, LongPollingSingleThreadUpdateConsumer {
+public class MessageDelegator {
 
-    BotProperties botProperties;
     ResponseService responseService;
     UserStateRepository userStateRepository;
     
@@ -65,20 +60,9 @@ public class TapeBot implements SpringLongPollingBot, LongPollingSingleThreadUpd
             }
         }
     }
-
-    @Override
-    public String getBotToken() {
-        return botProperties.getTelegram().getToken();
-    }
-
-    @Override
-    public LongPollingUpdateConsumer getUpdatesConsumer() {
-        return this;
-    }
-
-    @Override
+    
     @Transactional
-    public void consume(Update update) {
+    public void processUpdate(Update update) {
         if(!update.hasMessage() || !update.getMessage().hasText()){
             log.warn("update was ignored as it has no messsage for chatid {} - {}", update.getMessage().getChatId(), update);
             return;
@@ -86,18 +70,19 @@ public class TapeBot implements SpringLongPollingBot, LongPollingSingleThreadUpd
         
         Message message = update.getMessage();
         long chatId = message.getChatId();
+        var userStateEntity = userStateRepository.findById(chatId)
+            .orElseGet(() -> userStateRepository.save(UserStateEntity.builder()
+                .chatId(chatId)
+                .userState(UserState.NEW_CHAT)
+                .build()));
+        
         String receivedText = message.getText();
-        String botCommand = Optional.ofNullable(message.getEntities())
-            .stream().flatMap(Collection::stream)
-            .filter(e -> Objects.equals("bot_command", e.getType()))
-            .findFirst()
-            .map(MessageEntity::getText)
-            .orElse(null);
+        String botCommand = getFirstBotCommand(message.getEntities());
         Command command = Command.fromCommandString(botCommand);
         
         //if command is unknown, reject it
         if(botCommand != null && command == null){
-            responseService.send(chatId, null, "ungültiger bot-befehl, benutze " + Command.HELP.getCommand() + " für eine Liste der möglichen Befehle");
+            responseService.send(chatId, null, "ungültiger Bot-Befehl, benutze " + Command.HELP.getCommand() + " für eine Liste der möglichen Befehle");
             return;
         }
         
@@ -109,21 +94,29 @@ public class TapeBot implements SpringLongPollingBot, LongPollingSingleThreadUpd
                 log.error("missing handler for registered command {}", botCommand);
             }
             else {
-                handler.handleCommand(chatId, receivedText);
+                handler.handleMessage(userStateEntity, chatId, receivedText);
             }
             return;
         }
         
-        //no command was given, processing based on state
-        var stateOptional = userStateRepository.findById(chatId);
-        if(stateOptional.isEmpty()){
-            responseService.send(chatId, null, "Hi, gib /login zum einloggen oder /register zum registrieren ein.");
-            return;
-        }
-        UserStateEntity userStateEntity = stateOptional.get();
+        //if command is unknown, check if the state is tracked
         var handler = stateHandlerMap.get(userStateEntity.getUserState());
         if(handler != null){
             handler.handleMessage(userStateEntity, chatId, receivedText);
         }
+        
+        responseService.send(chatId, null, "Hi, gib /login zum einloggen oder /register zum registrieren ein.");
+    }
+    
+    private String getFirstBotCommand(List<MessageEntity> entities){
+        if(entities == null || entities.isEmpty()){
+            return null;
+        }
+        for (MessageEntity entity : entities) {
+            if(Objects.equals("bot_command", entity.getType())){
+                return entity.getText();
+            }
+        }
+        return null;
     }
 }

@@ -4,9 +4,7 @@ import bettertapebot.bot.ResponseService;
 import bettertapebot.handler.Command;
 import bettertapebot.handler.CommandHandler;
 import bettertapebot.repository.TapeRepository;
-import bettertapebot.repository.UserStateRepository;
 import bettertapebot.repository.entity.TapeEntity;
-import bettertapebot.repository.entity.UserState;
 import bettertapebot.repository.entity.UserStateEntity;
 import bettertapebot.util.TapeFormatter;
 import lombok.AccessLevel;
@@ -15,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,7 +24,6 @@ import java.util.List;
 public class GetAllHandler implements CommandHandler {
 
     ResponseService responseService;
-    UserStateRepository userStateRepository;
     TapeRepository tapeRepository;
 
     @Override
@@ -34,19 +32,20 @@ public class GetAllHandler implements CommandHandler {
     }
 
     @Override
-    public void handleCommand(long chatId, String message) {
-        var stateOptional = userStateRepository.findById(chatId);
-        var knownAndLoggedIn = stateOptional
-            .map(UserStateEntity::getUserState)
-            .map(UserState::isLoggedIn)
-            .orElse(false);
-        if(!knownAndLoggedIn){
+    @Transactional
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+        if(!userStateEntity.getUserState().isLoggedIn()){
             responseService.send(chatId, "Nur eingeloggte User können Tapes abfragen");
             return;
         }
-        boolean isAdmin = stateOptional.get().getUserState().isAdmin();
-        List<TapeEntity> tapes = tapeRepository.findAllByOrderByDateAddedDesc();
         
+        List<TapeEntity> tapes = tapeRepository.findAllByOrderByDateAddedDesc();
+        if(tapes.isEmpty()){
+            responseService.send(chatId, "Es gibt noch keine Einträge");
+            return;
+        }
+        
+        boolean isAdmin = userStateEntity.getUserState().isAdmin();
         StringBuilder stringBuilder = new StringBuilder();
         for (TapeEntity tape : tapes) {
             stringBuilder.append(TapeFormatter.formatTape(tape, isAdmin))

@@ -4,12 +4,14 @@ import bettertapebot.bot.ResponseService;
 import bettertapebot.handler.Command;
 import bettertapebot.handler.CommandHandler;
 import bettertapebot.properties.BotProperties;
+import bettertapebot.repository.entity.UserStateEntity;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,7 +32,8 @@ public class GetDsgvoHandler implements CommandHandler {
     }
 
     @Override
-    public void handleCommand(long chatId, String message) {
+    @Transactional
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
         try {
             var dsgoFile = Thread.currentThread().getContextClassLoader()
                 .getResource(botProperties.getDsgvoResourceName());

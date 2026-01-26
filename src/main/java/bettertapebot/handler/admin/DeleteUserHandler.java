@@ -2,31 +2,31 @@ package bettertapebot.handler.admin;
 
 import bettertapebot.bot.ResponseService;
 import bettertapebot.handler.Command;
+import bettertapebot.handler.CommandHandler;
 import bettertapebot.handler.StateHandler;
 import bettertapebot.repository.UserRepository;
-import bettertapebot.repository.UserStateRepository;
 import bettertapebot.repository.entity.UserState;
 import bettertapebot.repository.entity.UserStateEntity;
 import bettertapebot.util.MessageCleaner;
 import lombok.AccessLevel;
 import lombok.CustomLog;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.Set;
 
 @CustomLog
 @Component
+@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class DeleteUserHandler  extends AbstractAdminHandler implements StateHandler {
+public class DeleteUserHandler implements CommandHandler, StateHandler {
 
     UserRepository userRepository;
-    
-    public DeleteUserHandler(UserStateRepository userStateRepository, ResponseService responseService, UserRepository userRepository) {
-        super(userStateRepository, responseService);
-        this.userRepository = userRepository;
-    }
+    ResponseService responseService;
     
     @Override
     public @NonNull Command forCommand() {
@@ -39,25 +39,20 @@ public class DeleteUserHandler  extends AbstractAdminHandler implements StateHan
     }
     
     @Override
-    protected @NonNull String getErrorMessage() {
-        return "Nur Admins können Benutzer löschen";
-    }
-    
-    @Override
+    @Transactional
     public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
-        handleCommandWithMessage(userStateEntity, message);
-    }
-    
-    @Override
-    protected void handleCommandWithoutMessage(@NonNull UserStateEntity userStateEntity) {
-        userStateEntity.setUserState(UserState.DELETE_USER_GET_USERNAME);
-        responseService.send(userStateEntity.getChatId(), "Wie lautet der Benutzername?");
-    }
-    
-    @Override
-    protected void handleCommandWithMessage(@NonNull UserStateEntity userStateEntity, @NonNull String message) {
-        var usernameToRemove = MessageCleaner.getFirstWord(message);
+        if (!userStateEntity.getUserState().isAdmin()) {
+            responseService.send(chatId, "Nur Admins können Benutzer löschen");
+            return;
+        }
         
+        if(!StringUtils.hasText(message)){
+            userStateEntity.setUserState(UserState.DELETE_USER_GET_USERNAME);
+            responseService.send(userStateEntity.getChatId(), "Wie lautet der Benutzername?");
+            return;
+        }
+        
+        var usernameToRemove = MessageCleaner.getFirstWord(message);
         var deletedEntity = userRepository.deleteByUsername(usernameToRemove);
         if(deletedEntity.isPresent()){
             log.info("deleting user with username {} on request of {}", usernameToRemove, userStateEntity.getOwner().getUsername());

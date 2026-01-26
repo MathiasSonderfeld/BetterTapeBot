@@ -8,7 +8,6 @@ import bettertapebot.repository.entity.UserStateEntity;
 import bettertapebot.testutil.TestcontainersConfiguration;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,19 +26,11 @@ class LogoutHandlerTest {
     @Autowired
     LogoutHandler logoutHandler;
     
-    @MockitoSpyBean
-    UserStateRepository userStateRepository;
-    
     @MockitoBean
     ResponseService responseService;
     
-    @BeforeEach
-    void reset(){
-        Mockito.reset(
-            userStateRepository,
-            responseService
-        );
-    }
+    @Autowired
+    UserStateRepository userStateRepository;
     
     @AfterEach
     void cleanUp(){
@@ -55,9 +45,13 @@ class LogoutHandlerTest {
     @Test
     public void notLoggedInUserGetsDenied(){
         long chatId = 1234L;
-        logoutHandler.handleCommand(chatId, null);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.NEW_CHAT)
+            .build());
         
+        Mockito.reset(responseService);
+        logoutHandler.handleMessage(userStateEntity, chatId, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -71,15 +65,13 @@ class LogoutHandlerTest {
     @Test
     public void loggedInUserGetsLoggedOut(){
         long chatId = 2345L;
-        
-        var state = userStateRepository.save(UserStateEntity.builder()
-            .userState(UserState.LOGGED_IN)
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
+            .userState(UserState.LOGGED_IN)
             .build());
         
-        logoutHandler.handleCommand(chatId, null);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-        
+        Mockito.reset(responseService);
+        logoutHandler.handleMessage(userStateEntity, chatId, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -88,7 +80,7 @@ class LogoutHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Ich melde dich ab");
-        assertThat(state.getUserState()).isEqualTo(UserState.LOGGED_OUT);
+        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.LOGGED_OUT);
     }
 
 }

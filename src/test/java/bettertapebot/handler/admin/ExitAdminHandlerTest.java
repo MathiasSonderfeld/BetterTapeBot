@@ -2,17 +2,15 @@ package bettertapebot.handler.admin;
 
 import bettertapebot.bot.ResponseService;
 import bettertapebot.handler.Command;
+import bettertapebot.repository.UserRepository;
 import bettertapebot.repository.UserStateRepository;
+import bettertapebot.repository.entity.UserEntity;
 import bettertapebot.repository.entity.UserState;
 import bettertapebot.repository.entity.UserStateEntity;
 import bettertapebot.testutil.TestcontainersConfiguration;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -20,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,23 +28,19 @@ class ExitAdminHandlerTest {
     @Autowired
     ExitAdminHandler exitAdminHandler;
     
-    @MockitoSpyBean
-    UserStateRepository userStateRepository;
-    
     @MockitoBean
     ResponseService responseService;
     
-    @BeforeEach
-    void reset(){
-        Mockito.reset(
-            userStateRepository,
-            responseService
-        );
-    }
+    @Autowired
+    UserStateRepository userStateRepository;
+    
+    @Autowired
+    UserRepository userRepository;
     
     @AfterEach
     void cleanUp(){
         userStateRepository.deleteAll();
+        userRepository.deleteAll();
     }
     
     @Test
@@ -58,9 +51,19 @@ class ExitAdminHandlerTest {
     @Test
     public void unknownSessionGetsDenied(){
         long chatId = 1234L;
-        exitAdminHandler.handleCommand(chatId, "testmessage");
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        var userEntity = userRepository.save(UserEntity.builder()
+            .username("user")
+            .pin("1234")
+            .isAdmin(true)
+            .build());
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.LOGGED_IN)
+            .owner(userEntity)
+            .build());
         
+        Mockito.reset(responseService);
+        exitAdminHandler.handleMessage(userStateEntity, chatId, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -71,21 +74,22 @@ class ExitAdminHandlerTest {
             .contains("Du bist gar nicht im Admin-Modus");
     }
     
-    @EmptySource
-    @ValueSource(strings = "value")
-    @ParameterizedTest
-    public void alreadyAdminGetsInformed(String message){
+    @Test
+    public void adminLeavesAdminMode(){
         long chatId = 2345L;
-        
-        var state = userStateRepository.save(UserStateEntity.builder()
+        var userEntity = userRepository.save(UserEntity.builder()
+            .username("admin")
+            .pin("1234")
+            .isAdmin(true)
+            .build());
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
             .userState(UserState.ADMIN)
-            .owner(null)
+            .owner(userEntity)
             .build());
         
-        exitAdminHandler.handleCommand(chatId, message);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-        
+        Mockito.reset(responseService);
+        exitAdminHandler.handleMessage(userStateEntity, chatId, "mesage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -94,6 +98,6 @@ class ExitAdminHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Du hast den Admin-Modus verlassen");
-        assertThat(state.getUserState()).isEqualTo(UserState.LOGGED_IN);
+        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.LOGGED_IN);
     }
 }

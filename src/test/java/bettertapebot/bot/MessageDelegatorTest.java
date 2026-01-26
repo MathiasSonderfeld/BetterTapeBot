@@ -1,7 +1,5 @@
 package bettertapebot.bot;
 
-import bettertapebot.bot.ResponseService;
-import bettertapebot.bot.TapeBot;
 import bettertapebot.handler.Command;
 import bettertapebot.handler.CommandHandler;
 import bettertapebot.handler.StateHandler;
@@ -10,7 +8,6 @@ import bettertapebot.repository.UserStateRepository;
 import bettertapebot.repository.entity.UserState;
 import bettertapebot.repository.entity.UserStateEntity;
 import org.assertj.core.api.InstanceOfAssertFactories;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,16 +29,20 @@ import java.util.regex.Pattern;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringJUnitConfig
-class TapeBotTest {
+class MessageDelegatorTest {
     private static final Command HANDLED_COMMAND = Command.LOGOUT;
     private static final UserState HANDLED_STATE = UserState.LOGGED_OUT;
+    private static final UserStateEntity USER_STATE_ENTITY = UserStateEntity.builder()
+        .chatId(1234L)
+        .userState(UserState.NEW_CHAT)
+        .build();
 
     BotProperties botProperties;
     ResponseService responseService;
     UserStateRepository userStateRepository;
     CommandHandler commandHandler;
     StateHandler stateHandler;
-    TapeBot tapeBot;
+    MessageDelegator messageDelegator;
     
     private static Update createUpdate(long chatId, String text){
         ArrayList<MessageEntity> botCommands = new ArrayList<>();
@@ -76,20 +77,22 @@ class TapeBotTest {
     void setup(){
         botProperties = new BotProperties();
         botProperties.getTelegram().setToken("token");
+        
         responseService = Mockito.mock(ResponseService.class);
+        
+        
         userStateRepository = Mockito.mock(UserStateRepository.class);
+        Mockito.when(userStateRepository.findById(ArgumentMatchers.any())).thenReturn(Optional.of(USER_STATE_ENTITY));
+        
         commandHandler = Mockito.mock(CommandHandler.class);
         Mockito.when(commandHandler.forCommand()).thenReturn(HANDLED_COMMAND);
+        
         stateHandler = Mockito.mock(StateHandler.class);
         Mockito.when(stateHandler.forStates()).thenReturn(Set.of(HANDLED_STATE));
-        tapeBot = new TapeBot(botProperties, responseService, userStateRepository, Set.of(commandHandler), Set.of(stateHandler));
-        tapeBot.postConstruct();
+        
+        messageDelegator = new MessageDelegator(responseService, userStateRepository, Set.of(commandHandler), Set.of(stateHandler));
+        messageDelegator.postConstruct();
         Mockito.reset(commandHandler, stateHandler);
-    }
-    
-    @AfterEach
-    void reset(){
-        Mockito.reset(responseService, userStateRepository, commandHandler, stateHandler);
     }
     
     @Test
@@ -103,7 +106,7 @@ class TapeBotTest {
         Update update = new Update();
         update.setMessage(message);
         
-        Assertions.assertDoesNotThrow(() -> tapeBot.consume(update));
+        Assertions.assertDoesNotThrow(() -> messageDelegator.processUpdate(update));
         Mockito.verifyNoInteractions(responseService, userStateRepository, commandHandler, stateHandler);
     }
     
@@ -112,10 +115,11 @@ class TapeBotTest {
         long chatId = 234L;
         Update update = createUpdate(chatId, "/unknown command");
         
-        Assertions.assertDoesNotThrow(() -> tapeBot.consume(update));
-        Mockito.verifyNoInteractions(userStateRepository, commandHandler, stateHandler);
+        Assertions.assertDoesNotThrow(() -> messageDelegator.processUpdate(update));
+        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        Mockito.verifyNoInteractions(commandHandler, stateHandler);
         Mockito.verify(responseService, Mockito.times(1))
-            .send(ArgumentMatchers.eq(chatId), ArgumentMatchers.isNull(), ArgumentMatchers.contains("ungültiger bot-befehl"));
+            .send(ArgumentMatchers.eq(chatId), ArgumentMatchers.isNull(), ArgumentMatchers.contains("ungültiger Bot-Befehl"));
     }
     
     @Test
@@ -123,10 +127,10 @@ class TapeBotTest {
         long chatId = 345L;
         var text = "data";
         Update update = createUpdate(chatId, HANDLED_COMMAND.getCommand() + " "  + text);
-        
-        Assertions.assertDoesNotThrow(() -> tapeBot.consume(update));
-        Mockito.verifyNoInteractions(responseService, userStateRepository, stateHandler);
-        Mockito.verify(commandHandler, Mockito.times(1)).handleCommand(chatId, text);
+        Assertions.assertDoesNotThrow(() -> messageDelegator.processUpdate(update));
+        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        Mockito.verifyNoInteractions(responseService, stateHandler);
+        Mockito.verify(commandHandler, Mockito.times(1)).handleMessage(USER_STATE_ENTITY, chatId, text);
     }
     
     @Test
@@ -134,8 +138,35 @@ class TapeBotTest {
         long chatId = 456L;
         var text = "data";
         Update update = createUpdate(chatId, text);
+        var userStateEntity = UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.NEW_CHAT)
+            .build();
+        Mockito.when(userStateRepository.findById(chatId)).thenReturn(Optional.of(userStateEntity));
+        Assertions.assertDoesNotThrow(() -> messageDelegator.processUpdate(update));
+        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        Mockito.verifyNoInteractions(commandHandler, stateHandler);
         
-        Assertions.assertDoesNotThrow(() -> tapeBot.consume(update));
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(responseService, Mockito.times(1))
+            .send(ArgumentMatchers.eq(chatId), ArgumentMatchers.isNull(), captor.capture());
+        
+        var captures = captor.getAllValues();
+        assertThat(captures).isNotNull()
+            .hasSize(1)
+            .element(0)
+            .asInstanceOf(InstanceOfAssertFactories.STRING)
+            .contains("Hi")
+            .contains("/login")
+            .contains("/register");
+    }
+    
+    @Test
+    void testMessageWithKnownStateButWithoutHandlerGetsWelcomeMessage(){
+        long chatId = 567L;
+        var text = "data";
+        Update update = createUpdate(chatId, text);
+        Assertions.assertDoesNotThrow(() -> messageDelegator.processUpdate(update));
         Mockito.verifyNoInteractions(commandHandler, stateHandler);
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         
@@ -154,34 +185,17 @@ class TapeBotTest {
     }
     
     @Test
-    void testMessageWithKnownStateButWithoutHandlerGetsIgnored(){
-        long chatId = 567L;
-        var text = "data";
-        Update update = createUpdate(chatId, text);
-        UserStateEntity entity = UserStateEntity.builder()
-            .chatId(chatId)
-            .userState(UserState.ADMIN)
-            .build();
-        Mockito.when(userStateRepository.findById(chatId)).thenReturn(Optional.of(entity));
-        
-        Assertions.assertDoesNotThrow(() -> tapeBot.consume(update));
-        Mockito.verifyNoInteractions(responseService, commandHandler, stateHandler);
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-    }
-    
-    @Test
     void testMessageWithKnownStateGetsHandled(){
         long chatId = 678L;
         var text = "data";
         Update update = createUpdate(chatId, text);
-        var state = UserStateEntity.builder()
+        var userStateEntity = UserStateEntity.builder()
             .chatId(chatId)
             .userState(HANDLED_STATE)
             .build();
-        Mockito.when(userStateRepository.findById(chatId)).thenReturn(Optional.of(state));
-        
-        Assertions.assertDoesNotThrow(() -> tapeBot.consume(update));
-        Mockito.verifyNoInteractions(responseService, commandHandler);
+        Mockito.when(userStateRepository.findById(chatId)).thenReturn(Optional.of(userStateEntity));
+        Assertions.assertDoesNotThrow(() -> messageDelegator.processUpdate(update));
+        Mockito.verifyNoInteractions(commandHandler);
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         Mockito.verify(stateHandler, Mockito.times(1))
             .handleMessage(ArgumentMatchers.any(), ArgumentMatchers.eq(chatId), ArgumentMatchers.eq(text));

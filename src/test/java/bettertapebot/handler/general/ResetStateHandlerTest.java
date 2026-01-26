@@ -8,7 +8,6 @@ import bettertapebot.repository.entity.UserStateEntity;
 import bettertapebot.testutil.TestcontainersConfiguration;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -34,14 +33,6 @@ class ResetStateHandlerTest {
     @MockitoBean
     ResponseService responseService;
     
-    @BeforeEach
-    void reset(){
-        Mockito.reset(
-            userStateRepository,
-            responseService
-        );
-    }
-    
     @AfterEach
     void cleanUp(){
         userStateRepository.deleteAll();
@@ -53,11 +44,15 @@ class ResetStateHandlerTest {
     }
     
     @Test
-    public void unknownChatGetsSkipped(){
+    public void newChatGetsSkipped(){
         long chatId = 1234L;
-        resetStateHandler.handleCommand(chatId, "testmessage");
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.NEW_CHAT)
+            .build());
         
+        Mockito.reset(userStateRepository, responseService);
+        resetStateHandler.handleMessage(userStateEntity, chatId, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -66,20 +61,19 @@ class ResetStateHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("chat unbekannt, kein reset nötig");
+        Mockito.verifyNoInteractions(userStateRepository);
     }
     
     @Test
     public void chatGetsReset(){
         long chatId = 2345L;
-        
-        userStateRepository.save(UserStateEntity.builder()
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
             .chatId(chatId)
-            .userState(UserState.LOGGED_IN)
+            .userState(UserState.ADMIN)
             .build());
         
-        resetStateHandler.handleCommand(chatId, "testmessage");
-        Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
-        
+        resetStateHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        Mockito.verify(userStateRepository, Mockito.times(1)).deleteById(chatId);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
