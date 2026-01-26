@@ -68,6 +68,6 @@ public class DirectingHandler implements CommandHandler, StateHandler {
         boolean isAdmin = userStateEntity.isAdminModeActive();
         var response = TapeFormatter.formatTapes(tapes, isAdmin);
         responseService.send(chatId, response);
-        userStateEntity.setUserState(UserState.LOGGED_IN); //TODO figure out how to solve unwanted admin mode exit
+        userStateEntity.setUserState(UserState.LOGGED_IN);
     }
 }

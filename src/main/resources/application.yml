@@ -11,5 +11,18 @@ spring:
     hibernate:
       ddl-auto: validate
 better-tape-bot:
+  subscription:
+    countsAsYes:
+      - "ja"
+      - "j"
+      - "yes"
+      - "y"
+      - "true"
+    countsAsNo:
+      - "nein"
+      - "n"
+      - "no"
+      - "n"
+      - "false"
   telegram:
     token: "SECRET"

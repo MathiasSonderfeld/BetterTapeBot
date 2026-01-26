@@ -153,7 +153,7 @@ class StarringHandlerTest {
     }
     
     @Test
-    public void resetUserCommandWithValidUserGetsReset(){
+    public void starringWithValidUsernameGetsDelivered(){
         ZonedDateTime time = ZonedDateTime.of(2026, 2, 1,12,0,0,0, ZoneId.systemDefault());
         String expectedTime = "01.02.26 12:00";
         long chatId = 6789L;

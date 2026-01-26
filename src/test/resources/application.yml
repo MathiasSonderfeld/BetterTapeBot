@@ -6,5 +6,10 @@ spring:
   application:
     name: BetterTapeBot
 better-tape-bot:
+  subscription:
+    countsAsYes:
+      - "true"
+    countsAsNo:
+      - "false"
   telegram:
     token: "TEST_TOKEN"
