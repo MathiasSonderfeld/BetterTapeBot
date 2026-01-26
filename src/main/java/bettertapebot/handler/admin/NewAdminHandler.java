@@ -24,7 +24,7 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class NewAdminHandler implements CommandHandler, StateHandler { //TODO implement
+public class NewAdminHandler implements CommandHandler, StateHandler {
     
     UserRepository userRepository;
     ResponseService responseService;

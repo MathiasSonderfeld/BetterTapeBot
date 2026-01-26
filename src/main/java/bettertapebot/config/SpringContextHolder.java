@@ -1,4 +1,4 @@
-package bettertapebot.bot;
+package bettertapebot.config;
 
 import lombok.Getter;
 import org.jspecify.annotations.NonNull;

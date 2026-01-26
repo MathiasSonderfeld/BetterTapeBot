@@ -1,3 +1,5 @@
+# Don't change anything unless you know what you're doing
+# documentation in doc/liquibase.md
 databaseChangeLog:
   - include:
       file: db.changelog-create-users-table.yaml

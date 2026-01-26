@@ -46,11 +46,7 @@ public class GetAllHandler implements CommandHandler {
         }
         
         boolean isAdmin = userStateEntity.getUserState().isAdmin();
-        StringBuilder stringBuilder = new StringBuilder();
-        for (TapeEntity tape : tapes) {
-            stringBuilder.append(TapeFormatter.formatTape(tape, isAdmin))
-                .append("\n\n");
-        }
-        responseService.send(chatId, stringBuilder.toString());
+        var response = TapeFormatter.formatTapes(tapes, isAdmin);
+        responseService.send(chatId, response);
     }
 }

@@ -109,7 +109,7 @@ class DeleteUserHandlerTest {
     }
     
     @Test
-    public void deleteUserWithUnknownUserGetsAskedAgain(){
+    public void deleteUserWithUnknownUsernameGetsAskedAgain(){
         long chatId = 3456L;
         var userEntity = userRepository.save(UserEntity.builder()
             .username("admin")

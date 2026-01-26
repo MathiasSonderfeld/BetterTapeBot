@@ -1,4 +1,4 @@
-package bettertapebot.bot;
+package bettertapebot.config;
 
 import bettertapebot.properties.BotProperties;
 import jakarta.persistence.EntityManagerFactory;

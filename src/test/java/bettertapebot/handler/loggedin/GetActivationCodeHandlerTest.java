@@ -1,7 +1,9 @@
 package bettertapebot.handler.loggedin;
 
 import bettertapebot.bot.ResponseService;
+import bettertapebot.config.PasscodeGenerator;
 import bettertapebot.handler.Command;
+import bettertapebot.properties.BotProperties;
 import bettertapebot.repository.UserStateRepository;
 import bettertapebot.repository.entity.UserState;
 import bettertapebot.repository.entity.UserStateEntity;
@@ -20,7 +22,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({TestcontainersConfiguration.class, GetActivationCodeHandler.class})
+@Import({TestcontainersConfiguration.class, GetActivationCodeHandler.class, PasscodeGenerator.class, BotProperties.class})
 class GetActivationCodeHandlerTest {
     
     @Autowired

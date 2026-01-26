@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.time.Duration;
+
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ConfigurationProperties(prefix = "better-tape-bot")
@@ -16,6 +18,9 @@ public class BotProperties {
     @NotNull
     TelegramProperties telegram = new TelegramProperties();
 
+    @NotNull
+    Duration activationCodeTTL = Duration.ofHours(24);
+    
     @NotBlank
     String dsgvoResourceName = "dsgvo.txt";
 

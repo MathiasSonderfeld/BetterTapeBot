@@ -5,9 +5,9 @@ import bettertapebot.handler.Command;
 import bettertapebot.handler.CommandHandler;
 import bettertapebot.handler.StateHandler;
 import bettertapebot.repository.UserRepository;
-import bettertapebot.repository.UserStateRepository;
 import bettertapebot.repository.entity.UserState;
 import bettertapebot.repository.entity.UserStateEntity;
+import bettertapebot.util.MessageCleaner;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +15,7 @@ import lombok.experimental.FieldDefaults;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.Set;
 
@@ -22,10 +23,9 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class RemoveAdminHandler implements CommandHandler, StateHandler { //TODO implement
+public class RemoveAdminHandler implements CommandHandler, StateHandler {
 
     ResponseService responseService;
-    UserStateRepository userStateRepository;
     UserRepository userRepository;
 
     @Override
@@ -41,6 +41,34 @@ public class RemoveAdminHandler implements CommandHandler, StateHandler { //TODO
     @Override
     @Transactional
     public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
-    
+        if (!userStateEntity.getUserState().isAdmin()) {
+            responseService.send(chatId, "Nur Admins dürfen andere Admins entfernen");
+            return;
+        }
+        
+        if(!StringUtils.hasText(message)){
+            userStateEntity.setUserState(UserState.REMOVE_ADMIN_USER_GET_USERNAME);
+            responseService.send(userStateEntity.getChatId(), "Welcher Admin soll wieder eingeschränkt werden?");
+            return;
+        }
+        
+        var givenUsername = MessageCleaner.getFirstWord(message);
+        var user = userRepository.findById(givenUsername);
+        if(user.isEmpty()){
+            userStateEntity.setUserState(UserState.REMOVE_ADMIN_USER_GET_USERNAME);
+            responseService.send(userStateEntity.getChatId(), "Den Benutzer gibt es nicht. Probiers nochmal");
+            return;
+        }
+        
+        var userEntity = user.get();
+        if(!userEntity.getIsAdmin()){
+            userStateEntity.setUserState(UserState.ADMIN);
+            responseService.send(userStateEntity.getChatId(), userEntity.getUsername() + " ist nicht Admin");
+            return;
+        }
+        
+        userEntity.setIsAdmin(false);
+        userStateEntity.setUserState(UserState.ADMIN);
+        responseService.send(userStateEntity.getChatId(),  userEntity.getUsername() + " ist nicht mehr Admin");
     }
 }

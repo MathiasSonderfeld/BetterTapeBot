@@ -4,7 +4,7 @@ import bettertapebot.bot.ResponseService;
 import bettertapebot.handler.Command;
 import bettertapebot.handler.CommandHandler;
 import bettertapebot.repository.entity.UserStateEntity;
-import bettertapebot.util.PasscodeGenerator;
+import bettertapebot.config.PasscodeGenerator;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class GetActivationCodeHandler implements CommandHandler {
 
     ResponseService responseService;
+    PasscodeGenerator passcodeGenerator;
 
     @Override
     public @NonNull Command forCommand() {
@@ -33,6 +34,6 @@ public class GetActivationCodeHandler implements CommandHandler {
             responseService.send(chatId, "Nur eingeloggte User können Codes erzeugen");
             return;
         }
-        responseService.send(chatId, "Der aktuelle Freischaltcode lautet: " + PasscodeGenerator.generatePasscode());
+        responseService.send(chatId, "Der aktuelle Freischaltcode lautet: " + passcodeGenerator.generatePasscode());
     }
 }

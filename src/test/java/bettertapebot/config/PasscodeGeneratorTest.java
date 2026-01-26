@@ -1,6 +1,7 @@
-package bettertapebot.util;
+package bettertapebot.config;
 
-import bettertapebot.util.PasscodeGenerator;
+import bettertapebot.properties.BotProperties;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -14,14 +15,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringJUnitConfig
 class PasscodeGeneratorTest {
     
+    PasscodeGenerator passcodeGenerator;
+    
+    @BeforeEach
+    void setup(){
+        passcodeGenerator = new PasscodeGenerator(new BotProperties());
+    }
+    
     @Test
     void testCodeWithinTheSame24hStaysTheSame(){
-        var code = PasscodeGenerator.generatePasscode();
+        var code = passcodeGenerator.generatePasscode();
         assertThat(code).isPositive();
         for (int i = 0; i < 1000; i++) {
-            assertThat(PasscodeGenerator.generatePasscode()).isEqualTo(code);
-            assertThat(PasscodeGenerator.validatePasscode(code+1)).isFalse();
-            assertThat(PasscodeGenerator.validatePasscode(code)).isTrue();
+            assertThat(passcodeGenerator.generatePasscode()).isEqualTo(code);
+            assertThat(passcodeGenerator.validatePasscode(code+1)).isFalse();
+            assertThat(passcodeGenerator.validatePasscode(code)).isTrue();
         }
     }
     
@@ -30,11 +38,11 @@ class PasscodeGeneratorTest {
         int count = 1000;
         List<Integer> codes = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            PasscodeGenerator.setLastTimeGenerated(Instant.MIN);
-            var code = PasscodeGenerator.generatePasscode();
+            passcodeGenerator.setLastTimeGenerated(Instant.MIN);
+            var code = passcodeGenerator.generatePasscode();
             codes.add(code);
-            assertThat(PasscodeGenerator.validatePasscode(code+1)).isFalse();
-            assertThat(PasscodeGenerator.validatePasscode(code)).isTrue();
+            assertThat(passcodeGenerator.validatePasscode(code+1)).isFalse();
+            assertThat(passcodeGenerator.validatePasscode(code)).isTrue();
         }
         assertThat(codes).hasSize(count);
         var uniqueCodes = new HashSet<>(codes);

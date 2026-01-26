@@ -44,7 +44,6 @@ public class GetHelpHandler implements CommandHandler {
             .map(Command::getFormattedHelpText)
             .forEach(c -> sb.append(c).append("\n"));
         
-        //user commands
         if(userState.isLoggedIn()){
             sb.append("\n")
                 .append("Befehle für eingeloggte User:")
@@ -54,8 +53,7 @@ public class GetHelpHandler implements CommandHandler {
                 .map(Command::getFormattedHelpText)
                 .forEach(c -> sb.append(c).append("\n"));
         }
-
-        //admin commands
+        
         if(userState.isAdmin()){
             sb.append("\n")
                 .append("Befehle für Admins:")

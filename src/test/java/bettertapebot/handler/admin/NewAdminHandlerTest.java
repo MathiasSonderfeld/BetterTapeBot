@@ -78,7 +78,7 @@ class NewAdminHandlerTest {
     }
     
     @Test
-    public void newAdminWithoutUserGetsAskedForUsername(){
+    public void newAdminwithoutUsernameGetsAskedForUsername(){
         long chatId = 2345L;
         var userEntity = userRepository.save(UserEntity.builder()
             .username("admin")
@@ -140,7 +140,7 @@ class NewAdminHandlerTest {
     }
     
     @Test
-    public void newAdminWithUnknownUserGetsAskedAgain() {
+    public void newAdminWithUnknownUsernameGetsAskedAgain() {
         long chatId = 4567L;
         var userEntity = userRepository.save(UserEntity.builder()
             .username("admin")

@@ -1,3 +1,5 @@
+# Don't change anything unless you know what you're doing
+# documentation in doc/liquibase.md
 databaseChangeLog:
   - changeSet:
       id: create-table-tapes
@@ -60,3 +62,23 @@ databaseChangeLog:
             columns:
               - column:
                   name: date_added
+  - changeSet:
+      id: add-index-tapes-director
+      author: MathiasSonderfeld
+      changes:
+        - createIndex:
+            indexName: idx_tapes_director
+            tableName: tapes
+            columns:
+              - column:
+                  name: director
+  - changeSet:
+      id: add-index-tapes-star
+      author: MathiasSonderfeld
+      changes:
+        - createIndex:
+            indexName: idx_tapes_star
+            tableName: tapes
+            columns:
+              - column:
+                  name: star

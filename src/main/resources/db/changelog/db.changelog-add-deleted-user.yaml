@@ -1,3 +1,5 @@
+# Don't change anything unless you know what you're doing
+# documentation in doc/liquibase.md
 databaseChangeLog:
   - changeSet:
       id: add-user-deleted-to-users-table
