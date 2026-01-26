@@ -47,7 +47,7 @@ class GetDsgvoHandlerTest {
         
         getDsgvoHandler.handleMessage(userStateEntity, 1L, "");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(1L), textCaptor.capture());
+        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(1L), ArgumentMatchers.isNull(), textCaptor.capture());
         var texts = textCaptor.getAllValues();
         assertThat(texts).isNotNull()
             .hasSize(1)

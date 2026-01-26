@@ -105,7 +105,7 @@ public class MessageDelegator {
             handler.handleMessage(userStateEntity, chatId, receivedText);
         }
         
-        responseService.send(chatId, null, "Hi, gib /login zum einloggen oder /register zum registrieren ein.");
+        responseService.send(chatId, null, String.format("Hi, gib %s zum einloggen oder %s zum registrieren ein.", Command.LOGIN.getCommand(), Command.REGISTER.getCommand()));
     }
     
     private String getFirstBotCommand(List<MessageEntity> entities){

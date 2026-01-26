@@ -35,7 +35,7 @@ public class BecomeAdminHandler implements CommandHandler {
         }
         
         if(userStateEntity.isAdminModeActive()){
-            responseService.send(chatId, "Du bist bereits im Admin-Modus, /help für Befehle");
+            responseService.send(chatId, String.format("Du bist bereits im Admin-Modus, %s für Befehle", Command.HELP.getCommand()));
             return;
         }
         
@@ -46,6 +46,6 @@ public class BecomeAdminHandler implements CommandHandler {
         }
         userStateEntity.setAdminMode(true);
         userStateEntity.setUserState(UserState.LOGGED_IN);
-        responseService.send(chatId, "Du bist in den Admin-Bereich gewechselt, /help für Befehle");
+        responseService.send(chatId, String.format("Du bist in den Admin-Bereich gewechselt, %s für Befehle", Command.HELP.getCommand()));
     }
 }

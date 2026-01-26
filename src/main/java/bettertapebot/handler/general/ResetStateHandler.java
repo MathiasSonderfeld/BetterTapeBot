@@ -36,6 +36,7 @@ public class ResetStateHandler implements CommandHandler {
             return;
         }
         userStateRepository.deleteById(chatId);
-        responseService.send(chatId, "Chat wurde zurückgesetzt, benutze /start um von vorne zu beginnen");
+        var response = String.format("Chat wurde zurückgesetzt, benutze %s oder %s um von vorne zu beginnen", Command.REGISTER.getCommand(), Command.LOGIN.getCommand());
+        responseService.send(chatId, response);
     }
 }
