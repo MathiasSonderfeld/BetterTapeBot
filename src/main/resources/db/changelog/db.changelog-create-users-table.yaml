@@ -51,6 +51,7 @@ databaseChangeLog:
       author: MathiasSonderfeld
       changes:
         - sql:
+            splitStatements: false
             sql: |
               CREATE OR REPLACE FUNCTION prevent_anonymous_user_delete()
               RETURNS trigger AS $$
