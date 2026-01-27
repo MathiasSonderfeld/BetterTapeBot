@@ -2,6 +2,7 @@ package bettertapebot.handler.loggedin;
 
 import bettertapebot.bot.ResponseService;
 import bettertapebot.handler.Command;
+import bettertapebot.properties.BotProperties;
 import bettertapebot.repository.UserRepository;
 import bettertapebot.repository.UserStateRepository;
 import bettertapebot.repository.entity.UserEntity;
@@ -23,7 +24,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({TestcontainersConfiguration.class, GetAllUsersHandler.class})
+@Import({TestcontainersConfiguration.class, GetAllUsersHandler.class, BotProperties.class})
 class GetAllUsersHandlerTest {
     
     @Autowired
@@ -37,6 +38,9 @@ class GetAllUsersHandlerTest {
     
     @Autowired
     UserStateRepository userStateRepository;
+    
+    @Autowired
+    BotProperties botProperties;
     
     @AfterEach
     void cleanUp(){
@@ -109,6 +113,9 @@ class GetAllUsersHandlerTest {
             .element(0)
             .asInstanceOf(InstanceOfAssertFactories.STRING)
             .contains("Folgende User sind registriert:")
-            .contains(user1.getUsername(), user2.getUsername(), user3.getUsername());
+            .contains(user1.getUsername())
+            .contains(user2.getUsername())
+            .contains(user3.getUsername())
+            .doesNotContain(botProperties.getDefaultUserForTapes());
     }
 }

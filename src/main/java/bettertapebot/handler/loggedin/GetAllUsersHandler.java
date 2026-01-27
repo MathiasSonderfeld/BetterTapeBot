@@ -3,6 +3,7 @@ package bettertapebot.handler.loggedin;
 import bettertapebot.bot.ResponseService;
 import bettertapebot.handler.Command;
 import bettertapebot.handler.CommandHandler;
+import bettertapebot.properties.BotProperties;
 import bettertapebot.repository.UserRepository;
 import bettertapebot.repository.entity.UserEntity;
 import bettertapebot.repository.entity.UserStateEntity;
@@ -24,6 +25,7 @@ public class GetAllUsersHandler implements CommandHandler {
 
     UserRepository userRepository;
     ResponseService responseService;
+    BotProperties botProperties;
 
     @Override
     public @NonNull Command forCommand() {
@@ -40,7 +42,7 @@ public class GetAllUsersHandler implements CommandHandler {
 
         var allUsernames = userRepository.findAll().stream()
             .map(UserEntity::getUsername)
-            .filter(u -> !"anonymous".equalsIgnoreCase(u)) //TODO make default user configurable
+            .filter(u -> !botProperties.getDefaultUserForTapes().equalsIgnoreCase(u))
             .collect(Collectors.toSet());
 
         responseService.send(chatId, "Folgende User sind registriert: " + String.join(", ", allUsernames));

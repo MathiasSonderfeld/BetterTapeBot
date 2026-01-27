@@ -32,6 +32,9 @@ public class BotProperties {
     @NotBlank
     String denyGdprText = "Ablehnen";
     
+    @NotBlank
+    String defaultUserForTapes = "anonymous";
+    
     @NotNull
     SubscriptionProperties subscription = new SubscriptionProperties();
     
