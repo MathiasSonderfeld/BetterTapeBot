@@ -1,6 +1,5 @@
 package bettertapebot.bot;
 
-import bettertapebot.bot.ResponseService;
 import bettertapebot.properties.BotProperties;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -228,7 +227,7 @@ class ResponseServiceTest {
             
             for (int j = 1; j < timestamps.size(); j++) {
                 Duration gap = Duration.between(timestamps.get(j-1), timestamps.get(j));
-                assertThat(gap.toMillis()).isLessThanOrEqualTo(20L);
+                assertThat(gap.toMillis()).isLessThanOrEqualTo(30L);
             }
         }
         

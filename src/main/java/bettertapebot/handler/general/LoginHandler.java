@@ -58,7 +58,7 @@ public class LoginHandler implements CommandHandler, StateHandler {
             var pin = MessageCleaner.getFirstWord(message);
             var userEntity = userStateEntity.getOwner();
             
-            if(Objects.equals(pin, userEntity.getPin())){
+            if(Objects.equals(pin, userEntity.getPin())){ //TODO verify PIN schema
                 userStateEntity.setUserState(UserState.LOGGED_IN);
                 responseService.send(chatId, "du wurdest erfolgreich eingeloggt");
             }

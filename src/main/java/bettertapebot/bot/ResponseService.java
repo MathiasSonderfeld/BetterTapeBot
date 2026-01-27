@@ -113,6 +113,4 @@ public class ResponseService {
         .subscribeOn(Schedulers.boundedElastic())
         .then();
     }
-
-
 }

@@ -14,7 +14,7 @@ import java.util.Random;
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class PasscodeGenerator {
+public class PasscodeGenerator { //TODO add generate admin key and startup output if no user is registered
     
     BotProperties botProperties;
     

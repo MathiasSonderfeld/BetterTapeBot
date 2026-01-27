@@ -40,6 +40,7 @@ public class GetAllUsersHandler implements CommandHandler {
 
         var allUsernames = userRepository.findAll().stream()
             .map(UserEntity::getUsername)
+            .filter(u -> !"anonymous".equalsIgnoreCase(u)) //TODO make default user configurable
             .collect(Collectors.toSet());
 
         responseService.send(chatId, "Folgende User sind registriert: " + String.join(", ", allUsernames));
