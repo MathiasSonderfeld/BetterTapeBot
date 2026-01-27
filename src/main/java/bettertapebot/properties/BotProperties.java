@@ -70,8 +70,14 @@ public class BotProperties {
 
         @Positive
         int messageLengthLimit = 4096;
-
+        
+        /*
+         * Telegram API defines limit at 1 msg per second
+         */
+        @NotNull
+        Duration delayBetweenMessagesForSameChat = Duration.ofSeconds(1);
+        
         @Positive
-        int delayBetweenMessagesMs = 900;
+        int retryCountInCaseOfTooManyRequests = 5;
     }
 }
