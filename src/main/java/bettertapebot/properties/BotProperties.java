@@ -36,6 +36,9 @@ public class BotProperties {
     String defaultUserForTapes = "anonymous";
     
     @NotNull
+    Duration tapeCacheTTL = Duration.ofHours(1);
+    
+    @NotNull
     SubscriptionProperties subscription = new SubscriptionProperties();
     
     @NotNull

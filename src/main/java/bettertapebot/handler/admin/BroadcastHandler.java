@@ -15,7 +15,6 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
 import java.util.Set;
 
 @CustomLog
@@ -50,11 +49,7 @@ public class BroadcastHandler implements CommandHandler, StateHandler {
             return;
         }
         
-        var loggedInStates = Arrays.stream(UserState.values())
-            .filter(UserState::isLoggedIn)
-            .toList();
-        
-        var chats = userStateRepository.findUserStateEntitiesByUserStateIn(loggedInStates)
+        var chats = userStateRepository.findUserStateEntitiesByUserStateIn(UserState.LOGGED_IN_STATES)
             .stream().map(UserStateEntity::getChatId).toList();
         
         userStateEntity.setUserState(UserState.LOGGED_IN);

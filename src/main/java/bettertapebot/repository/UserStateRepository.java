@@ -11,8 +11,7 @@ import java.util.List;
 
 @Repository
 public interface UserStateRepository extends JpaRepository<UserStateEntity, Long> {
-    
     List<UserStateEntity> findUserStateEntitiesByUserStateIn(Collection<UserState> userStates);
-    
     long deleteUserStateEntitiesByOwner(UserEntity owner);
+    List<UserStateEntity> findAllByUserStateIsInAndOwner_WantsAbonnement(Collection<UserState> userStates, Boolean ownerWantsAbonnement);
 }

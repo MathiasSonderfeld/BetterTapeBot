@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Getter
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -39,4 +43,8 @@ public enum UserState {
 
     @Getter
     boolean loggedIn;
+    
+    public static final Set<UserState> LOGGED_IN_STATES = Arrays.stream(UserState.values())
+        .filter(UserState::isLoggedIn)
+        .collect(Collectors.toSet());
 }
