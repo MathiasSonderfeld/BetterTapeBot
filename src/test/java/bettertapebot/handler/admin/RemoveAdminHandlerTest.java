@@ -65,7 +65,7 @@ class RemoveAdminHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        removeAdminHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        removeAdminHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -93,7 +93,7 @@ class RemoveAdminHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        removeAdminHandler.handleMessage(userStateEntity, chatId, null);
+        removeAdminHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -126,7 +126,7 @@ class RemoveAdminHandlerTest {
         String unknownUsername = "unknown";
         
         Mockito.reset(userRepository, responseService);
-        removeAdminHandler.handleMessage(userStateEntity, chatId, unknownUsername);
+        removeAdminHandler.handleMessage(userStateEntity, unknownUsername);
         Mockito.verify(userRepository, Mockito.times(1)).findById(unknownUsername);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -163,7 +163,7 @@ class RemoveAdminHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        removeAdminHandler.handleMessage(userStateEntity, chatId, otherAdmin.getUsername());
+        removeAdminHandler.handleMessage(userStateEntity, otherAdmin.getUsername());
         Mockito.verify(userRepository, Mockito.times(1)).findById(otherAdmin.getUsername());
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -201,7 +201,7 @@ class RemoveAdminHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        removeAdminHandler.handleMessage(userStateEntity, chatId, otherUser.getUsername());
+        removeAdminHandler.handleMessage(userStateEntity, otherUser.getUsername());
         Mockito.verify(userRepository, Mockito.times(1)).findById(otherUser.getUsername());
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());

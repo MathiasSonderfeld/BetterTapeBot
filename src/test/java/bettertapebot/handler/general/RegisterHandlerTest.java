@@ -81,7 +81,7 @@ class RegisterHandlerTest {
             .build());
         
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, chatId, "1234");
+        registerHandler.handleMessage(userStateEntity, "1234");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -102,7 +102,7 @@ class RegisterHandlerTest {
             .build());
         
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, chatId, null);
+        registerHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(3)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -124,7 +124,7 @@ class RegisterHandlerTest {
             .build());
         
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, chatId, "asdf");
+        registerHandler.handleMessage(userStateEntity, "asdf");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(3)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -147,7 +147,7 @@ class RegisterHandlerTest {
         var code = passcodeGenerator.generatePasscode() + 10;
         
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, chatId, String.format("%04d", code));
+        registerHandler.handleMessage(userStateEntity, String.format("%04d", code));
         Mockito.verify(passcodeGenerator, Mockito.times(1)).validatePasscode(code);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -171,7 +171,7 @@ class RegisterHandlerTest {
         var code = passcodeGenerator.generatePasscode();
         
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, chatId, String.format("%04d", code));
+        registerHandler.handleMessage(userStateEntity, String.format("%04d", code));
         Mockito.verify(passcodeGenerator, Mockito.times(1)).validatePasscode(code);
         
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
@@ -199,7 +199,7 @@ class RegisterHandlerTest {
             .build());
         
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, chatId, botProperties.getDenyGdprText());
+        registerHandler.handleMessage(userStateEntity, botProperties.getDenyGdprText());
         Mockito.verify(userStateRepository, Mockito.times(1)).deleteById(chatId);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -220,7 +220,7 @@ class RegisterHandlerTest {
             .build());
         
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, chatId, "I dont know!");
+        registerHandler.handleMessage(userStateEntity, "I dont know!");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<ReplyKeyboardMarkup> markupCaptor = ArgumentCaptor.forClass(ReplyKeyboardMarkup.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), markupCaptor.capture(), textCaptor.capture());
@@ -241,7 +241,7 @@ class RegisterHandlerTest {
             .build());
         
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, chatId, botProperties.getAcceptGdprText());
+        registerHandler.handleMessage(userStateEntity, botProperties.getAcceptGdprText());
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(2)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -261,7 +261,7 @@ class RegisterHandlerTest {
             .build());
         
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, chatId, "🥳🥳🥳");
+        registerHandler.handleMessage(userStateEntity, "🥳🥳🥳");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -286,7 +286,7 @@ class RegisterHandlerTest {
             .build());
         
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, chatId, preexistingUsername);
+        registerHandler.handleMessage(userStateEntity, preexistingUsername);
         Mockito.verify(userRepository, Mockito.times(1)).existsById(preexistingUsername);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(2)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -309,7 +309,7 @@ class RegisterHandlerTest {
         String username = "username";
         
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, chatId, username);
+        registerHandler.handleMessage(userStateEntity, username);
         Mockito.verify(userRepository, Mockito.times(1)).existsById(username);
         Mockito.verify(userRepository, Mockito.times(1)).save(ArgumentMatchers.assertArg(entity -> {
            assertThat(entity.getUsername()).isEqualTo(username);
@@ -344,7 +344,7 @@ class RegisterHandlerTest {
             .build());
         
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, chatId, "abcd");
+        registerHandler.handleMessage(userStateEntity, "abcd");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -369,7 +369,7 @@ class RegisterHandlerTest {
         
         String pin = "1234";
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, chatId, pin);
+        registerHandler.handleMessage(userStateEntity, pin);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(3)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();

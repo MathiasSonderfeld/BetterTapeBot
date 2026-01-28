@@ -40,9 +40,9 @@ public class DeleteUserHandler implements CommandHandler, StateHandler {
     
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         if (!userStateEntity.isAdminModeActive()) {
-            responseService.send(chatId, "Nur Admins können Benutzer löschen");
+            responseService.send(userStateEntity.getChatId(), "Nur Admins können Benutzer löschen");
             return;
         }
         

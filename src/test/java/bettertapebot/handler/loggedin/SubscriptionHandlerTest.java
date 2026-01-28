@@ -65,7 +65,7 @@ class SubscriptionHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        subscriptionHandler.handleMessage(userStateEntity, chatId, null);
+        subscriptionHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -90,7 +90,7 @@ class SubscriptionHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        subscriptionHandler.handleMessage(userStateEntity, chatId, null);
+        subscriptionHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<ReplyKeyboardMarkup> markupCaptor = ArgumentCaptor.forClass(ReplyKeyboardMarkup.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), markupCaptor.capture(), textCaptor.capture());
@@ -123,7 +123,7 @@ class SubscriptionHandlerTest {
         String uninterpretableValue = "I dont know!";
         
         Mockito.reset(responseService);
-        subscriptionHandler.handleMessage(userStateEntity, chatId, uninterpretableValue);
+        subscriptionHandler.handleMessage(userStateEntity, uninterpretableValue);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<ReplyKeyboardMarkup> markupCaptor = ArgumentCaptor.forClass(ReplyKeyboardMarkup.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), markupCaptor.capture(), textCaptor.capture());
@@ -156,7 +156,7 @@ class SubscriptionHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        subscriptionHandler.handleMessage(userStateEntity, chatId, botProperties.getSubscription().getCountsAsYes().getFirst());
+        subscriptionHandler.handleMessage(userStateEntity, botProperties.getSubscription().getCountsAsYes().getFirst());
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -189,7 +189,7 @@ class SubscriptionHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        subscriptionHandler.handleMessage(userStateEntity, chatId, botProperties.getSubscription().getCountsAsNo().getFirst());
+        subscriptionHandler.handleMessage(userStateEntity, botProperties.getSubscription().getCountsAsNo().getFirst());
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();

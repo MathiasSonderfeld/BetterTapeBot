@@ -66,7 +66,7 @@ class LoginHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        loginHandler.handleMessage(userStateEntity, chatId, userEntity.getUsername());
+        loginHandler.handleMessage(userStateEntity, userEntity.getUsername());
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -94,7 +94,7 @@ class LoginHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        loginHandler.handleMessage(userStateEntity, chatId, null);
+        loginHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -125,7 +125,7 @@ class LoginHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        loginHandler.handleMessage(userStateEntity, chatId, userEntity.getUsername());
+        loginHandler.handleMessage(userStateEntity, userEntity.getUsername());
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -158,7 +158,7 @@ class LoginHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        loginHandler.handleMessage(userStateEntity, chatId, admin);
+        loginHandler.handleMessage(userStateEntity, admin);
         Mockito.verify(userRepository, Mockito.times(1)).findById(admin);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -201,7 +201,7 @@ class LoginHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        loginHandler.handleMessage(userStateEntity, chatId, userEntity.getUsername());
+        loginHandler.handleMessage(userStateEntity, userEntity.getUsername());
         Mockito.verify(userRepository, Mockito.times(1)).findById(userEntity.getUsername());
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -237,7 +237,7 @@ class LoginHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        loginHandler.handleMessage(userStateEntity, chatId, "wrong pin");
+        loginHandler.handleMessage(userStateEntity, "wrong pin");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -268,7 +268,7 @@ class LoginHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        loginHandler.handleMessage(userStateEntity, chatId, userEntity.getPin());
+        loginHandler.handleMessage(userStateEntity, userEntity.getPin());
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();

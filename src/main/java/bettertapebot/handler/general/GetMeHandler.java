@@ -27,10 +27,11 @@ public class GetMeHandler implements CommandHandler {
 
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         var owner = userStateEntity.getOwner();
+        var chatId = userStateEntity.getChatId();
         var username = owner != null ? owner.getUsername() : "unknown";
         var stateName = userStateEntity.getUserState().name();
-        responseService.send(chatId, String.format("chatId: %d, username: %s, user state: %s", chatId, username, stateName));
+        responseService.send(userStateEntity.getChatId(), String.format("chatId: %d, username: %s, user state: %s", chatId, username, stateName));
     }
 }

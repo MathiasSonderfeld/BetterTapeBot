@@ -33,20 +33,20 @@ public class GetAllHandler implements CommandHandler {
 
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         if(!userStateEntity.getUserState().isLoggedIn()){
-            responseService.send(chatId, "Nur eingeloggte User können Tapes abfragen");
+            responseService.send(userStateEntity.getChatId(), "Nur eingeloggte User können Tapes abfragen");
             return;
         }
         
         List<TapeEntity> tapes = tapeRepository.findAllByOrderByDateAddedDesc();
         if(tapes.isEmpty()){
-            responseService.send(chatId, "Es gibt noch keine Einträge");
+            responseService.send(userStateEntity.getChatId(), "Es gibt noch keine Einträge");
             return;
         }
         
         boolean isAdmin = userStateEntity.isAdminModeActive();
         var response = TapeFormatter.formatTapes(tapes, isAdmin);
-        responseService.send(chatId, response);
+        responseService.send(userStateEntity.getChatId(), response);
     }
 }

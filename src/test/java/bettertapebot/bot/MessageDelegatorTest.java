@@ -130,7 +130,7 @@ class MessageDelegatorTest {
         Assertions.assertDoesNotThrow(() -> messageDelegator.processUpdate(update));
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         Mockito.verifyNoInteractions(responseService, stateHandler);
-        Mockito.verify(commandHandler, Mockito.times(1)).handleMessage(USER_STATE_ENTITY, chatId, text);
+        Mockito.verify(commandHandler, Mockito.times(1)).handleMessage(USER_STATE_ENTITY, text);
     }
     
     @Test
@@ -198,6 +198,6 @@ class MessageDelegatorTest {
         Mockito.verifyNoInteractions(commandHandler);
         Mockito.verify(userStateRepository, Mockito.times(1)).findById(chatId);
         Mockito.verify(stateHandler, Mockito.times(1))
-            .handleMessage(ArgumentMatchers.any(), ArgumentMatchers.eq(chatId), ArgumentMatchers.eq(text));
+            .handleMessage(ArgumentMatchers.any(), ArgumentMatchers.eq(text));
     }
 }

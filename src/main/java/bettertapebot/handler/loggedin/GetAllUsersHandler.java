@@ -34,9 +34,9 @@ public class GetAllUsersHandler implements CommandHandler {
 
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         if(!userStateEntity.getUserState().isLoggedIn()){
-            responseService.send(chatId, "Nur eingeloggte User können andere User sehen");
+            responseService.send(userStateEntity.getChatId(), "Nur eingeloggte User können andere User sehen");
             return;
         }
 
@@ -45,6 +45,6 @@ public class GetAllUsersHandler implements CommandHandler {
             .filter(u -> !botProperties.getDefaultUserForTapes().equalsIgnoreCase(u))
             .collect(Collectors.toSet());
 
-        responseService.send(chatId, "Folgende User sind registriert: " + String.join(", ", allUsernames));
+        responseService.send(userStateEntity.getChatId(), "Folgende User sind registriert: " + String.join(", ", allUsernames));
     }
 }

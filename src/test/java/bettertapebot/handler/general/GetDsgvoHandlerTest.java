@@ -45,9 +45,9 @@ class GetDsgvoHandlerTest {
             .userState(UserState.NEW_CHAT)
             .build());
         
-        getDsgvoHandler.handleMessage(userStateEntity, 1L, "");
+        getDsgvoHandler.handleMessage(userStateEntity, "");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(1L), ArgumentMatchers.isNull(), textCaptor.capture());
+        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), ArgumentMatchers.isNull(), textCaptor.capture());
         var texts = textCaptor.getAllValues();
         assertThat(texts).isNotNull()
             .hasSize(1)

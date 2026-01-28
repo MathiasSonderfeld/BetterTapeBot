@@ -33,7 +33,7 @@ public class GetDsgvoHandler implements CommandHandler {
 
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         try {
             var dsgoFile = Thread.currentThread().getContextClassLoader()
                 .getResource(botProperties.getGdprResourceName());
@@ -44,7 +44,7 @@ public class GetDsgvoHandler implements CommandHandler {
             }
 
             String dsgvo = Files.readString(Path.of(dsgoFile.getPath()));
-            responseService.send(chatId, null, dsgvo);
+            responseService.send(userStateEntity.getChatId(), null, dsgvo);
         } catch (IOException e) {
          log.error("cant load dsgvo resource, error during file access", e);
         }

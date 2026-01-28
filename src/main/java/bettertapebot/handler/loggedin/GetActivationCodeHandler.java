@@ -32,14 +32,14 @@ public class GetActivationCodeHandler implements CommandHandler {
 
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         if(!userStateEntity.getUserState().isLoggedIn()){
-            responseService.send(chatId, "Nur eingeloggte User können Codes erzeugen");
+            responseService.send(userStateEntity.getChatId(), "Nur eingeloggte User können Codes erzeugen");
             return;
         }
         
         var ttlFormatted = DurationFormatter.format(botProperties.getActivationCodeTTL(), botProperties.getActivationCodeFormatLocale());
         var response = String.format("Der aktuelle Freischaltcode lautet: %04d, er ist %s gültig", passcodeGenerator.generatePasscode(), ttlFormatted);
-        responseService.send(chatId, response);
+        responseService.send(userStateEntity.getChatId(), response);
     }
 }

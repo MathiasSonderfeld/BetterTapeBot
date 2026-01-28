@@ -30,7 +30,7 @@ public class GetHelpHandler implements CommandHandler {
 
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         var userState = userStateEntity.getUserState();
         
         var commandsMap = Arrays.stream(Command.values())
@@ -63,6 +63,6 @@ public class GetHelpHandler implements CommandHandler {
                 .map(Command::getFormattedHelpText)
                 .forEach(c -> sb.append(c).append("\n"));
         }
-        responseService.send(chatId, sb.toString());
+        responseService.send(userStateEntity.getChatId(), sb.toString());
     }
 }

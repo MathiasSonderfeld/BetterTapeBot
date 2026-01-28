@@ -73,7 +73,7 @@ class DeleteTapeHandlerTest {
             .owner(userEntity)
             .build());
         
-        deleteTapeHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        deleteTapeHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -101,7 +101,7 @@ class DeleteTapeHandlerTest {
             .build());
         
         Mockito.reset(tapeRepository, responseService);
-        deleteTapeHandler.handleMessage(userStateEntity, chatId, null);
+        deleteTapeHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -133,7 +133,7 @@ class DeleteTapeHandlerTest {
             .build());
         
         Mockito.reset(tapeRepository, responseService);
-        deleteTapeHandler.handleMessage(userStateEntity, chatId, "invalid");
+        deleteTapeHandler.handleMessage(userStateEntity, "invalid");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -184,7 +184,7 @@ class DeleteTapeHandlerTest {
             .build());
         
         Mockito.reset(tapeRepository, responseService);
-        deleteTapeHandler.handleMessage(userStateEntity, chatId, tape.getId().toString());
+        deleteTapeHandler.handleMessage(userStateEntity, tape.getId().toString());
         Mockito.verify(tapeRepository, Mockito.times(1)).deleteTapeEntityById(tape.getId());
         
         var tapeOptional = tapeRepository.findById(tape.getId());
@@ -212,7 +212,7 @@ class DeleteTapeHandlerTest {
         
         Mockito.reset(tapeRepository, responseService);
         UUID randomId = UUID.randomUUID();
-        deleteTapeHandler.handleMessage(userStateEntity, chatId, randomId.toString());
+        deleteTapeHandler.handleMessage(userStateEntity, randomId.toString());
         Mockito.verify(tapeRepository, Mockito.times(1)).deleteTapeEntityById(randomId);
         
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);

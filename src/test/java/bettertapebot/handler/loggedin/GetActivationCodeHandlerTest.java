@@ -53,7 +53,7 @@ class GetActivationCodeHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        getActivationCodeHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        getActivationCodeHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -73,7 +73,7 @@ class GetActivationCodeHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        getActivationCodeHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        getActivationCodeHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();

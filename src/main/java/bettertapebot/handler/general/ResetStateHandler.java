@@ -30,13 +30,13 @@ public class ResetStateHandler implements CommandHandler {
 
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         if(userStateEntity.getUserState() == UserState.NEW_CHAT){
-            responseService.send(chatId, "chat unbekannt, kein reset nötig");
+            responseService.send(userStateEntity.getChatId(), "chat unbekannt, kein reset nötig");
             return;
         }
-        userStateRepository.deleteById(chatId);
+        userStateRepository.deleteById(userStateEntity.getChatId());
         var response = String.format("Chat wurde zurückgesetzt, benutze %s oder %s um von vorne zu beginnen", Command.REGISTER.getCommand(), Command.LOGIN.getCommand());
-        responseService.send(chatId, response);
+        responseService.send(userStateEntity.getChatId(), response);
     }
 }

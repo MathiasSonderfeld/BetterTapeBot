@@ -43,9 +43,9 @@ public class DirectingHandler implements CommandHandler, StateHandler {
 
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         if (!userStateEntity.getUserState().isLoggedIn()) {
-            responseService.send(chatId, "Nur eingeloggte User können Tapes abfragen");
+            responseService.send(userStateEntity.getChatId(), "Nur eingeloggte User können Tapes abfragen");
             return;
         }
         
@@ -67,7 +67,7 @@ public class DirectingHandler implements CommandHandler, StateHandler {
         var tapes = tapeRepository.findAllByDirector(director);
         boolean isAdmin = userStateEntity.isAdminModeActive();
         var response = TapeFormatter.formatTapes(tapes, isAdmin);
-        responseService.send(chatId, response);
+        responseService.send(userStateEntity.getChatId(), response);
         userStateEntity.setUserState(UserState.LOGGED_IN);
     }
 }

@@ -69,7 +69,7 @@ class GetLastHandlerTest {
             .build());
         
         Mockito.reset(tapeRepository, responseService);
-        getLastHandler.handleMessage(userStateEntity, chatId, null);
+        getLastHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -97,7 +97,7 @@ class GetLastHandlerTest {
             .build());
         
         Mockito.reset(tapeRepository, responseService);
-        getLastHandler.handleMessage(userStateEntity, chatId, null);
+        getLastHandler.handleMessage(userStateEntity, null);
         Mockito.verify(tapeRepository, Mockito.times(1)).findTopByOrderByDateAddedDesc();
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -162,7 +162,7 @@ class GetLastHandlerTest {
             .build());
         
         Mockito.reset(tapeRepository, responseService);
-        getLastHandler.handleMessage(requestorStateEntity, chatId, null);
+        getLastHandler.handleMessage(requestorStateEntity, null);
         Mockito.verify(tapeRepository, Mockito.times(1)).findTopByOrderByDateAddedDesc();
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());

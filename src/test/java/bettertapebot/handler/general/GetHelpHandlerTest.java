@@ -54,7 +54,7 @@ class GetHelpHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        getHelpHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        getHelpHandler.handleMessage(userStateEntity, "testmessage");
         var expected = Arrays.stream(Command.values())
             .filter(c -> c.getCommandLevel() == Command.CommandLevel.GENERAL)
             .map(Command::getFormattedHelpText)
@@ -85,7 +85,7 @@ class GetHelpHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        getHelpHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        getHelpHandler.handleMessage(userStateEntity, "testmessage");
         var expected = Arrays.stream(Command.values())
             .filter(c -> c.getCommandLevel() != Command.CommandLevel.ADMIN)
             .map(Command::getFormattedHelpText)
@@ -117,7 +117,7 @@ class GetHelpHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        getHelpHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        getHelpHandler.handleMessage(userStateEntity, "testmessage");
         var expected = Arrays.stream(Command.values())
             .map(Command::getFormattedHelpText)
             .collect(Collectors.toSet());

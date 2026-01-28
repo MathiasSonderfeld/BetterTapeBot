@@ -51,7 +51,7 @@ class LogoutHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        logoutHandler.handleMessage(userStateEntity, chatId, null);
+        logoutHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -71,7 +71,7 @@ class LogoutHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        logoutHandler.handleMessage(userStateEntity, chatId, null);
+        logoutHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();

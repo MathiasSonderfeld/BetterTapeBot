@@ -28,24 +28,24 @@ public class BecomeAdminHandler implements CommandHandler {
 
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         if(!userStateEntity.getUserState().isLoggedIn()){
-            responseService.send(chatId, "Nur eingeloggte User können in den Admin-Modus wechseln");
+            responseService.send(userStateEntity.getChatId(), "Nur eingeloggte User können in den Admin-Modus wechseln");
             return;
         }
         
         if(userStateEntity.isAdminModeActive()){
-            responseService.send(chatId, String.format("Du bist bereits im Admin-Modus, %s für Befehle", Command.HELP.getCommand()));
+            responseService.send(userStateEntity.getChatId(), String.format("Du bist bereits im Admin-Modus, %s für Befehle", Command.HELP.getCommand()));
             return;
         }
         
         var user = userStateEntity.getOwner();
         if(!user.getIsAdmin()){
-            responseService.send(chatId, "Du bist kein Admin");
+            responseService.send(userStateEntity.getChatId(), "Du bist kein Admin");
             return;
         }
         userStateEntity.setAdminMode(true);
         userStateEntity.setUserState(UserState.LOGGED_IN);
-        responseService.send(chatId, String.format("Du bist in den Admin-Bereich gewechselt, %s für Befehle", Command.HELP.getCommand()));
+        responseService.send(userStateEntity.getChatId(), String.format("Du bist in den Admin-Bereich gewechselt, %s für Befehle", Command.HELP.getCommand()));
     }
 }

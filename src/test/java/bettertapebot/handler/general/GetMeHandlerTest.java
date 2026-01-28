@@ -63,7 +63,7 @@ class GetMeHandlerTest {
             .owner(userEntity)
             .build());
         
-        getMeHandler.handleMessage(userStateEntity, chatId, null);
+        getMeHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -86,7 +86,7 @@ class GetMeHandlerTest {
             .adminMode(true)
             .build());
         
-        getMeHandler.handleMessage(userStateEntity, chatId, null);
+        getMeHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();

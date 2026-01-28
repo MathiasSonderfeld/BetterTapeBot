@@ -57,7 +57,7 @@ class BecomeAdminHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        becomeAdminHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        becomeAdminHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -84,7 +84,7 @@ class BecomeAdminHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        becomeAdminHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        becomeAdminHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -111,7 +111,7 @@ class BecomeAdminHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        becomeAdminHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        becomeAdminHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -138,7 +138,7 @@ class BecomeAdminHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        becomeAdminHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        becomeAdminHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();

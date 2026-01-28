@@ -94,7 +94,7 @@ public class MessageDelegator {
                 log.error("missing handler for registered command {}", botCommand);
             }
             else {
-                handler.handleMessage(userStateEntity, chatId, receivedText);
+                handler.handleMessage(userStateEntity, receivedText);
             }
             return;
         }
@@ -102,7 +102,7 @@ public class MessageDelegator {
         //if command is unknown, check if the state is tracked
         var handler = stateHandlerMap.get(userStateEntity.getUserState());
         if(handler != null){
-            handler.handleMessage(userStateEntity, chatId, receivedText);
+            handler.handleMessage(userStateEntity, receivedText);
             return;
         }
         

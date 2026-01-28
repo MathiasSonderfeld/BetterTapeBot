@@ -69,7 +69,7 @@ class BroadcastHandlerTest {
             .owner(userEntity)
             .build());
         
-        broadcastHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        broadcastHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -95,7 +95,7 @@ class BroadcastHandlerTest {
             .owner(userEntity)
             .build());
         
-        broadcastHandler.handleMessage(userStateEntity, chatId, null);
+        broadcastHandler.handleMessage(userStateEntity, null);
         
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -139,7 +139,7 @@ class BroadcastHandlerTest {
             .chatId(loggedOutChatId)
             .build());
         
-        broadcastHandler.handleMessage(userStateEntity, chatId, message);
+        broadcastHandler.handleMessage(userStateEntity, message);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1))
             .broadcast(ArgumentMatchers.assertArg(l ->

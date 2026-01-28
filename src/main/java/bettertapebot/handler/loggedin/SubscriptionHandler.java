@@ -57,9 +57,9 @@ public class SubscriptionHandler implements CommandHandler, StateHandler {
 
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         if (!userStateEntity.getUserState().isLoggedIn()) {
-            responseService.send(chatId, "Nur eingeloggte User können ihren Updates-Status ändern");
+            responseService.send(userStateEntity.getChatId(), "Nur eingeloggte User können ihren Updates-Status ändern");
             return;
         }
         

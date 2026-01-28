@@ -52,7 +52,7 @@ class ResetStateHandlerTest {
             .build());
         
         Mockito.reset(userStateRepository, responseService);
-        resetStateHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        resetStateHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -73,7 +73,7 @@ class ResetStateHandlerTest {
             .adminMode(true)
             .build());
         
-        resetStateHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        resetStateHandler.handleMessage(userStateEntity, "testmessage");
         Mockito.verify(userStateRepository, Mockito.times(1)).deleteById(chatId);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());

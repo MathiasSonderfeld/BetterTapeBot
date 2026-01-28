@@ -67,7 +67,7 @@ class ResetUserHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        resetUserHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        resetUserHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -95,7 +95,7 @@ class ResetUserHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        resetUserHandler.handleMessage(userStateEntity, chatId, null);
+        resetUserHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -128,7 +128,7 @@ class ResetUserHandlerTest {
         String unknownUsername = "unknown";
         
         Mockito.reset(userRepository, responseService);
-        resetUserHandler.handleMessage(userStateEntity, chatId, unknownUsername);
+        resetUserHandler.handleMessage(userStateEntity, unknownUsername);
         Mockito.verify(userRepository, Mockito.times(1)).findById(unknownUsername);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -171,7 +171,7 @@ class ResetUserHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        resetUserHandler.handleMessage(userStateEntity, chatId, otherUser.getUsername());
+        resetUserHandler.handleMessage(userStateEntity, otherUser.getUsername());
         Mockito.verify(userRepository, Mockito.times(1)).findById(otherUser.getUsername());
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());

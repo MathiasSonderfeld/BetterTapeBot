@@ -62,7 +62,7 @@ class GetAllUsersHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        getAllUsersHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        getAllUsersHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -103,7 +103,7 @@ class GetAllUsersHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        getAllUsersHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        getAllUsersHandler.handleMessage(userStateEntity, "testmessage");
         Mockito.verify(userRepository, Mockito.times(1)).findAll();
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());

@@ -65,7 +65,7 @@ class NewAdminHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        newAdminHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        newAdminHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -93,7 +93,7 @@ class NewAdminHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        newAdminHandler.handleMessage(userStateEntity, chatId, null);
+        newAdminHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -125,7 +125,7 @@ class NewAdminHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        newAdminHandler.handleMessage(userStateEntity, chatId, userEntity.getUsername());
+        newAdminHandler.handleMessage(userStateEntity, userEntity.getUsername());
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -158,7 +158,7 @@ class NewAdminHandlerTest {
         String unknownUsername = "unknown";
         
         Mockito.reset(userRepository, responseService);
-        newAdminHandler.handleMessage(userStateEntity, chatId, unknownUsername);
+        newAdminHandler.handleMessage(userStateEntity, unknownUsername);
         Mockito.verify(userRepository, Mockito.times(1)).findById(unknownUsername);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -195,7 +195,7 @@ class NewAdminHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        newAdminHandler.handleMessage(userStateEntity, chatId, otherAdmin.getUsername());
+        newAdminHandler.handleMessage(userStateEntity, otherAdmin.getUsername());
         Mockito.verify(userRepository, Mockito.times(1)).findById(otherAdmin.getUsername());
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -233,7 +233,7 @@ class NewAdminHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        newAdminHandler.handleMessage(userStateEntity, chatId, otherUser.getUsername());
+        newAdminHandler.handleMessage(userStateEntity, otherUser.getUsername());
         Mockito.verify(userRepository, Mockito.times(1)).findById(otherUser.getUsername());
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());

@@ -41,9 +41,9 @@ public class NewAdminHandler implements CommandHandler, StateHandler {
     
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         if (!userStateEntity.isAdminModeActive()) {
-            responseService.send(chatId, "Nur Admins dürfen neue Admins festlegen");
+            responseService.send(userStateEntity.getChatId(), "Nur Admins dürfen neue Admins festlegen");
             return;
         }
         

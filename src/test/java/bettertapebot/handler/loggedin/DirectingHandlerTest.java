@@ -74,7 +74,7 @@ class DirectingHandlerTest {
             .build());
         
         Mockito.reset(userRepository, tapeRepository, responseService);
-        directingHandler.handleMessage(userStateEntity, chatId, null);
+        directingHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -102,7 +102,7 @@ class DirectingHandlerTest {
             .build());
         
         Mockito.reset(userRepository, tapeRepository, responseService);
-        directingHandler.handleMessage(userStateEntity, chatId, null);
+        directingHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -135,7 +135,7 @@ class DirectingHandlerTest {
         String unknownUsername = "unknown";
         
         Mockito.reset(userRepository, tapeRepository, responseService);
-        directingHandler.handleMessage(userStateEntity, chatId, unknownUsername);
+        directingHandler.handleMessage(userStateEntity, unknownUsername);
         Mockito.verify(userRepository, Mockito.times(1)).findById(unknownUsername);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -199,7 +199,7 @@ class DirectingHandlerTest {
             .build());
         
         Mockito.reset(userRepository, tapeRepository, responseService);
-        directingHandler.handleMessage(requestorState, chatId, director.getUsername());
+        directingHandler.handleMessage(requestorState, director.getUsername());
         Mockito.verify(userRepository, Mockito.times(1)).findById(director.getUsername());
         Mockito.verify(tapeRepository, Mockito.times(1)).findAllByDirector(director);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);

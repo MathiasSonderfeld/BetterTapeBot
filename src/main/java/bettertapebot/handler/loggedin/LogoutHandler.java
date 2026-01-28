@@ -28,12 +28,12 @@ public class LogoutHandler implements CommandHandler {
 
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         if(!userStateEntity.getUserState().isLoggedIn()){
-            responseService.send(chatId, "Du bist nicht eingeloggt");
+            responseService.send(userStateEntity.getChatId(), "Du bist nicht eingeloggt");
             return;
         }
         userStateEntity.setUserState(UserState.LOGGED_OUT);
-        responseService.send(chatId, "Ich melde dich ab");
+        responseService.send(userStateEntity.getChatId(), "Ich melde dich ab");
     }
 }

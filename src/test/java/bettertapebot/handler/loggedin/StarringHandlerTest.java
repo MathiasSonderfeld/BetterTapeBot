@@ -74,7 +74,7 @@ class StarringHandlerTest {
             .build());
         
         Mockito.reset(userRepository, tapeRepository, responseService);
-        starringHandler.handleMessage(userStateEntity, chatId, null);
+        starringHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -102,7 +102,7 @@ class StarringHandlerTest {
             .build());
         
         Mockito.reset(userRepository, tapeRepository, responseService);
-        starringHandler.handleMessage(userStateEntity, chatId, null);
+        starringHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -135,7 +135,7 @@ class StarringHandlerTest {
         String unknownUsername = "unknown";
         
         Mockito.reset(userRepository, tapeRepository, responseService);
-        starringHandler.handleMessage(userStateEntity, chatId, unknownUsername);
+        starringHandler.handleMessage(userStateEntity, unknownUsername);
         Mockito.verify(userRepository, Mockito.times(1)).findById(unknownUsername);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -199,7 +199,7 @@ class StarringHandlerTest {
             .build());
         
         Mockito.reset(userRepository, tapeRepository, responseService);
-        starringHandler.handleMessage(requestorState, chatId, star.getUsername());
+        starringHandler.handleMessage(requestorState, star.getUsername());
         Mockito.verify(userRepository, Mockito.times(1)).findById(star.getUsername());
         Mockito.verify(tapeRepository, Mockito.times(1)).findAllByStar(star);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);

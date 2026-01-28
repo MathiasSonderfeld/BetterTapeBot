@@ -40,7 +40,7 @@ public class AddTapeHandler implements CommandHandler, StateHandler { //TODO imp
 
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
     
     }
 }

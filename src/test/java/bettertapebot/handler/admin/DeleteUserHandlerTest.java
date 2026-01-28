@@ -65,7 +65,7 @@ class DeleteUserHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        deleteUserHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        deleteUserHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -93,7 +93,7 @@ class DeleteUserHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        deleteUserHandler.handleMessage(userStateEntity, chatId, null);
+        deleteUserHandler.handleMessage(userStateEntity, null);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -126,7 +126,7 @@ class DeleteUserHandlerTest {
         String usernameToDelete = "unknown";
         
         Mockito.reset(userRepository, responseService);
-        deleteUserHandler.handleMessage(userStateEntity, chatId, usernameToDelete);
+        deleteUserHandler.handleMessage(userStateEntity, usernameToDelete);
         Mockito.verify(userRepository, Mockito.times(1)).deleteByUsername(usernameToDelete);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -164,7 +164,7 @@ class DeleteUserHandlerTest {
             .build());
         
         Mockito.reset(userRepository, responseService);
-        deleteUserHandler.handleMessage(userStateEntity, chatId, userToRemove.getUsername());
+        deleteUserHandler.handleMessage(userStateEntity, userToRemove.getUsername());
         Mockito.verify(userRepository, Mockito.times(1)).deleteByUsername(userToRemove.getUsername());
         Mockito.verifyNoInteractions(responseService);
         

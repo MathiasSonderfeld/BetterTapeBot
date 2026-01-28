@@ -72,7 +72,7 @@ public class RegisterHandler implements CommandHandler, StateHandler {
 
     @Override
     @Transactional
-    public void handleMessage(@NonNull UserStateEntity userStateEntity, long chatId, String message) {
+    public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         //check if logged in
         if(userStateEntity.getUserState().isLoggedIn()){
             responseService.send(userStateEntity.getChatId(), "Du bist bereits registriert und eingeloggt");

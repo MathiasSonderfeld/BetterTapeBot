@@ -63,7 +63,7 @@ class ExitAdminHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        exitAdminHandler.handleMessage(userStateEntity, chatId, "testmessage");
+        exitAdminHandler.handleMessage(userStateEntity, "testmessage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -90,7 +90,7 @@ class ExitAdminHandlerTest {
             .build());
         
         Mockito.reset(responseService);
-        exitAdminHandler.handleMessage(userStateEntity, chatId, "mesage");
+        exitAdminHandler.handleMessage(userStateEntity, "mesage");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
