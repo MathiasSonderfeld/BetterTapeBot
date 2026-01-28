@@ -14,7 +14,6 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 import reactor.util.retry.Retry;
 
-import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -69,24 +68,9 @@ public class AsyncTelegramClient {
     
     private Mono<Message> sendWithRetry(SendMessage msg) {
         return Mono.fromCallable(() -> telegramClient.execute(msg))
-            .onErrorResume(th -> {
-                //check if telegram sends HTTP 429 - too many requests
-                if(th instanceof TelegramApiRequestException apiRequestException && apiRequestException.getErrorCode() == 429){
-                    //if so, read the read_after response parameter and wait that long
-                    log.warn("request was denied due to 429 - too many requests, waiting and retrying", apiRequestException);
-                    return Mono.delay(Duration.ofSeconds(apiRequestException.getParameters().getRetryAfter()))
-                        //then throw this custom exception to trigger the retry
-                        .then(Mono.error(new TooManyRequestsException()));
-                }
-                //in any other case propagate error further
-                return Mono.error(th);
-            })
-            //retry on custom exception. Now bot waits for retry_after seconds and then retries the request
-            //we need this workaround with the custom exception as Retry cant access exception data, and so we cant tell it to wait retry_after seconds
-            .retryWhen(Retry.max(botProperties.getTelegram().getRetryCountInCaseOfTooManyRequests())
-                .filter(err -> err instanceof TooManyRequestsException))
+            //retry if we get 429 too many requests
+            .retryWhen(Retry.backoff(botProperties.getTelegram().getRetryCountInCaseOfTooManyRequests(), botProperties.getTelegram().getDelayBetweenMessagesForSameChat())
+                .filter(err -> err instanceof TelegramApiRequestException apiEx && Integer.valueOf(429).equals(apiEx.getErrorCode())))
             .doOnError(e -> log.error("failure when sending, message is dropped", e));
     }
-    
-    private static class TooManyRequestsException extends Exception {}
 }

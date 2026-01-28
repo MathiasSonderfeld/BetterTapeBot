@@ -136,12 +136,9 @@ public class RegisterHandler implements CommandHandler, StateHandler {
         }
         else {
             userStateEntity.setUserState(UserState.REGISTER_AWAITING_DSGVO);
-            String response = String.format("""
-                Nice! 😎
-                Leider sind wir in Deutschland und Datenschutz ist wichtig... 😒
-                Bitte bestätige, dass ich Deine Daten für diesen Dienst speichern und verarbeiten darf.
-                Gib %s ein, um genaueres zu erfahren.""",
-                Command.DSGVO.getCommand());
+            responseService.send(userStateEntity.getChatId(), "Nice! 😎");
+            responseService.send(userStateEntity.getChatId(), "Leider sind wir in Deutschland und Datenschutz ist wichtig... 😒");
+            String response = String.format("Bitte bestätige, dass ich deine Daten für diesen Dienst speichern und verarbeiten darf. Gib %s ein, um Genaueres zu erfahren.", Command.DSGVO.getCommand());
             responseService.send(userStateEntity.getChatId(), dsgvoMarkup, response);
         }
     }
@@ -157,10 +154,8 @@ public class RegisterHandler implements CommandHandler, StateHandler {
             return;
         }
         userStateEntity.setUserState(UserState.REGISTER_AWAITING_USERNAME);
-        responseService.send(userStateEntity.getChatId(), """
-            Toll, das hat geklappt! 🥳
-            Wie soll dein Benutzername lauten? Er wird bei den Tapes angezeigt und du brauchst den für den Login 😊"""
-        );
+        responseService.send(userStateEntity.getChatId(), "Toll, das hat geklappt! 🥳");
+        responseService.send(userStateEntity.getChatId(), "Wie soll dein Benutzername lauten? Er wird bei den Tapes angezeigt und du brauchst den für den Login 😊");
     }
     
     private void validateUsername(UserStateEntity userStateEntity, String username) {
@@ -171,10 +166,8 @@ public class RegisterHandler implements CommandHandler, StateHandler {
         
         boolean userExists = userRepository.existsById(username);
         if(userExists){
-            var response = String.format("""
-            Den Benutzernamen kennen wir schon! 👀
-            Benutze einen anderen oder verwende %s um dich anzumelden""",
-                Command.RESET.getCommand());
+            responseService.send(userStateEntity.getChatId(), "Den Benutzernamen kennen wir schon! 👀");
+            var response = String.format("Benutze einen anderen oder verwende %s um dich anzumelden", Command.RESET.getCommand());
             responseService.send(userStateEntity.getChatId(), response);
             return;
         }
@@ -185,13 +178,9 @@ public class RegisterHandler implements CommandHandler, StateHandler {
             .build());
         userStateEntity.setOwner(userEntity);
         userStateEntity.setUserState(UserState.REGISTER_AWAITING_PIN);
-        
-        var response = String.format("""
-            Juhu 🎉
-            Dein Benutzername lautet: %s
-            Denke dir jetzt eine 4-stellige PIN aus. Du brauchst sie später, um dich erneut einzuloggen.""",
-            username);
-        responseService.send(userStateEntity.getChatId(), response);
+        responseService.send(userStateEntity.getChatId(), "Juhu 🎉");
+        responseService.send(userStateEntity.getChatId(), String.format("Dein Benutzername lautet: %s", username));
+        responseService.send(userStateEntity.getChatId(), "Denke dir jetzt eine 4-stellige PIN aus. Du brauchst sie später, um dich erneut einzuloggen.");
     }
     
     private void validatePin(UserStateEntity userStateEntity, String pin) {
