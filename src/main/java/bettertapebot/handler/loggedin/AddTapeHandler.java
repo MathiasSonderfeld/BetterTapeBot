@@ -1,10 +1,10 @@
 package bettertapebot.handler.loggedin;
 
 import bettertapebot.bot.ResponseService;
+import bettertapebot.cache.TapeCache;
 import bettertapebot.handler.Command;
 import bettertapebot.handler.CommandHandler;
 import bettertapebot.handler.StateHandler;
-import bettertapebot.properties.BotProperties;
 import bettertapebot.repository.TapeRepository;
 import bettertapebot.repository.UserRepository;
 import bettertapebot.repository.UserStateRepository;
@@ -18,17 +18,11 @@ import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jspecify.annotations.NonNull;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @CustomLog
 @Component
@@ -36,27 +30,11 @@ import java.util.concurrent.TimeUnit;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AddTapeHandler implements CommandHandler, StateHandler {
     
-    HashMap<Long, Map.Entry<Instant, String>> tapeCache = new HashMap<>();
-
-    ResponseService responseService;
-    UserRepository userRepository;
-    TapeRepository tapeRepository;
-    BotProperties botProperties;
+    TapeCache tapeCache;
     UserStateRepository userStateRepository;
-    
-    //check cache every 10 mins for old entries and remove them
-    @Scheduled(fixedDelay = 10, timeUnit = TimeUnit.MINUTES)
-    void cleanOldTapeNames() {
-        for (var cacheEntry : tapeCache.entrySet()) {
-            var chatId = cacheEntry.getKey();
-            var createTime = cacheEntry.getValue().getKey();
-            var age = Duration.between(Instant.now(), createTime);
-            //age - ttl > 0 <=> age > ttl
-            if(age.minus(botProperties.getTapeCacheTTL()).isPositive()){
-                tapeCache.remove(chatId);
-            }
-        }
-    }
+    TapeRepository tapeRepository;
+    UserRepository userRepository;
+    ResponseService responseService;
     
     @Override
     public @NonNull Command forCommand() {
@@ -86,7 +64,8 @@ public class AddTapeHandler implements CommandHandler, StateHandler {
             responseService.send(userStateEntity.getChatId(), "Welchen Titel soll das Werk tragen?");
             return;
         }
-        tapeCache.put(userStateEntity.getChatId(), Map.entry(Instant.now(), message));
+        
+        tapeCache.put(userStateEntity.getChatId(), message);
         userStateEntity.setUserState(UserState.ADD_TAPE_GET_STAR);
         responseService.send(userStateEntity.getChatId(), "Wer ist der Star dieses Meisterwerks?");
     }
@@ -104,10 +83,10 @@ public class AddTapeHandler implements CommandHandler, StateHandler {
         tapeCache.remove(userStateEntity.getChatId());
         
         var tapeEntity = tapeRepository.save(TapeEntity.builder()
-            .title(tapeCacheEntry.getValue())
+            .title(tapeCacheEntry.tapeTitle())
             .star(star)
             .director(director)
-            .dateAdded(tapeCacheEntry.getKey())
+            .dateAdded(tapeCacheEntry.dateAdded())
             .build());
         
         userStateEntity.setUserState(UserState.LOGGED_IN);

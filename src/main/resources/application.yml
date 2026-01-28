@@ -10,6 +10,17 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+management:
+  server:
+    port: 8090
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
 better-tape-bot:
   subscription:
     countsAsYes:

@@ -1,7 +1,7 @@
 Datenschutzerklärung für den Chatbot zur Erfassung von Filmtiteln
 
 1.	Verantwortlicher
-    Verantwortlich für die Verarbeitung der Daten ist Vincent Terzenbach, E-Mail: datenschutz@terzenbach.com.
+    Verantwortlich für die Verarbeitung der Daten ist Max Mustermann, E-Mail: datenschutz@mustermann.de.
 
 2.	Zweck der Datenverarbeitung
     Der Chatbot dient der Erfassung und Verwaltung von Filmtiteln, die von den Benutzern eingegeben werden. Zur Nutzung des Chatbots ist eine Registrierung erforderlich, bei der ein Benutzername und eine PIN angegeben werden müssen. Diese Daten werden benötigt, um die Benutzer eindeutig zu identifizieren und ihnen den Zugang zu ermöglichen, auch nach einem Gerätewechsel.

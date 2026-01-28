@@ -10,14 +10,16 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 @Configuration
 public class ContextConfig {
-
-    @Bean
-    public TelegramClient telegramClient(BotProperties botProperties){
-        return new OkHttpTelegramClient(botProperties.getTelegram().getToken());
-    }
     
     @Bean
     public JpaTransactionManager transactionManager(EntityManagerFactory emf) {
         return new JpaTransactionManager(emf);
     }
+
+    @Bean
+    public TelegramClient telegramClient(BotProperties botProperties){
+        return new OkHttpTelegramClient(botProperties.getTelegram().getToken());
+    }
 }
+
+
