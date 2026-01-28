@@ -167,7 +167,7 @@ public class RegisterHandler implements CommandHandler, StateHandler {
         boolean userExists = userRepository.existsById(username);
         if(userExists){
             responseService.send(userStateEntity.getChatId(), "Den Benutzernamen kennen wir schon! 👀");
-            var response = String.format("Benutze einen anderen oder verwende %s um dich anzumelden", Command.RESET.getCommand());
+            var response = String.format("Benutze einen anderen oder verwende %s um dich anzumelden", Command.LOGIN.getCommand());
             responseService.send(userStateEntity.getChatId(), response);
             return;
         }

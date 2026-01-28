@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.ArgumentCaptor;
@@ -37,14 +38,18 @@ class AsyncTelegramClientTest {
     TelegramClient telegramClient;
     AsyncTelegramClient asyncTelegramClient;
     
-    
     @BeforeAll
     void setup() {
         botProperties = new BotProperties();
-        botProperties.getTelegram().setDelayBetweenMessagesForSameChat(Duration.ofMillis(TEST_DELAY));
-        botProperties.getTelegram().setRetryCountInCaseOfTooManyRequests(TEST_RETRY);
         telegramClient = Mockito.mock(TelegramClient.class);
         asyncTelegramClient = new AsyncTelegramClient(telegramClient, botProperties);
+    }
+    
+    @BeforeEach
+    void reset(){
+        botProperties.getTelegram().setDelayBetweenMessagesForSameChat(Duration.ofMillis(TEST_DELAY));
+        botProperties.getTelegram().setRetryCountInCaseOfTooManyRequests(TEST_RETRY);
+        Mockito.reset(telegramClient);
     }
     
     @Test

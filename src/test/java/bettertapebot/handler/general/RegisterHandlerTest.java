@@ -173,21 +173,214 @@ class RegisterHandlerTest {
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
         registerHandler.handleMessage(userStateEntity, chatId, String.format("%04d", code));
         Mockito.verify(passcodeGenerator, Mockito.times(1)).validatePasscode(code);
+        
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<ReplyKeyboardMarkup> markupCaptor = ArgumentCaptor.forClass(ReplyKeyboardMarkup.class);
+        Mockito.verify(responseService, Mockito.times(2)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
+        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), markupCaptor.capture(), textCaptor.capture());
+        assertKeyboardWithAcceptOrDenyOrCommandExists(markupCaptor.getAllValues());
+        var texts = textCaptor.getAllValues();
+        assertThat(texts).isNotNull().hasSize(3);
+        assertThat(texts.getFirst()).contains("Nice");
+        assertThat(texts.get(1)).contains("Leider sind wir in Deutschland und Datenschutz ist wichtig... 😒");
+        assertThat(texts.get(2)).contains("Bitte bestätige, dass ich deine Daten für diesen Dienst speichern und verarbeiten darf.")
+            .contains(Command.DSGVO.getCommand())
+            .contains("ein, um Genaueres zu erfahren.");
+        Mockito.verifyNoInteractions(userStateRepository, userRepository);
+        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.REGISTER_AWAITING_DSGVO);
+    }
+    
+    @Test
+    public void chatWithGdprNoGetsReset(){
+        long chatId = 1234L;
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.REGISTER_AWAITING_DSGVO)
+            .build());
+        
+        Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
+        registerHandler.handleMessage(userStateEntity, chatId, botProperties.getDenyGdprText());
+        Mockito.verify(userStateRepository, Mockito.times(1)).deleteById(chatId);
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
+        var texts = textCaptor.getAllValues();
+        assertThat(texts).isNotNull().hasSize(1);
+        assertThat(texts.getFirst()).isEqualTo("Tut mir Leid, aber ohne Einverständnis kann ich dich nicht reinlassen. Ich habe alle Informationen über diesen Chat gelöscht. Ciao!");
+        Mockito.verifyNoInteractions(passcodeGenerator, userRepository);
+        var updatedState = userStateRepository.findById(chatId);
+        assertThat(updatedState).isNotNull().isEmpty();
+    }
+    
+    @Test
+    public void chatWithInvalidGdprGetsAskedAgain(){
+        long chatId = 1234L;
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.REGISTER_AWAITING_DSGVO)
+            .build());
+        
+        Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
+        registerHandler.handleMessage(userStateEntity, chatId, "I dont know!");
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<ReplyKeyboardMarkup> markupCaptor = ArgumentCaptor.forClass(ReplyKeyboardMarkup.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), markupCaptor.capture(), textCaptor.capture());
         assertKeyboardWithAcceptOrDenyOrCommandExists(markupCaptor.getAllValues());
         var texts = textCaptor.getAllValues();
-        assertThat(texts).isNotNull()
-            .hasSize(1)
-            .element(0)
-            .asInstanceOf(InstanceOfAssertFactories.STRING)
-            .contains("Nice")
-            .contains("Leider sind wir in Deutschland und Datenschutz ist wichtig... 😒")
-            .contains("Bitte bestätige, dass ich Deine Daten für diesen Dienst speichern und verarbeiten darf.")
-            .contains(Command.DSGVO.getCommand());
-        Mockito.verifyNoInteractions(userStateRepository, userRepository);
+        assertThat(texts).isNotNull().hasSize(1);
+        assertThat(texts.getFirst()).isEqualTo("Die Antwort konnte ich nicht auswerten. Bitte bestätige, dass ich deine Daten für diesen Dienst speichern und verarbeiten darf.");
+        Mockito.verifyNoInteractions(passcodeGenerator, userStateRepository, userRepository);
         assertThat(userStateEntity.getUserState()).isEqualTo(UserState.REGISTER_AWAITING_DSGVO);
+    }
+    
+    @Test
+    public void chatWithGdprYesGetsAskedForUsername(){
+        long chatId = 1234L;
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.REGISTER_AWAITING_DSGVO)
+            .build());
+        
+        Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
+        registerHandler.handleMessage(userStateEntity, chatId, botProperties.getAcceptGdprText());
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(responseService, Mockito.times(2)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
+        var texts = textCaptor.getAllValues();
+        assertThat(texts).isNotNull().hasSize(2);
+        assertThat(texts.getFirst()).isEqualTo("Toll, das hat geklappt! 🥳");
+        assertThat(texts.get(1)).isEqualTo("Wie soll dein Benutzername lauten? Er wird bei den Tapes angezeigt und du brauchst den für den Login 😊");
+        Mockito.verifyNoInteractions(passcodeGenerator, userStateRepository, userRepository);
+        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.REGISTER_AWAITING_USERNAME);
+    }
+    
+    @Test
+    public void chatWithInvalidUsernameGetsAskedAgain(){
+        long chatId = 1234L;
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.REGISTER_AWAITING_USERNAME)
+            .build());
+        
+        Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
+        registerHandler.handleMessage(userStateEntity, chatId, "🥳🥳🥳");
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
+        var texts = textCaptor.getAllValues();
+        assertThat(texts).isNotNull().hasSize(1);
+        assertThat(texts.getFirst()).isEqualTo("Der Username hat ein ungültiges Format. Erlaubte Zeichen sind A-Z, a-z, +, _, ., -");
+        Mockito.verifyNoInteractions(passcodeGenerator, userStateRepository, userRepository);
+        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.REGISTER_AWAITING_USERNAME);
+    }
+    
+    @Test
+    public void chatWithExistingUsernameGetsAskedAgain(){
+        long chatId = 1234L;
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.REGISTER_AWAITING_USERNAME)
+            .build());
+        
+        String preexistingUsername = "preexisting";
+        userRepository.save(UserEntity.builder()
+            .username(preexistingUsername)
+            .pin("9876")
+            .build());
+        
+        Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
+        registerHandler.handleMessage(userStateEntity, chatId, preexistingUsername);
+        Mockito.verify(userRepository, Mockito.times(1)).existsById(preexistingUsername);
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(responseService, Mockito.times(2)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
+        var texts = textCaptor.getAllValues();
+        assertThat(texts).isNotNull().hasSize(2);
+        assertThat(texts.getFirst()).isEqualTo("Den Benutzernamen kennen wir schon! 👀");
+        assertThat(texts.get(1)).contains("Benutze einen anderen oder verwende")
+            .contains(Command.LOGIN.getCommand());
+        Mockito.verifyNoInteractions(passcodeGenerator, userStateRepository);
+        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.REGISTER_AWAITING_USERNAME);
+    }
+    
+    @Test
+    public void chatWithValidUsernameGetsAskedForPin(){
+        long chatId = 1234L;
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.REGISTER_AWAITING_USERNAME)
+            .build());
+        String username = "username";
+        
+        Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
+        registerHandler.handleMessage(userStateEntity, chatId, username);
+        Mockito.verify(userRepository, Mockito.times(1)).existsById(username);
+        Mockito.verify(userRepository, Mockito.times(1)).save(ArgumentMatchers.assertArg(entity -> {
+           assertThat(entity.getUsername()).isEqualTo(username);
+            assertThat(entity.getPin()).isEqualTo("xxxx");
+            assertThat(entity.getIsAdmin()).isFalse();
+            assertThat(entity.getWantsAbonnement()).isTrue();
+        }));
+        
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(responseService, Mockito.times(3)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
+        var texts = textCaptor.getAllValues();
+        assertThat(texts).isNotNull().hasSize(3);
+        assertThat(texts.getFirst()).isEqualTo("Juhu 🎉");
+        assertThat(texts.get(1)).contains("Dein Benutzername lautet:").contains(username);
+        assertThat(texts.get(2)).isEqualTo("Denke dir jetzt eine 4-stellige PIN aus. Du brauchst sie später, um dich erneut einzuloggen.");
+        Mockito.verifyNoInteractions(passcodeGenerator, userStateRepository);
+        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.REGISTER_AWAITING_PIN);
+        assertThat(userStateEntity.getOwner()).isNotNull()
+            .extracting(UserEntity::getUsername).isEqualTo(username);
+    }
+    
+    @Test
+    public void chatWithInvalidPinGetsAskedAgain(){
+        long chatId = 1234L;
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.REGISTER_AWAITING_PIN)
+            .build());
+        userRepository.save(UserEntity.builder()
+            .username("username")
+            .pin("xxxx")
+            .build());
+        
+        Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
+        registerHandler.handleMessage(userStateEntity, chatId, "abcd");
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
+        var texts = textCaptor.getAllValues();
+        assertThat(texts).isNotNull().hasSize(1);
+        assertThat(texts.getFirst()).isEqualTo("Die PIN hat ein ungültiges Format. Ich brauche 4 Ziffern.");
+        Mockito.verifyNoInteractions(passcodeGenerator, userRepository, userStateRepository);
+        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.REGISTER_AWAITING_PIN);
+    }
+    
+    @Test
+    public void chatWithValidPinGetsLoggedIn(){
+        long chatId = 1234L;
+        var userEntity = userRepository.save(UserEntity.builder()
+            .username("username")
+            .pin("xxxx")
+            .build());
+        var userStateEntity = userStateRepository.save(UserStateEntity.builder()
+            .chatId(chatId)
+            .userState(UserState.REGISTER_AWAITING_PIN)
+            .owner(userEntity)
+            .build());
+        
+        String pin = "1234";
+        Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
+        registerHandler.handleMessage(userStateEntity, chatId, pin);
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(responseService, Mockito.times(3)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
+        var texts = textCaptor.getAllValues();
+        assertThat(texts).isNotNull().hasSize(3);
+        assertThat(texts.getFirst()).isEqualTo("Yeah! 🥳");
+        assertThat(texts.get(1)).contains("Du bist jetzt eingeloggt!");
+        assertThat(texts.get(2)).contains(Command.ADD.getCommand()).contains("um neue Tapes hinzuzufügen").contains(Command.HELP.getCommand());
+        Mockito.verifyNoInteractions(passcodeGenerator, userRepository, userStateRepository);
+        assertThat(userStateEntity.getUserState()).isEqualTo(UserState.LOGGED_IN);
+        assertThat(userStateEntity.getOwner()).isNotNull()
+            .extracting(UserEntity::getPin).isEqualTo(pin);
     }
     
     

@@ -1,6 +1,7 @@
 package bettertapebot.bot;
 
 import bettertapebot.properties.BotProperties;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -32,6 +33,11 @@ class ResponseServiceTest {
         botProperties.getTelegram().setMessageLengthLimit(TEST_MESSAGE_LENGTH);
         asyncTelegramClient = Mockito.mock(AsyncTelegramClient.class);
         responseService = new ResponseService(botProperties, asyncTelegramClient);
+    }
+    
+    @AfterEach
+    void reset() {
+        Mockito.reset(asyncTelegramClient);
     }
     
     @Test
