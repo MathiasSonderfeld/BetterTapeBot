@@ -51,7 +51,7 @@ public class RegisterHandler implements CommandHandler, StateHandler {
     @PostConstruct
     void postConstruct(){
         dsgvoMarkup = ReplyKeyboardMarkup.builder()
-            .keyboardRow(new KeyboardRow(botProperties.getAcceptGdprText(), botProperties.getDenyGdprText(), Command.DSGVO.getCommand()))
+            .keyboardRow(new KeyboardRow(botProperties.getGdpr().getAcceptText(), botProperties.getGdpr().getDenyText(), Command.DSGVO.getCommand()))
             .build();
     }
     
@@ -144,12 +144,12 @@ public class RegisterHandler implements CommandHandler, StateHandler {
     }
     
     private void validateGdprResponse(UserStateEntity userStateEntity, String response) {
-        if(botProperties.getDenyGdprText().equalsIgnoreCase(response)){
+        if(botProperties.getGdpr().getDenyText().equalsIgnoreCase(response)){
             userStateRepository.deleteById(userStateEntity.getChatId());
             responseService.send(userStateEntity.getChatId(), "Tut mir Leid, aber ohne Einverständnis kann ich dich nicht reinlassen. Ich habe alle Informationen über diesen Chat gelöscht. Ciao!");
             return;
         }
-        if(!botProperties.getAcceptGdprText().equalsIgnoreCase(response)){
+        if(!botProperties.getGdpr().getAcceptText().equalsIgnoreCase(response)){
             responseService.send(userStateEntity.getChatId(), dsgvoMarkup, "Die Antwort konnte ich nicht auswerten. Bitte bestätige, dass ich deine Daten für diesen Dienst speichern und verarbeiten darf.");
             return;
         }

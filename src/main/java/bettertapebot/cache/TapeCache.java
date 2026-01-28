@@ -44,7 +44,7 @@ public class TapeCache {
             var createTime = cacheEntry.getValue().dateAdded();
             var age = Duration.between(createTime, Instant.now());
             //age - ttl > 0 <=> age > ttl
-            if(age.minus(botProperties.getTapeCacheTTL()).isPositive()){
+            if(age.minus(botProperties.getTapeCacheTtl()).isPositive()){
                 internalStorage.remove(chatId);
             }
         }

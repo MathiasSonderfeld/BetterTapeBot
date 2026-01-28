@@ -36,7 +36,7 @@ public class GetDsgvoHandler implements CommandHandler {
     public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         try {
             var dsgoFile = Thread.currentThread().getContextClassLoader()
-                .getResource(botProperties.getGdprResourceName());
+                .getResource(botProperties.getGdpr().getResource());
 
             if(dsgoFile == null) {
                 log.error("cant load dsgvo resource, the url is null");

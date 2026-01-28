@@ -199,7 +199,7 @@ class RegisterHandlerTest {
             .build());
         
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, botProperties.getDenyGdprText());
+        registerHandler.handleMessage(userStateEntity, botProperties.getGdpr().getDenyText());
         Mockito.verify(userStateRepository, Mockito.times(1)).deleteById(chatId);
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(1)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
@@ -241,7 +241,7 @@ class RegisterHandlerTest {
             .build());
         
         Mockito.reset(passcodeGenerator, userStateRepository, userRepository, responseService);
-        registerHandler.handleMessage(userStateEntity, botProperties.getAcceptGdprText());
+        registerHandler.handleMessage(userStateEntity, botProperties.getGdpr().getAcceptText());
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(responseService, Mockito.times(2)).send(ArgumentMatchers.eq(chatId), textCaptor.capture());
         var texts = textCaptor.getAllValues();
@@ -391,8 +391,8 @@ class RegisterHandlerTest {
         assertThat(markup.getKeyboard()).hasSize(1);
         var keyboardRow = markup.getKeyboard().getFirst();
         assertThat(keyboardRow.size()).isEqualTo(3);
-        assertThat(keyboardRow.getFirst().getText()).isEqualTo(botProperties.getAcceptGdprText());
-        assertThat(keyboardRow.get(1).getText()).isEqualTo(botProperties.getDenyGdprText());
+        assertThat(keyboardRow.getFirst().getText()).isEqualTo(botProperties.getGdpr().getAcceptText());
+        assertThat(keyboardRow.get(1).getText()).isEqualTo(botProperties.getGdpr().getDenyText());
         assertThat(keyboardRow.get(2).getText()).isEqualTo(Command.DSGVO.getCommand());
     }
 }

@@ -38,7 +38,7 @@ public class GetActivationCodeHandler implements CommandHandler {
             return;
         }
         
-        var ttlFormatted = DurationFormatter.format(botProperties.getActivationCodeTTL(), botProperties.getActivationCodeFormatLocale());
+        var ttlFormatted = DurationFormatter.format(botProperties.getActivationCode().getTtl(), botProperties.getActivationCode().getFormatLocale());
         var response = String.format("Der aktuelle Freischaltcode lautet: %04d, er ist %s gültig", passcodeGenerator.generatePasscode(), ttlFormatted);
         responseService.send(userStateEntity.getChatId(), response);
     }

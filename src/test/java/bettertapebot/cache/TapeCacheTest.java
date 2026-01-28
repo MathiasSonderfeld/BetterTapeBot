@@ -47,7 +47,7 @@ class TapeCacheTest {
     
     @Test
     void testCleanUpDeletesOldData(){
-        botProperties.setTapeCacheTTL(Duration.ofMillis(1));
+        botProperties.setTapeCacheTtl(Duration.ofMillis(1));
         var title = "test";
         var id = 1L;
         Assertions.assertDoesNotThrow(() -> tapeCache.put(id, title));
@@ -59,7 +59,7 @@ class TapeCacheTest {
     
     @Test
     void testCleanUpPreservesNewData(){
-        botProperties.setTapeCacheTTL(Duration.ofMillis(100));
+        botProperties.setTapeCacheTtl(Duration.ofMillis(100));
         var title = "test";
         var id = 1L;
         Assertions.assertDoesNotThrow(() -> tapeCache.put(id, title));

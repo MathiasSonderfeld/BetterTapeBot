@@ -27,7 +27,7 @@ public class PasscodeGenerator { //TODO add generate admin key and startup outpu
 
     public int generatePasscode() {
         Instant now = Instant.now();
-        if (now.isAfter(lastTimeGenerated.plus(botProperties.getActivationCodeTTL()))) {
+        if (now.isAfter(lastTimeGenerated.plus(botProperties.getActivationCode().getTtl()))) {
             Random random = new Random();
             currentPasscode = random.nextInt(1000,9000); //generate 4 digit code
             lastTimeGenerated = now;
@@ -37,7 +37,7 @@ public class PasscodeGenerator { //TODO add generate admin key and startup outpu
     }
 
     public boolean validatePasscode(int code) {
-        if (Instant.now().isAfter(lastTimeGenerated.plus(botProperties.getActivationCodeTTL())) || (lastTimeGenerated == Instant.MIN && code == 0)) {
+        if (Instant.now().isAfter(lastTimeGenerated.plus(botProperties.getActivationCode().getTtl())) || (lastTimeGenerated == Instant.MIN && code == 0)) {
             return false;
         }
         return code == currentPasscode;

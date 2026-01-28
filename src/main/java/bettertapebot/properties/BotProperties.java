@@ -17,32 +17,47 @@ import java.util.Locale;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ConfigurationProperties(prefix = "better-tape-bot")
 public class BotProperties {
-
-    @NotNull
-    Duration activationCodeTTL = Duration.ofHours(24);
-    @NotNull
-    Locale activationCodeFormatLocale = Locale.GERMANY;
-    
-    @NotBlank
-    String gdprResourceName = "dsgvo.txt";
-    
-    @NotBlank
-    String acceptGdprText = "Akzeptieren";
-    
-    @NotBlank
-    String denyGdprText = "Ablehnen";
     
     @NotBlank
     String defaultUserForTapes = "anonymous";
     
     @NotNull
-    Duration tapeCacheTTL = Duration.ofHours(1);
+    Duration tapeCacheTtl = Duration.ofHours(1);
+    
+    @NotNull
+    GdprProperties gdpr = new GdprProperties();
+    
+    @NotNull
+    ActivationCodeProperties activationCode = new ActivationCodeProperties();
     
     @NotNull
     SubscriptionProperties subscription = new SubscriptionProperties();
     
     @NotNull
     TelegramProperties telegram = new TelegramProperties();
+    
+    @Data
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class GdprProperties {
+        @NotBlank
+        String resource = "dsgvo.txt";
+        
+        @NotBlank
+        String acceptText = "Akzeptieren";
+        
+        @NotBlank
+        String denyText = "Ablehnen";
+    }
+    
+    @Data
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class ActivationCodeProperties {
+        @NotNull
+        Duration ttl = Duration.ofHours(24);
+        
+        @NotNull
+        Locale formatLocale = Locale.GERMANY;
+    }
     
     @Data
     @FieldDefaults(level = AccessLevel.PRIVATE)
