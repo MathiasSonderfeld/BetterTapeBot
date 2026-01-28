@@ -26,7 +26,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.Set;
-import java.util.regex.Pattern;
 
 @CustomLog
 @Component
@@ -36,8 +35,6 @@ public class RegisterHandler implements CommandHandler, StateHandler {
 
     private static final Set<UserState> REGISTER_START = Set.of(UserState.NEW_CHAT, UserState.LOGGED_OUT);
     private static final String MEMBERS_CAN_GET_CODE = String.format("Mit %s können alle eingeloggten Mitglieder einen gültigen Freischaltcode anzufordern! 🤯", Command.CODE.getCommand());
-    private static final Pattern USERNAME_REGEX = Pattern.compile("^[A-Za-z0-9+_.-]{2,255}$");
-    private static final Pattern PIN_REGEX = Pattern.compile("^[0-9]{4}$");
     
     BotProperties botProperties;
     ResponseService responseService;
@@ -159,7 +156,7 @@ public class RegisterHandler implements CommandHandler, StateHandler {
     }
     
     private void validateUsername(UserStateEntity userStateEntity, String username) {
-        if(!USERNAME_REGEX.matcher(username).matches()){
+        if(!botProperties.getInputValidation().getUsername().matcher(username).matches()){
             responseService.send(userStateEntity.getChatId(), "Der Username hat ein ungültiges Format. Erlaubte Zeichen sind A-Z, a-z, +, _, ., -");
             return;
         }
@@ -184,7 +181,7 @@ public class RegisterHandler implements CommandHandler, StateHandler {
     }
     
     private void validatePin(UserStateEntity userStateEntity, String pin) {
-        if(!PIN_REGEX.matcher(pin).matches()){
+        if(!botProperties.getInputValidation().getPin().matcher(pin).matches()){
             responseService.send(userStateEntity.getChatId(), "Die PIN hat ein ungültiges Format. Ich brauche 4 Ziffern.");
             return;
         }

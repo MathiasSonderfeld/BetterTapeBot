@@ -13,3 +13,6 @@ better-tape-bot:
       - "false"
   telegram:
     token: "TEST_TOKEN"
+  input-validation:
+    username: "^[A-Za-z0-9+_.-]{2,255}$"
+    pin: "^[0-9]{4}$"

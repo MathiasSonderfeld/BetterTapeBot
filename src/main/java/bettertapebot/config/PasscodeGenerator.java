@@ -14,10 +14,10 @@ import java.util.Random;
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class PasscodeGenerator { //TODO add generate admin key and startup output if no user is registered
+public class PasscodeGenerator {
     
     BotProperties botProperties;
-    
+    Random random = new Random();
     
     @NonFinal
     @Setter(AccessLevel.PROTECTED)
@@ -28,8 +28,7 @@ public class PasscodeGenerator { //TODO add generate admin key and startup outpu
     public int generatePasscode() {
         Instant now = Instant.now();
         if (now.isAfter(lastTimeGenerated.plus(botProperties.getActivationCode().getTtl()))) {
-            Random random = new Random();
-            currentPasscode = random.nextInt(1000,9000); //generate 4 digit code
+            currentPasscode = random.nextInt(1000,10000); //generate 4 digit code
             lastTimeGenerated = now;
             return currentPasscode;
         }

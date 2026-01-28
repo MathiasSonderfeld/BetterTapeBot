@@ -26,6 +26,7 @@ public enum Command {
     SUBSCRIPTION(CommandLevel.LOGGED_IN, "/subscription", "Empfang von Benachrichtigungen zu neuen Tapes aktiveren bzw. deaktivieren"),
     LOGOUT(CommandLevel.LOGGED_IN, "/logout", "loggt den aktuellen nutzer aus"),
     
+    INIT(CommandLevel.ADMIN, "/init", "gibt initialen admin zugang"),
     ADMIN(CommandLevel.ADMIN, "/admin", "in den Admin-Modus wechseln"),
     DELETE_USER(CommandLevel.ADMIN, "/deleteuser", "ausgewählten User löschen"),
     DELETE_TAPE(CommandLevel.ADMIN, "/deletetape", "ausgewähltes Tape löschen"),

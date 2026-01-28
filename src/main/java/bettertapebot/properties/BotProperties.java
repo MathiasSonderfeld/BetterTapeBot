@@ -8,12 +8,15 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 @Data
+@Validated
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ConfigurationProperties(prefix = "better-tape-bot")
 public class BotProperties {
@@ -23,6 +26,12 @@ public class BotProperties {
     
     @NotNull
     Duration tapeCacheTtl = Duration.ofHours(1);
+    
+    @NotNull
+    Pattern pinValidation = Pattern.compile("^[0-9]{4}$");
+    
+    @NotNull
+    InputValidationProperties inputValidation = new InputValidationProperties();
     
     @NotNull
     GdprProperties gdpr = new GdprProperties();
@@ -37,6 +46,19 @@ public class BotProperties {
     TelegramProperties telegram = new TelegramProperties();
     
     @Data
+    @Validated
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class InputValidationProperties {
+        @NotNull
+        Pattern username;
+        
+        @NotNull
+        Pattern pin;
+    }
+    
+    
+    @Data
+    @Validated
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class GdprProperties {
         @NotBlank
@@ -50,6 +72,7 @@ public class BotProperties {
     }
     
     @Data
+    @Validated
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class ActivationCodeProperties {
         @NotNull
@@ -60,6 +83,7 @@ public class BotProperties {
     }
     
     @Data
+    @Validated
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class SubscriptionProperties {
         @NotEmpty
@@ -81,6 +105,7 @@ public class BotProperties {
     }
 
     @Data
+    @Validated
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class TelegramProperties {
         @NotBlank

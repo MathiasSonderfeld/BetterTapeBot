@@ -19,6 +19,9 @@ public enum UserState {
     LOGGED_IN(true),
 
     //Login and Register
+    INIT_REQUEST_ADMIN_KEY(false),
+    INIT_REQUEST_USERNAME(false),
+    INIT_REQUEST_PIN(false),
     LOGIN_VALIDATE_USERNAME(false),
     LOGIN_VALIDATE_PIN(false),
     REGISTER_AWAITING_DSGVO(false),
