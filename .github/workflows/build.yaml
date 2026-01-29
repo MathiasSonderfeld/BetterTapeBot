@@ -18,6 +18,11 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        variant:
+          - { tag: "nonroot", suffix: "" }
+          - { tag: "debug-nonroot", suffix: "-debug" }
 
     steps:
       - name: Checkout code
@@ -71,6 +76,8 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
+          build-args: |
+            BASE_TAG=${{ matrix.variant.tag }}
           tags: |
-            ${{ env.REGISTRY }}/${{ steps.imagename.outputs.image_name }}:${{ steps.version.outputs.version }}
-            ${{ env.REGISTRY }}/${{ steps.imagename.outputs.image_name }}:latest
+            ${{ env.REGISTRY }}/${{ steps.imagename.outputs.image_name }}:${{ steps.version.outputs.version }}${{ matrix.variant.suffix }}
+            ${{ env.REGISTRY }}/${{ steps.imagename.outputs.image_name }}:latest${{ matrix.variant.suffix }}
