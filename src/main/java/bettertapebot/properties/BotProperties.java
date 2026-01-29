@@ -9,6 +9,8 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
@@ -69,8 +71,8 @@ public class BotProperties {
     @Validated
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class GdprProperties {
-        @NotBlank
-        String resource = "dsgvo.txt";
+        @NotNull
+        Resource resource = new ClassPathResource("dsgvo.txt");
         
         @NotBlank
         String acceptText = "Akzeptieren";

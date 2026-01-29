@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 @CustomLog
 @Component
@@ -35,15 +34,7 @@ public class GetDsgvoHandler implements CommandHandler {
     @Transactional
     public void handleMessage(@NonNull UserStateEntity userStateEntity, String message) {
         try {
-            var dsgoFile = Thread.currentThread().getContextClassLoader()
-                .getResource(botProperties.getGdpr().getResource());
-
-            if(dsgoFile == null) {
-                log.error("cant load dsgvo resource, the url is null");
-                return;
-            }
-
-            String dsgvo = Files.readString(Path.of(dsgoFile.getPath()));
+            String dsgvo = Files.readString(botProperties.getGdpr().getResource().getFilePath());
             responseService.send(userStateEntity.getChatId(), null, dsgvo);
         } catch (IOException e) {
          log.error("cant load dsgvo resource, error during file access", e);

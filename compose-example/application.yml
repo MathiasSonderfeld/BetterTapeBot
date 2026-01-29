@@ -13,13 +13,7 @@ spring:
     hibernate:
       ddl-auto: validate
 better-tape-bot:
-  subscription:
-    countsAsYes:
-      - "ja"
-      - "j"
-      - "yes"
-      - "y"
-    countsAsNo:
-      - "nein"
-      - "n"
-      - "no"
+  gdpr:
+    resource: file:/config/dsgvo.txt
+  telegram:
+    token: "SECRET"
