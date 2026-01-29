@@ -14,6 +14,6 @@ spring:
       ddl-auto: validate
 better-tape-bot:
   gdpr:
-    resource: file:/dsgvo/dsgvo.txt
+    resource: file:/config/dsgvo.txt
   telegram:
     token: "SECRET"
