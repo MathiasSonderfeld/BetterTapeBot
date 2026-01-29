@@ -24,7 +24,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,6 +46,9 @@ class StarringHandlerTest {
     
     @Autowired
     UserStateRepository userStateRepository;
+    
+    @Autowired
+    BotProperties botProperties;
     
     @BeforeEach
     void reset(){
@@ -155,7 +157,7 @@ class StarringHandlerTest {
     
     @Test
     public void starringWithValidUsernameGetsDelivered(){
-        ZonedDateTime time = ZonedDateTime.of(2026, 2, 1,12,0,0,0, ZoneId.systemDefault());
+        ZonedDateTime time = ZonedDateTime.of(2026, 2, 1,12,0,0,0, botProperties.getOutputTimezone());
         String expectedTime = "01.02.26 12:00";
         long chatId = 6789L;
         var requestor = userRepository.save(UserEntity.builder()

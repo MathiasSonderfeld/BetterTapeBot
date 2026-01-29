@@ -26,7 +26,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,6 +48,9 @@ class GetAllHandlerTest {
     
     @Autowired
     UserRepository userRepository;
+    
+    @Autowired
+    BotProperties botProperties;
     
     @BeforeEach
     void reset(){
@@ -120,7 +122,7 @@ class GetAllHandlerTest {
     @ValueSource(booleans = {true, false})
     public void testGetsListOfTapes(boolean isAdmin){
         long chatId = 3456L;
-        ZonedDateTime time = ZonedDateTime.of(2025, 9, 1,12,0,0,0, ZoneId.systemDefault());
+        ZonedDateTime time = ZonedDateTime.of(2025, 9, 1,12,0,0,0, botProperties.getOutputTimezone());
         String expectedTime = "01.09.25 12:00";
         var requestor = userRepository.save(UserEntity.builder()
             .username("requestor")
