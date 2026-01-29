@@ -3,6 +3,7 @@ package bettertapebot.handler.loggedin;
 import bettertapebot.bot.ResponseService;
 import bettertapebot.handler.Command;
 import bettertapebot.handler.CommandHandler;
+import bettertapebot.properties.BotProperties;
 import bettertapebot.repository.TapeRepository;
 import bettertapebot.repository.entity.TapeEntity;
 import bettertapebot.repository.entity.UserStateEntity;
@@ -25,6 +26,7 @@ public class GetAllHandler implements CommandHandler {
 
     ResponseService responseService;
     TapeRepository tapeRepository;
+    BotProperties botProperties;
 
     @Override
     public @NonNull Command forCommand() {
@@ -46,7 +48,7 @@ public class GetAllHandler implements CommandHandler {
         }
         
         boolean isAdmin = userStateEntity.isAdminModeActive();
-        var response = TapeFormatter.formatTapes(tapes, isAdmin);
+        var response = TapeFormatter.formatTapes(tapes, botProperties.getOutputTimezone(), isAdmin);
         responseService.send(userStateEntity.getChatId(), response);
     }
 }

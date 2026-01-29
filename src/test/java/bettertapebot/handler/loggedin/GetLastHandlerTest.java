@@ -2,6 +2,7 @@ package bettertapebot.handler.loggedin;
 
 import bettertapebot.bot.ResponseService;
 import bettertapebot.handler.Command;
+import bettertapebot.properties.BotProperties;
 import bettertapebot.repository.TapeRepository;
 import bettertapebot.repository.UserRepository;
 import bettertapebot.repository.UserStateRepository;
@@ -30,7 +31,7 @@ import java.time.ZonedDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({TestcontainersConfiguration.class, GetLastHandler.class})
+@Import({TestcontainersConfiguration.class, GetLastHandler.class, BotProperties.class})
 class GetLastHandlerTest {
     
     @Autowired

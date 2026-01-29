@@ -5,6 +5,7 @@ import bettertapebot.cache.TapeCache;
 import bettertapebot.handler.Command;
 import bettertapebot.handler.CommandHandler;
 import bettertapebot.handler.StateHandler;
+import bettertapebot.properties.BotProperties;
 import bettertapebot.repository.TapeRepository;
 import bettertapebot.repository.UserRepository;
 import bettertapebot.repository.UserStateRepository;
@@ -35,6 +36,7 @@ public class AddTapeHandler implements CommandHandler, StateHandler {
     TapeRepository tapeRepository;
     UserRepository userRepository;
     ResponseService responseService;
+    BotProperties botProperties;
     
     @Override
     public @NonNull Command forCommand() {
@@ -90,7 +92,7 @@ public class AddTapeHandler implements CommandHandler, StateHandler {
             .build());
         
         userStateEntity.setUserState(UserState.LOGGED_IN);
-        var formattedTape = TapeFormatter.formatTape(tapeEntity, false);
+        var formattedTape = TapeFormatter.formatTape(tapeEntity, botProperties.getOutputTimezone(), false);
         var activeIds = userStateRepository.findAllByUserStateIsInAndOwner_WantsAbonnement(UserState.LOGGED_IN_STATES, true)
             .stream()
             .map(UserStateEntity::getChatId)

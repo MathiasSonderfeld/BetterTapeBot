@@ -2,7 +2,6 @@ package bettertapebot.util;
 
 import bettertapebot.repository.entity.TapeEntity;
 import bettertapebot.repository.entity.UserEntity;
-import bettertapebot.util.TapeFormatter;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -20,7 +19,8 @@ class TapeFormatterTest {
         UUID uuid = UUID.fromString("ae30228b-1623-41b8-bf49-bcb4a49ff62a");
         var expected = "<b>Inception</b> <i>mit</i> Leonardo DiCaprio\n<i>von</i> Christopher Nolan am 01.02.91 05:41";
         var expectedAdmin = expected + "\n<code>ae30228b-1623-41b8-bf49-bcb4a49ff62a</code>";
-        var date = ZonedDateTime.of(1991, 2, 1, 5, 41, 14, 0, ZoneId.systemDefault());
+        var zoneId = ZoneId.of("Europe/Berlin");
+        var date = ZonedDateTime.of(1991, 2, 1, 5, 41, 14, 0, zoneId);
         var leo = UserEntity.builder()
             .username("Leonardo DiCaprio")
             .build();
@@ -34,7 +34,7 @@ class TapeFormatterTest {
             .director(chris)
             .dateAdded(date.toInstant())
             .build();
-        assertThat(TapeFormatter.formatTape(tape, false)).isEqualTo(expected);
-        assertThat(TapeFormatter.formatTape(tape, true)).isEqualTo(expectedAdmin);
+        assertThat(TapeFormatter.formatTape(tape, zoneId, false)).isEqualTo(expected);
+        assertThat(TapeFormatter.formatTape(tape, zoneId, true)).isEqualTo(expectedAdmin);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -28,7 +29,8 @@ public class BotProperties {
     Duration tapeCacheTtl = Duration.ofHours(1);
     
     @NotNull
-    Pattern pinValidation = Pattern.compile("^[0-9]{4}$");
+    ZoneId outputTimezone = ZoneId.of("Europe/Berlin");
+    
     
     @NotNull
     InputValidationProperties inputValidation = new InputValidationProperties();

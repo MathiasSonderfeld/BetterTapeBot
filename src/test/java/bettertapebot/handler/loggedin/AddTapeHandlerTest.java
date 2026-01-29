@@ -4,6 +4,7 @@ import bettertapebot.bot.ResponseService;
 import bettertapebot.cache.TapeCache;
 import bettertapebot.cache.TapeCacheEntry;
 import bettertapebot.handler.Command;
+import bettertapebot.properties.BotProperties;
 import bettertapebot.repository.TapeRepository;
 import bettertapebot.repository.UserRepository;
 import bettertapebot.repository.UserStateRepository;
@@ -30,7 +31,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({TestcontainersConfiguration.class, AddTapeHandler.class, TapeCache.class})
+@Import({TestcontainersConfiguration.class, AddTapeHandler.class, TapeCache.class, BotProperties.class})
 class AddTapeHandlerTest {
     
     @Autowired

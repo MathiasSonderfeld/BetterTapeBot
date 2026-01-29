@@ -18,10 +18,10 @@ public class TapeFormatter {
         <i>von</i> %s am %s
         """.trim();
     
-    public String formatTape(@NonNull TapeEntity tape, boolean addId){
+    public String formatTape(@NonNull TapeEntity tape, ZoneId zoneId, boolean addId){
         var dateString = tape.getDateAdded()
             .atOffset(ZoneOffset.UTC)
-            .atZoneSameInstant(ZoneId.systemDefault())
+            .atZoneSameInstant(zoneId)
             .format(DATE_FORMAT);
         var formatted = String.format(TEMPLATE, tape.getTitle(), tape.getStar().getUsername(), tape.getDirector().getUsername(), dateString);
         if(addId){
@@ -30,11 +30,11 @@ public class TapeFormatter {
         return formatted;
     }
     
-    public String formatTapes(@NonNull Collection<TapeEntity> tapes, boolean addId){
+    public String formatTapes(@NonNull Collection<TapeEntity> tapes, ZoneId zoneId, boolean addId){
         if(tapes.isEmpty()){
             return "Es gibt noch keine Einträge";
         }
-        return tapes.stream().map(t -> formatTape(t, addId))
+        return tapes.stream().map(t -> formatTape(t, zoneId, addId))
             .collect(Collectors.joining("\n\n"));
     }
 }

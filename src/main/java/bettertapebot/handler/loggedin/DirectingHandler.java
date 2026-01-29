@@ -4,6 +4,7 @@ import bettertapebot.bot.ResponseService;
 import bettertapebot.handler.Command;
 import bettertapebot.handler.CommandHandler;
 import bettertapebot.handler.StateHandler;
+import bettertapebot.properties.BotProperties;
 import bettertapebot.repository.TapeRepository;
 import bettertapebot.repository.UserRepository;
 import bettertapebot.repository.entity.UserState;
@@ -30,6 +31,7 @@ public class DirectingHandler implements CommandHandler, StateHandler {
     ResponseService responseService;
     UserRepository userRepository;
     TapeRepository tapeRepository;
+    BotProperties botProperties;
 
     @Override
     public @NonNull Command forCommand() {
@@ -66,7 +68,7 @@ public class DirectingHandler implements CommandHandler, StateHandler {
         var director = directorOptional.get();
         var tapes = tapeRepository.findAllByDirector(director);
         boolean isAdmin = userStateEntity.isAdminModeActive();
-        var response = TapeFormatter.formatTapes(tapes, isAdmin);
+        var response = TapeFormatter.formatTapes(tapes, botProperties.getOutputTimezone(), isAdmin);
         responseService.send(userStateEntity.getChatId(), response);
         userStateEntity.setUserState(UserState.LOGGED_IN);
     }
