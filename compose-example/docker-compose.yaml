@@ -3,7 +3,7 @@ services:
     image: postgres:latest
     container_name: BetterTapeBotDb
     environment:
-      # any change in values also need to applied to the health check, BetterTapeBot container and other config files
+      # any change in values also need to applied to the BetterTapeBot container and other config files
       POSTGRES_DB: bettertapebot
       POSTGRES_USER: changeme_root
       POSTGRES_PASSWORD: changeme_root_password

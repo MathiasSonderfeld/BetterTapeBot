@@ -1,5 +1,6 @@
 package bettertapebot.properties;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -33,18 +34,23 @@ public class BotProperties {
     
     
     @NotNull
+    @Valid
     InputValidationProperties inputValidation = new InputValidationProperties();
     
     @NotNull
+    @Valid
     GdprProperties gdpr = new GdprProperties();
     
     @NotNull
+    @Valid
     ActivationCodeProperties activationCode = new ActivationCodeProperties();
     
     @NotNull
+    @Valid
     SubscriptionProperties subscription = new SubscriptionProperties();
     
     @NotNull
+    @Valid
     TelegramProperties telegram = new TelegramProperties();
     
     @Data
@@ -52,10 +58,10 @@ public class BotProperties {
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class InputValidationProperties {
         @NotNull
-        Pattern username;
+        Pattern username = Pattern.compile("^[A-Za-z0-9+_.-]{2,255}$");
         
         @NotNull
-        Pattern pin;
+        Pattern pin = Pattern.compile("^[0-9]{4}$");
     }
     
     
@@ -89,9 +95,9 @@ public class BotProperties {
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class SubscriptionProperties {
         @NotEmpty
-        List<String> countsAsYes;
+        List<String> countsAsYes = List.of("y", "yes", "j", "ja");
         @NotEmpty
-        List<String> countsAsNo;
+        List<String> countsAsNo = List.of("n", "no", "nein");
         
         public Boolean interpretStatus(String input){
             if(countsAsYes.contains(input)){
