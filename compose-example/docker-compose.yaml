@@ -1,12 +1,9 @@
-# docker-compose.yml
-version: '3.8'
-
 services:
   postgres:
     image: postgres:latest
     container_name: BetterTapeBotDb
     environment:
-      # any change in values also need to applied to the BetterTapeBot container and other config files
+      # any change in values also need to applied to the health check, BetterTapeBot container and other config files
       POSTGRES_DB: bettertapebot
       POSTGRES_USER: changeme_root
       POSTGRES_PASSWORD: changeme_root_password
@@ -17,12 +14,12 @@ services:
       APP_USER: changeme_app_user
       APP_PASSWORD: changeme_app_password
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
       - ./init-users.sh:/docker-entrypoint-initdb.d/init-users.sh:ro
     networks:
       - betterTapeBotIntranet
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d $POSTGRES_DB -U $POSTGRES_USER"]
+      test: ["CMD", "pg_isready", "-U", "changeme_root", "-d", "bettertapebot"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,7 +31,9 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      BETTER-TAPE-BOT_TELEGRAM_TOKEN: changeme_token
+      SPRING_CONFIG_LOCATION: file:/config/application.yml
+    volumes:
+      - ./application.yml:/config/application.yml:ro
     networks:
       - betterTapeBotIntranet
       - internet
