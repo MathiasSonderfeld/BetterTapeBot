@@ -44,14 +44,15 @@
 <details>
 <summary><b>General Commands</b></summary>
 
-| Command | Description |
-|---------|-------------|
-| `/register` | Register a new account |
-| `/login` | Log into your account |
-| `/dsgvo` | View privacy policy |
-| `/me` | Show your user info |
-| `/help` | Display help |
-| `/reset` | Reset chat state |
+| Command     | Description                |
+|-------------|----------------------------|
+| `/init`     | Initialize a fresh install |
+| `/register` | Register a new account     |
+| `/login`    | Log into your account      |
+| `/dsgvo`    | View privacy policy        |
+| `/me`       | Show your user info        |
+| `/help`     | Display help               |
+| `/reset`    | Reset chat state           |
 
 </details>
 

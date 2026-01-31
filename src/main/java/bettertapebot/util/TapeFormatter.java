@@ -14,9 +14,8 @@ import java.util.stream.Collectors;
 public class TapeFormatter {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
     private static final String TEMPLATE = """
-        <b>%s</b> <i>mit</i> %s
-        <i>von</i> %s am %s
-        """.trim();
+        <b>"%s" — %s</b>
+        <i>von %s am %s</i>""";
     
     public String formatTape(@NonNull TapeEntity tape, ZoneId zoneId, boolean addId){
         var dateString = tape.getDateAdded()
