@@ -17,7 +17,7 @@ class TapeFormatterTest {
     @Test
     void testNormalUser(){
         UUID uuid = UUID.fromString("ae30228b-1623-41b8-bf49-bcb4a49ff62a");
-        var expected = "<b>Inception</b> <i>mit</i> Leonardo DiCaprio\n<i>von</i> Christopher Nolan am 01.02.91 05:41";
+        var expected = "<b>\"Inception\" — Leonardo DiCaprio</b>\n<i>von Christopher Nolan am 01.02.91 05:41</i>";
         var expectedAdmin = expected + "\n<code>ae30228b-1623-41b8-bf49-bcb4a49ff62a</code>";
         var zoneId = ZoneId.of("Europe/Berlin");
         var date = ZonedDateTime.of(1991, 2, 1, 5, 41, 14, 0, zoneId);
