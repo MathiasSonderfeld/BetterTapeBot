@@ -1,8 +1,8 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version "$springBootVersion"
-    id 'io.spring.dependency-management' version "$springDependencyManagement"
-    id("io.freefair.lombok") version "$lombokVersion"
+    id 'org.springframework.boot' version '4.0.2'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id("io.freefair.lombok") version '9.2.0'
     id 'org.graalvm.buildtools.native' version "$graalVmNativeGradlePluginVersion"
 }
 
@@ -32,15 +32,15 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    implementation "org.telegram:telegrambots-springboot-longpolling-starter:${telegramBotVersion}"
-    implementation "org.telegram:telegrambots-client:${telegramBotVersion}"
+    implementation 'org.telegram:telegrambots-springboot-longpolling-starter:9.2.1'
+    implementation 'org.telegram:telegrambots-client:9.2.1'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-liquibase'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.postgresql:postgresql'
-    implementation "com.ibm.icu:icu4j:${icu4jVersion}"
+    implementation 'com.ibm.icu:icu4j:78.2'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
