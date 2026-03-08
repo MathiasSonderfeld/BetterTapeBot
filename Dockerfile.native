@@ -1,4 +1,5 @@
-FROM gcr.io/distroless/base-debian13:nonroot
+FROM gcr.io/distroless/base-debian13:${BASE_TAG}
 ARG TARGETARCH
+ARG BASE_TAG=nonroot
 COPY native/${TARGETARCH}/BetterTapeBot /app
 ENTRYPOINT ["/app"]

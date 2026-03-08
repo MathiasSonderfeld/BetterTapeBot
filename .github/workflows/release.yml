@@ -70,6 +70,11 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        variant:
+          - { tag: "nonroot", suffix: "" }
+          - { tag: "debug-nonroot", suffix: "-debug" }
 
     steps:
       - name: Checkout code
@@ -102,7 +107,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build and push native Docker image
         uses: docker/build-push-action@v5
         with:
@@ -110,8 +114,10 @@ jobs:
           file: Dockerfile.native
           platforms: linux/amd64,linux/arm64
           push: true
+          build-args: |
+            BASE_TAG=${{ matrix.variant.tag }}
           tags: |
-            ${{ env.REGISTRY }}/${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.version }}-native
-            ${{ env.REGISTRY }}/${{ needs.build.outputs.image_name }}:latest-native
+            ${{ env.REGISTRY }}/${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.version }}-native${{ matrix.variant.suffix }}
+            ${{ env.REGISTRY }}/${{ needs.build.outputs.image_name }}:latest-native${{ matrix.variant.suffix }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
