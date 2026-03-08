@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version "$springBootVersion"
     id 'io.spring.dependency-management' version "$springDependencyManagement"
     id("io.freefair.lombok") version "$lombokVersion"
+    id 'org.graalvm.buildtools.native' version "$graalVmNativeGradlePluginVersion"
 }
 
 group = 'bettertapebot'
