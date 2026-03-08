@@ -1,0 +1,59 @@
+name: build-native.yaml
+
+on:
+  workflow_call:
+
+jobs:
+  build-native-amd64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '25'
+          distribution: 'graalvm'
+          native-image-job-reports: 'true'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build native image (amd64)
+        run: ./gradlew nativeCompile --no-daemon
+
+      - name: Upload native binary (amd64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-binary-amd64
+          path: build/native/nativeCompile/BetterTapeBot
+          retention-days: 1
+
+  build-native-arm64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '25'
+          distribution: 'graalvm'
+          native-image-job-reports: 'true'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build native image (arm64)
+        run: ./gradlew nativeCompile --no-daemon
+
+      - name: Upload native binary (arm64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-binary-arm64
+          path: build/native/nativeCompile/BetterTapeBot
+          retention-days: 1

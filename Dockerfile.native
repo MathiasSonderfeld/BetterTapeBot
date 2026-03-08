@@ -1,3 +1,4 @@
-FROM gcr.io/distroless/static-debian13:nonroot
-COPY build/native/nativeCompile/BetterTapeBot /app
+FROM gcr.io/distroless/base-debian13:nonroot
+ARG TARGETARCH
+COPY native/${TARGETARCH}/BetterTapeBot /app
 ENTRYPOINT ["/app"]

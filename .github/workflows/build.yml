@@ -8,7 +8,6 @@ on:
       image_name:
         value: ${{ jobs.build.outputs.image_name }}
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
