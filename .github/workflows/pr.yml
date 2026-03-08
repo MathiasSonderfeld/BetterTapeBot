@@ -1,0 +1,10 @@
+name: Compile & Test on Pull-Request
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    # noinspection UndefinedAction
+    uses: ./.github/workflows/build.yml
