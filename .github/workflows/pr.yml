@@ -1,4 +1,4 @@
-name: Compile & Test on Pull-Request
+name: pr.yml
 on:
   pull_request:
     branches:
@@ -6,4 +6,4 @@ on:
 
 jobs:
   build:
-    uses: ./.github/workflows/build.yaml
+    uses: ./.github/workflows/build.yml
