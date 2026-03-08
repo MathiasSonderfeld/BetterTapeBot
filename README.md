@@ -9,7 +9,7 @@
     <img src="https://github.com/MathiasSonderfeld/BetterTapeBot/actions/workflows/build.yaml/badge.svg" alt="CI Status"/>
   </a>
   <img src="https://img.shields.io/badge/Java-25-e76f00?logo=openjdk&logoColor=e76f00" alt="Java 25"/>
-  <img src="https://img.shields.io/badge/Spring%20Boot-4.0.2-6cb52d?logo=spring" alt="Spring Boot 4.0.2"/>
+  <img src="https://img.shields.io/badge/Spring%20Boot-4-6cb52d?logo=spring" alt="Spring Boot 4"/>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-AGPL%20v3-blue.svg" alt="License: AGPL v3"/>
   </a>
