@@ -1,4 +1,4 @@
-name: build-native.yaml
+name: Build native image
 
 on:
   workflow_call:

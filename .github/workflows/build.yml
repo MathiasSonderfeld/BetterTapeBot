@@ -1,4 +1,4 @@
-name: build.yml
+name: Compile and Test
 
 on:
   workflow_call:

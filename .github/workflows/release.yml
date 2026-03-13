@@ -1,4 +1,4 @@
-name: Build & Release
+name: Build and Release images
 
 on:
   push:
@@ -56,6 +56,8 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
+          provenance: false
+          sbom: false
           build-args: |
             BASE_TAG=${{ matrix.variant.tag }}
           tags: |
