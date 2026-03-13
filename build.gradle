@@ -65,9 +65,3 @@ tasks.named('test') {
 bootJar {
     archiveFileName = "app.jar"
 }
-
-graalvmNative {
-    agent {
-        enabled = true
-    }
-}

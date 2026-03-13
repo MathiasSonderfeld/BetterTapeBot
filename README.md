@@ -123,16 +123,16 @@ ghcr.io/mathiassonderfeld/bettertapebot:<tag>
 
 ### Image Variants
 
-| Tag | Base | Architecture | Description |
-|-----|------|-------------|-------------|
-| `latest` | distroless/java25 | amd64, arm64 | Standard JVM image |
-| `latest-debug` | distroless/java25 | amd64, arm64 | JVM image with Busybox shell for debugging |
-| `latest-native` | distroless/base | amd64, arm64 | GraalVM Native Image — faster startup, lower memory |
-| `latest-native-debug` | distroless/base | amd64, arm64 | Native image with Busybox shell for debugging |
+| Tag | Base | Architecture | Description                                                           |
+|-----|------|-------------|-----------------------------------------------------------------------|
+| `latest` | distroless/java25 | amd64, arm64 | Standard JVM image                                                    |
+| `latest-debug` | distroless/java25 | amd64, arm64 | JVM image with Busybox shell for debugging                            |
+| `latest-native` | distroless/base | amd64, arm64 | GraalVM Native Image — faster startup, lower memory, currently broken |
+| `latest-native-debug` | distroless/base | amd64, arm64 | Native image with Busybox shell for debugging, currently broken                         |
 
 All tags are also available versioned, e.g. `1.2.3`, `1.2.3-debug`, `1.2.3-native`, `1.2.3-native-debug`.
 
-The **native image** is recommended for production deployments where startup time and memory footprint matter.
+## The **native image** are currently blocked by an [issue with hibernate 7](https://hibernate.atlassian.net/browse/HHH-19530).
 The **debug variants** should only be used for troubleshooting — they include a shell (`docker exec -it <container> sh`) but are otherwise identical.
 
 ### 🚀 Deploying via GHCR
