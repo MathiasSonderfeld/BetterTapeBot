@@ -113,7 +113,48 @@ better-tape-bot:
     token: "YOUR_BOT_TOKEN"
 ```
 
-### Local Development
+## 🐳 Container Images
+
+Pre-built images are available on GitHub Container Registry (GHCR) and updated automatically on every push to `main`.
+
+```
+ghcr.io/mathiassonderfeld/bettertapebot:<tag>
+```
+
+### Image Variants
+
+| Tag | Base | Architecture | Description |
+|-----|------|-------------|-------------|
+| `latest` | distroless/java25 | amd64, arm64 | Standard JVM image |
+| `latest-debug` | distroless/java25 | amd64, arm64 | JVM image with Busybox shell for debugging |
+| `latest-native` | distroless/base | amd64, arm64 | GraalVM Native Image — faster startup, lower memory |
+| `latest-native-debug` | distroless/base | amd64, arm64 | Native image with Busybox shell for debugging |
+
+All tags are also available versioned, e.g. `1.2.3`, `1.2.3-debug`, `1.2.3-native`, `1.2.3-native-debug`.
+
+The **native image** is recommended for production deployments where startup time and memory footprint matter.
+The **debug variants** should only be used for troubleshooting — they include a shell (`docker exec -it <container> sh`) but are otherwise identical.
+
+### 🚀 Deploying via GHCR
+
+```bash
+# Pull the latest image
+docker pull ghcr.io/mathiassonderfeld/bettertapebot:latest-native
+
+# Run with Docker
+docker run -d \
+  -e SPRING_DATASOURCE_URL=jdbc:postgresql://host:5432/tapebot \
+  -e SPRING_DATASOURCE_USERNAME=postgres \
+  -e SPRING_DATASOURCE_PASSWORD=password \
+  -e BETTER_TAPE_BOT_TELEGRAM_TOKEN=YOUR_BOT_TOKEN \
+  ghcr.io/mathiassonderfeld/bettertapebot:latest-native
+```
+
+Or with Docker Compose — a ready-to-use example configuration including `docker-compose.yml`, `application.yml`, and further resources is available in the [`compose-example/`](compose-example/) folder.
+
+## Local Development
+
+### compiling and running locally
 
 ```bash
 # Build the project
@@ -123,7 +164,7 @@ better-tape-bot:
 ./gradlew bootRun
 ```
 
-### 🐳 Docker
+### building a Docker Image Locally
 
 ```bash
 # Build JAR

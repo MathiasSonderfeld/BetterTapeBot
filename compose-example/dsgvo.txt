@@ -30,7 +30,7 @@ Datenschutzerklärung für den Chatbot zur Erfassung von Filmtiteln
     Die gespeicherten Daten werden durch geeignete technische und organisatorische Maßnahmen geschützt, um den unbefugten Zugriff und Missbrauch zu verhindern.
 
 10.	Rechte der Nutzer
-    Jeder Benutzer hat das Recht auf Auskunft über die von ihm gespeicherten Daten sowie das Recht auf Berichtigung, Löschung, Einschränkung der Verarbeitung oder Übertragung dieser Daten. Zudem besteht das Recht, die Einwilligung zur Datenverarbeitung jederzeit zu widerrufen. Anfragen hierzu können an datenschutz@terzenbach.com gestellt werden.
+    Jeder Benutzer hat das Recht auf Auskunft über die von ihm gespeicherten Daten sowie das Recht auf Berichtigung, Löschung, Einschränkung der Verarbeitung oder Übertragung dieser Daten. Zudem besteht das Recht, die Einwilligung zur Datenverarbeitung jederzeit zu widerrufen. Anfragen hierzu können an datenschutz@mustermann.de gestellt werden.
 
 11.	Widerspruchsrecht
     Nutzer haben das Recht, der Verarbeitung ihrer personenbezogenen Daten aus Gründen, die sich aus ihrer besonderen Situation ergeben, jederzeit zu widersprechen.

@@ -1,12 +1,14 @@
 spring:
   application:
     name: BetterTapeBot
-  profiles:
-    active: secret
   datasource:
-    url: jdbc:postgresql://localhost:5432/tapebot
-    username: postgres
-    password: password
+    url: jdbc:postgresql://localhost:5432/bettertapebot
+    username: changeme_app_user
+    password: changeme_app_password
+  liquibase:
+    url: jdbc:postgresql://localhost:5432/bettertapebot
+    user: changeme_migration_user
+    password: changeme_migration_password
   jpa:
     hibernate:
       ddl-auto: validate
@@ -22,5 +24,7 @@ management:
       probes:
         enabled: true
 better-tape-bot:
+  gdpr:
+    resource: file:/config/dsgvo.txt
   telegram:
-    token: "SECRET"
+    token: "8364473255:AAHKBLiP-ODq62r7Jv9Ex08FKNvEsiiMOjw"
