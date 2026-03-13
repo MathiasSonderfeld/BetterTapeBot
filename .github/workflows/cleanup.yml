@@ -14,4 +14,4 @@ jobs:
         package: bettertapebot
         token: ${{ secrets.GITHUB_TOKEN }}
         delete-untagged: true
-        dry-run: true
+        dry-run: false
