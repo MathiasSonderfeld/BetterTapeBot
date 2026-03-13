@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  cleanup:
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -11,6 +11,7 @@ jobs:
     - name: Delete untagged images
       uses: dataaxiom/ghcr-cleanup-action@v1
       with:
+        package: bettertapebot
         token: ${{ secrets.GITHUB_TOKEN }}
         delete-untagged: true
         dry-run: true
